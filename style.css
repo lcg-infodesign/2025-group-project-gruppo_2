@@ -24,8 +24,7 @@ body {
 
 #title {
   font-size: 3.5rem;
-  font-weight: 200;
-  letter-spacing: 2px;
+  font-weight: 400;
   margin-bottom: 20px;
   white-space: nowrap;
 }
@@ -45,7 +44,7 @@ body {
 
 #intro-text {
   position: absolute;
-  top: calc(30% + 100vh); /* metà viewport sotto il titolo */
+  top: calc(30% + 80vh); /* di 80% della viewport sotto il titolo */
   width: 60%;
   left: 50%;
   transform: translateX(-50%);
