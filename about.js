@@ -4,9 +4,9 @@ let titleText = "ABOUT US";
 let aboutIntroText =
   "We are students from Politecnico di Milano,\n" +
   "united by a shared passion for data analysis\n" +
-  "and its power to reveal complex realities.\n" +
+  "and its power to <span class='red'>reveal complex realities</span>.\n" +
   "With this university project, we aim to shed\n" +
-  "light on the violence faced by journalists around\n" +
+  "light on the <span class='red'>violence</span> faced by <span class='red'>journalists</span> around\n" +
   "the world. Through structured data and intuitive\n" +
   "visualizations, we highlight the severity,\n" +
   "geographic spread, and specific forms of threats,\n" +
@@ -26,20 +26,21 @@ let projectTitleText = "OUR PROJECT";
 let aboutProjectText = 
 "Our goal is to make data clear, accessible, and\n" +
 "meaningful—offering an understandable overview of\n" +
-"the work carried out by the Committee to Protect\n" +
-"Journalists (CPJ) in documenting journalists and\n" +
-"media workers killed in conflict and high-risk\n" +
+"the work carried out by the <span class='red'>Committee to Protect</span>\n" +
+"<span class='red'>Journalists</span> (CPJ) in documenting <span class='red'>journalists and</span>\n" +
+"<span class='red'>media workers killed</span> in conflict and high-risk\n" +
 "environments.\n\n" + 
-"We strive to enable interactive exploration through\n" +
+"We strive to enable <span class='red'>interactive exploration</span> through\n" +
 "visualizations that help users grasp connections,\n" +
 "trends, and dynamics across time and space.\n\n" +
-"We aim to restore the human value behind each\n" +
+
+"We aim to <span class='red'>restore the human value</span> behind each\n" +
 "datapoint, recognizing that every entry represents a\n" +
 "story, a name, and a commitment to truth.\n\n" +
  
 "Ultimately, this project seeks to promote awareness\n" +
-"of press freedom and reveal the real impact of\n" +
-"violence on the right to information.";
+"of <span class='red'>press freedom</span> and reveal the real impact of\n" +
+"violence on the <span class='red'>right to information.</span>";
 
 let titleIndex = 0;
 
@@ -144,12 +145,41 @@ function typeText(id, text, incrementIndex, getIndex) {
   el.style.opacity = 1;
 
   let idx = getIndex();
-  if (idx < text.length) {
-    el.textContent += text.charAt(idx);
-    incrementIndex();
-    setTimeout(() => typeText(id, text, incrementIndex, getIndex), 50);
+
+  // Fine testo → stop
+  if (idx >= text.length) return;
+
+  // --- Gestione tag HTML completi (come <span> e </span>) ---
+  if (text[idx] === "<") {
+    let closing = text.indexOf(">", idx); // trova la fine del tag
+    let tag = text.substring(idx, closing + 1); // prende tutto il tag
+
+    el.innerHTML += tag;
+
+    // salta tutto il tag
+    idx = closing + 1;
+    while (getIndex() < idx) incrementIndex();
+
+    setTimeout(() => typeText(id, text, incrementIndex, getIndex), 10);
+    return;
   }
+
+  // --- Gestione newline \n → <br> ---
+  if (text[idx] === "\n") {
+    el.innerHTML += "<br>";
+    incrementIndex();
+    setTimeout(() => typeText(id, text, incrementIndex, getIndex), 35);
+    return;
+  }
+
+  // --- carattere normale ---
+  el.innerHTML += text.charAt(idx);
+  incrementIndex();
+  setTimeout(() => typeText(id, text, incrementIndex, getIndex), 35);
 }
+
+
+
 
 
 function draw() {
