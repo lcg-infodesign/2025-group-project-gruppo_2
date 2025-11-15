@@ -41,8 +41,6 @@ let aboutProjectText =
 "of press freedom and reveal the real impact of\n" +
 "violence on the right to information.";
 
-// --- INDICI --- //
-
 let titleIndex = 0;
 
 let introIndex = 0;
@@ -57,9 +55,7 @@ let projectIndex = 0;
 let projectStarted = false;
 
 
-// ---------------------------------------------------------------------------
-//                                TITLE
-// ---------------------------------------------------------------------------
+// titolo
 
 function setup() {
   createCanvas(windowWidth, document.documentElement.scrollHeight);
@@ -78,9 +74,7 @@ function typeTitle() {
 }
 
 
-// ---------------------------------------------------------------------------
-//                     INTERSECTION OBSERVERS (3 sezioni)
-// ---------------------------------------------------------------------------
+// intersection observers (calcola quando il testo diventa visibile x far partire l animazione)
 
 function initObservers() {
 
@@ -121,9 +115,7 @@ function initObservers() {
 }
 
 
-// ---------------------------------------------------------------------------
-//       GENERIC OBSERVER + SCRITTURA MACCHINA (riutilizzabile)
-// ---------------------------------------------------------------------------
+// funzione x animazione macchina da scrivere che si avvia con l observer
 
 function observeAndType(id, typeCallback, setStarted, isStarted) {
   let element = document.getElementById(id);
@@ -145,9 +137,7 @@ function observeAndType(id, typeCallback, setStarted, isStarted) {
 }
 
 
-// ---------------------------------------------------------------------------
-//     GENERIC typewriter function (riutilizzabile per ogni sezione)
-// ---------------------------------------------------------------------------
+// animazione testo generale
 
 function typeText(id, text, incrementIndex, getIndex) {
   let el = document.getElementById(id);
@@ -161,8 +151,6 @@ function typeText(id, text, incrementIndex, getIndex) {
   }
 }
 
-
-// ---------------------------------------------------------------------------
 
 function draw() {
   background(25);
