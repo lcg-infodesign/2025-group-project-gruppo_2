@@ -1,4 +1,4 @@
-// --- TESTI DA SCRIVERE --- //
+// testi
 
 let titleText = "ABOUT US";
 let aboutIntroText =
