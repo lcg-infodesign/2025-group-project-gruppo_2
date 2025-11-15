@@ -1,6 +1,6 @@
 html, body {
-  margin: 10px;
-  padding: 10px;
+  margin: 0;
+  padding: 0;
 }
 
 canvas {
@@ -8,31 +8,60 @@ canvas {
 }
 
 body {
-  min-height: 300vh;
-  overflow-x: hidden;
+  min-height: 400vh;
   background: #191919;
   color: rgb(255, 245, 233);
   font-family: "JetBrains Mono", monospace;
+  overflow-x: hidden;
 }
 
-#intro-container {
-  position: absolute;
-  top: 20%;
+/* distanza tra elementi dello stesso container */
+:root {
+  --spacing-small: 20px;
+  --spacing-large: calc(var(--spacing-small) * 2);
+}
+
+/* distanza tra i container */
+.section {
   width: 100%;
   text-align: center;
+  position: absolute;
+}
+
+/* rende visibile quando il testo va a capo */
+#about-intro, #about-team, #about-project {
+  white-space: pre-line;
+}
+
+
+/* ABOUT US */
+
+#intro-container {
+  top: 20%;
 }
 
 #title {
   font-size: 3rem;
   font-weight: 400;
-  margin-bottom: 20px;
   white-space: nowrap;
+  margin-bottom: var(--spacing-large);
+}
+
+#about-intro {
+  width: 60%;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  font-weight: 200;
+  text-align: center;
+  opacity: 0;
+  margin-bottom: var(--spacing-large);
 }
 
 #arrow {
   font-size: 2rem;
   color: red;
-  margin-top: 20px;
+  margin-top: 0;
   animation: blink 1.2s infinite alternate;
 }
 
@@ -41,17 +70,55 @@ body {
   to   { opacity: 0.3; }
 }
 
+/* OUR TEAM */
 
-#about-intro {
-  position: absolute;
-  top: calc(30% + 80vh); /* di 80% della viewport sotto il titolo */
+#team-container {
+  top: calc(20% + 140vh);
+}
+
+#our-team {
+  font-size: 2.4rem;
+  font-weight: 400;
+  margin-bottom: var(--spacing-large);
+}
+
+#about-team {
   width: 60%;
-  left: 50%;
-  transform: translateX(-50%);
+  margin: 0 auto;
   font-size: 1.2rem;
   line-height: 1.6;
   text-align: center;
   font-weight: 200;
-  color: rgb(255, 245, 233);
-  opacity: 0; /* appare quando inizia l’animazione */
+  opacity: 0;
+  margin-bottom: var(--spacing-large);
 }
+
+#arrow2 {
+  font-size: 2rem;
+  color: red;
+  animation: blink 1.2s infinite alternate;
+}
+
+/* OUR PROJECT */
+
+#project-container {
+  top: calc(20% + 280vh);
+}
+
+#our-project {
+  font-size: 2.4rem;
+  font-weight: 400;
+  margin-bottom: var(--spacing-large);
+}
+
+#about-project {
+  width: 60%;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  text-align: center;
+  font-weight: 200;
+  opacity: 0;
+}
+
+
