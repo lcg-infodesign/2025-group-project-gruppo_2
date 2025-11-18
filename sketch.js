@@ -22,6 +22,15 @@ function setup() {
   
   typeTitle();
   setupIntroTrigger();
+
+  //estrae colonna country
+  const countries = data.getColumn("country");
+
+  //valori unici
+  const uniqueCountries = new Set(countries);
+
+  console.log("Valori unici:", [...uniqueCountries]);
+  console.log("Numero di valori unici:", uniqueCountries.size);
 }
 
 //animazione che scrive il titolo
