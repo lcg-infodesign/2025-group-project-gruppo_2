@@ -8,11 +8,21 @@ canvas {
 }
 
 body {
-  min-height: 300vh;
+  min-height: 200vh;
   overflow-x: hidden;
   background: #191919;
   color: rgb(255, 245, 233);
   font-family: "JetBrains Mono", monospace;
+}
+
+#intro-section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  position: relative;
 }
 
 #title-container {
@@ -20,6 +30,8 @@ body {
   top: 30%;
   width: 100%;
   text-align: center;
+  z-index: 100;
+  pointer-events: none;
 }
 
 #title {
@@ -54,4 +66,26 @@ body {
   font-weight: 200;
   color: rgb(255, 245, 233);
   opacity: 0; /* appare quando inizia l’animazione */
+  z-index: 100;
+  pointer-events: none;
+}
+
+#visualization-section {
+  margin-top: 120vh;
+  min-height: 200vh;
+  position: relative;
+  padding-top: 10vh;
+}
+
+#visualization {
+  width: 100%;
+  height: 400vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+#visualization canvas {
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-out;
 }
