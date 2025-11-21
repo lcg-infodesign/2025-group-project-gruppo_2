@@ -25,8 +25,8 @@ function preload() {
 
 
 function setup() {
-  //let pageHeight = document.documentElement.scrollHeight;
-  createCanvas(windowWidth, windowHeight);
+  let pageHeight = document.documentElement.scrollHeight;
+  createCanvas(windowWidth, pageHeight);
   
   typeTitle();
   setupIntroTrigger();
@@ -127,12 +127,26 @@ function typeSection(index) {
 function nextSection() {
   bullets[currentSection].classList.remove("active");
 
-  currentSection = (currentSection + 1) % sectionsText.length;
+  currentSection++;
 
-  bullets[currentSection].classList.add("active");
-
-  typeSection(currentSection);
+  if (currentSection < sectionsText.length) {
+    bullets[currentSection].classList.add("active");
+    typeSection(currentSection);
+  } else {
+    // quando finiscono le sezioni mostra il bottone
+    showButton();
+  }
 }
+
+// mostra il bottone
+function showButton() {
+  const btn = document.getElementById("button");
+  if (btn) {
+    btn.style.opacity = "1";
+  }
+}
+
+
 
 
 function draw() {
