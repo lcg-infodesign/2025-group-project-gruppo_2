@@ -149,7 +149,7 @@ function typeText(id, text, incrementIndex, getIndex) {
   // Fine testo → stop
   if (idx >= text.length) return;
 
-  // --- Gestione tag HTML completi (come <span> e </span>) ---
+  // gestione span
   if (text[idx] === "<") {
     let closing = text.indexOf(">", idx); // trova la fine del tag
     let tag = text.substring(idx, closing + 1); // prende tutto il tag
@@ -164,7 +164,7 @@ function typeText(id, text, incrementIndex, getIndex) {
     return;
   }
 
-  // --- Gestione newline \n → <br> ---
+  // gestione degli a capo con \n
   if (text[idx] === "\n") {
     el.innerHTML += "<br>";
     incrementIndex();
@@ -172,7 +172,7 @@ function typeText(id, text, incrementIndex, getIndex) {
     return;
   }
 
-  // --- carattere normale ---
+  // carattere normale
   el.innerHTML += text.charAt(idx);
   incrementIndex();
   setTimeout(() => typeText(id, text, incrementIndex, getIndex), 35);

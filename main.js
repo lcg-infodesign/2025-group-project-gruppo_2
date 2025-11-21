@@ -1,18 +1,16 @@
-// --DIMENSIONI DELL'INTERFACCIA--
-//dichiarate qui e impostate in setup()
+// dimensioni
+
 let sidebarWidth; //larghezza della barra laterale dove stanno i testi e i filtri
 let mainWidth; //larghezza della zona dove sta la viz principale
 let padding; //margini dai bordi laterali dello schermo
 
-// --COLORI--
-//dichiarate qui e impostate in setup()
+// colori
 let bg; // colore di sfondo (nero)
 let white;
 let red;
 let red_translucent; //rosso scuro per i fondi di pulsanti, icone ecc.
 let red_hover; //rosso per i fondi quando c'è l'hover del mouse
 
-// --TIPOGRAFIA--
 let font = "JetBrains Mono";
 
 

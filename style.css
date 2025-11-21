@@ -1,4 +1,4 @@
-html, body {
+html/*, body*/ {
   margin: 10px;
   padding: 10px;
 }
@@ -23,7 +23,7 @@ body {
 }
 
 #title {
-  font-size: 3.5rem;
+  font-size: 5rem;
   font-weight: 400;
   margin-bottom: 20px;
   white-space: nowrap;
@@ -42,16 +42,48 @@ body {
 }
 
 
-#intro-text {
+#intro-container {
   position: absolute;
-  top: calc(30% + 80vh); /* di 80% della viewport sotto il titolo */
+  top: calc(30% + 80vh);
   width: 60%;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 1.2rem;
-  line-height: 1.6;
-  text-align: center;
-  font-weight: 200;
-  color: rgb(255, 245, 233);
-  opacity: 0; /* appare quando inizia l’animazione */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  opacity: 1;
 }
+
+#intro-text {
+  width: calc(100% - 25px - 8px); /* spazio x pallini e gap */
+  font-size: 1.2rem;
+  text-align: center;
+  line-height: 1.6;
+  font-weight: 200;
+  min-height: 180px;
+  opacity: 0; /* si anima dal javascript */
+}
+
+#bullets {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-left: 0;
+  margin-right: 25px;
+  gap: 12px;
+}
+
+.bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.667);
+  transition: background 0.3s;
+}
+
+.bullet.active {
+  background: red;
+}
+
