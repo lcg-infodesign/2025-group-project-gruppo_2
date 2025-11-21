@@ -47,7 +47,7 @@ function setup() {
 //funzione che disegna la griglia sotto i pallini
 function drawGrid(){
   let yLabelWidth = padding + 60; //larghezza per le etichette dell'asse y
-  let xLabelHeight = 30; //altezza per le etichette dell'asse x
+  let xLabelHeight = 50; //altezza per le etichette dell'asse x
   let rowHeight = (height - 2 * padding - xLabelHeight) / categories.length; //altezza della singola riga nel grafico
 
   for(let i = 0; i < categories.length; i ++){
@@ -65,7 +65,39 @@ function drawGrid(){
     //righe orizzontali delle categorie
     noFill();
     stroke(white);
-    line(padding + yLabelWidth, y, mainWidth - padding, y)
+    strokeWeight(1);
+    line(padding + yLabelWidth, y, mainWidth - padding, y);
+  }
+
+  //tacca ogni anno sull'asse x
+  for(let i = 0; i <= (2025-1992); i++){
+    let x = padding + yLabelWidth + i * (mainWidth - 2*padding - yLabelWidth) / (2025-1992);
+    let topY = height - padding - xLabelHeight;
+    let bottomY = height - padding - 40;
+    line(x, topY, x, bottomY);
+  }
+
+  //etichetta e tacca spessa ogni 5 anni
+  for(let i = 0; i < ceil((2025 - 1992) / 5); i++){
+    let label = i*5 + 1995;
+    let initialX = padding + yLabelWidth + 3 * ((mainWidth - 2*padding - yLabelWidth) / (2025 - 1992));
+    let x = initialX + (i * 5) * (mainWidth - 2*padding - yLabelWidth) / (2025 - 1992);
+
+    //etichetta
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(label, x, height - padding - 32);
+
+    //tacca spessa
+    let topY = height - padding - xLabelHeight;
+    let bottomY = height - padding - 40;
+    noFill();
+    stroke(white);
+    strokeWeight(2);
+    line(x, topY, x, bottomY);
   }
 }
 
