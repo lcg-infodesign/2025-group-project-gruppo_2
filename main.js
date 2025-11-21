@@ -1,3 +1,5 @@
+let data;
+
 // dimensioni
 
 let sidebarWidth; //larghezza della barra laterale dove stanno i testi e i filtri
@@ -13,6 +15,8 @@ let red_hover; //rosso per i fondi quando c'è l'hover del mouse
 
 let font = "JetBrains Mono";
 
+// variabili per la visualizzazione dei pallini
+let dots = {};
 
 //categorie source_of_fire
 let categories = [
@@ -25,6 +29,10 @@ let categories = [
   "Political Group",
   "Unknown"
 ];
+
+function preload() {
+  data = loadTable("assets/data.csv", "csv", "header");
+}
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -40,6 +48,18 @@ function setup() {
   white = color(255,255,255);
   red_translucent = color(255,0,0, 60);
   red_hover = color(255,0,0, 80);
+
+  //carico i dati nell'oggetto dots
+  for(let i = 0; i < data.getRowCount(); i++){
+    let journalist = {
+      name: data.get(i, "journalist/media worker_name"),
+      sourceOfFire: data.get(i, "source_of_fire")
+    };
+    dots[i] = journalist;
+  }
+
+  console.log(dots);
+  
 }
 
 //funzione che disegna la griglia sotto i pallini
@@ -99,8 +119,15 @@ function drawGrid(){
   }
 }
 
+//funzione che disegna i pallini di un anno
+function drawDotsTillYear(currentYear, newYear){
+
+}
+
 function draw() {
-  background(220);
+  background(50);
   
   drawGrid();
+
+  let currentYear = 1992;
 }
