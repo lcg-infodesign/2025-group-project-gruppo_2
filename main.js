@@ -6,6 +6,14 @@ let sidebarWidth; //larghezza della barra laterale dove stanno i testi e i filtr
 let mainWidth; //larghezza della zona dove sta la viz principale
 let padding; //margini dai bordi laterali dello schermo
 
+let yLabelWidth; //larghezza per le etichette dell'asse y
+let xLabelHeight; //altezza per le etichette dell'asse x
+let rowHeight; //altezza della singola riga nel grafico
+let initialX; //posizione x da cui comincia il primo anno
+let yearWidth; //larghezza di ogni colonna (corrispondente a 1 anno)
+let diam; //diametro dei pallini
+let gravity; //regola la velocità della caduta
+
 // colori
 let bg; // colore di sfondo (nero)
 let white;
@@ -42,6 +50,14 @@ function setup() {
   mainWidth = windowWidth - sidebarWidth;
   padding = 30;
 
+  yLabelWidth = padding + 60;
+  xLabelHeight = 50;
+  rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
+  initialX = padding + yLabelWidth ;
+  yearWidth = (mainWidth - 2*padding - yLabelWidth) / (2025-1992);
+  diam = 10;
+  gravity = 2;
+
   //imposto i colori
   bg = color(0,0,0);
   red = color(255, 0, 0);
@@ -51,9 +67,13 @@ function setup() {
 
   //carico i dati nell'oggetto dots
   for(let i = 0; i < data.getRowCount(); i++){
+    let date = data.get(i, "entry_date");
+    let fourDigitYear = date.slice(-4);
     let journalist = {
       name: data.get(i, "journalist/media worker_name"),
-      sourceOfFire: data.get(i, "source_of_fire")
+      sourceOfFire: data.get(i, "source_of_fire"),
+      year: fourDigitYear,
+      y: -diam/2 //inizializzo la y del pallino fuori dallo schermo in modo che possa essere animato aumentando la y
     };
     dots[i] = journalist;
   }
@@ -64,10 +84,7 @@ function setup() {
 
 //funzione che disegna la griglia sotto i pallini
 function drawGrid(){
-  let yLabelWidth = padding + 60; //larghezza per le etichette dell'asse y
-  let xLabelHeight = 50; //altezza per le etichette dell'asse x
-  let rowHeight = (height - 2 * padding - xLabelHeight) / categories.length; //altezza della singola riga nel grafico
-
+  
   for(let i = 0; i < categories.length; i ++){
 
     let y = padding + i * rowHeight + rowHeight/2;
@@ -89,7 +106,7 @@ function drawGrid(){
 
   //tacca ogni anno sull'asse x
   for(let i = 0; i <= (2025-1992); i++){
-    let x = padding + yLabelWidth + i * (mainWidth - 2*padding - yLabelWidth) / (2025-1992);
+    let x = initialX + i * yearWidth;
     let topY = height - padding - xLabelHeight;
     let bottomY = height - padding - 40;
     line(x, topY, x, bottomY);
@@ -98,8 +115,7 @@ function drawGrid(){
   //etichetta e tacca spessa ogni 5 anni
   for(let i = 0; i < ceil((2025 - 1992) / 5); i++){
     let label = i*5 + 1995;
-    let initialX = padding + yLabelWidth + 3 * ((mainWidth - 2*padding - yLabelWidth) / (2025 - 1992));
-    let x = initialX + (i * 5) * (mainWidth - 2*padding - yLabelWidth) / (2025 - 1992);
+    let x = initialX + 3 * ((mainWidth - 2*padding - yLabelWidth) / (2025 - 1992)) + (i * 5) * yearWidth;
 
     //etichetta
     fill(white);
@@ -120,14 +136,33 @@ function drawGrid(){
 }
 
 //funzione che disegna i pallini di un anno
-function drawDotsTillYear(currentYear, newYear){
-
+function animateDot(i){
+  let category = dots[i].sourceOfFire;
+  let year = dots[i].year;
+  let categoryIndex = categories.indexOf(category);
+  let maxY = 0; //per ora metto 0 così i pallini che non rientrano in nessuna categoria si fermano in alto
+  if(!isNaN(categoryIndex)){
+    maxY = padding + categoryIndex * rowHeight + rowHeight/2; //questo parametro dovrà essere dipendente dal fatto che ci siano già altri pallini arrivati o meno
+  }
+  let x = initialX + (year - 1992) * yearWidth;
+  let y = dots[i].y;
+  if(y <= maxY){
+    circle(x, y, diam);
+  }else{
+    circle(x, maxY, diam);
+  }
+  dots[i].y += gravity;
 }
 
 function draw() {
   background(50);
   
   drawGrid();
+  fill(white);
 
   let currentYear = 1992;
+
+  for(let i = 0; i < data.getRowCount(); i ++){
+    animateDot(i, 0);
+  }
 }
