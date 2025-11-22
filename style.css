@@ -1,14 +1,19 @@
 html {
-  margin: 10px;
-  padding: 10px;
+  margin: 0px;
+  padding: 0px;
 }
 
 canvas {
   display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
 }
 
+
 body {
-  min-height: 300vh;
+  min-height: 150vh;
   overflow-x: hidden;
   background: #191919;
   color: rgb(255, 245, 233);
@@ -44,7 +49,7 @@ body {
 
 #intro-container {
   position: relative;
-  top: calc(30% + 80vh);
+  /*top: calc(30% + 80vh);*/
   margin-top: 50vh;
   left: 50%;
   transform: translateX(-50%);
@@ -110,3 +115,19 @@ body {
   width: fit-content;
   display: block;
 }
+
+#navigation-help {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: underline;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: none;
+}
+
+

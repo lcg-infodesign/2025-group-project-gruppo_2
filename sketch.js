@@ -25,8 +25,8 @@ function preload() {
 
 
 function setup() {
-  let pageHeight = document.documentElement.scrollHeight;
-  createCanvas(windowWidth, pageHeight);
+
+  createCanvas(windowWidth, windowHeight);
   
   typeTitle();
   setupIntroTrigger();
@@ -56,13 +56,17 @@ function setup() {
     let rect = container.getBoundingClientRect();
 
     // posizione dell’elemento relativa all’intera pagina
-    const scrollTarget = window.scrollY + rect.top - (window.innerHeight / 2) + (rect.height / 2);
+    let scrollTarget = window.scrollY + rect.top - (window.innerHeight / 2) + (rect.height / 2);
 
     window.scrollTo({
       top: scrollTarget,
       behavior: "smooth"
     });
-  });
+
+    // mostra la scritta di navigazione
+    const help = document.getElementById("navigation-help");
+    help.style.opacity = 1;
+    });
 }
 
 
@@ -113,7 +117,7 @@ function typeSection(index) {
     if (typingIndex < sectionsText[index].length) {
       introEl.textContent += sectionsText[index].charAt(typingIndex);
       typingIndex++;
-      setTimeout(typeChar, 40);
+      setTimeout(typeChar, 30);
     } else {
       isTyping = false;
     }
@@ -155,6 +159,6 @@ function draw() {
 
 
 function windowResized() {
-  let pageHeight = document.documentElement.scrollHeight;
-  resizeCanvas(windowWidth, pageHeight);
+  resizeCanvas(windowWidth, window.innerHeight);
 }
+
