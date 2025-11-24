@@ -1,14 +1,13 @@
-// Costanti per P5.js 
+// Costanti per P5.js (Invariate)
 const DOT_COUNT = 80; 
 const DOT_RADIUS = 3;  
-const DOT_COLOR = 255; 
 let dots = []; 
 let bullets; 
 
-// Distanza minima per il campo di forze 
+// Distanza minima per il campo di forze (Invariata)
 const MIN_DISTANCE_SQUARED = 50 * 50; 
 
-// Sezioni di contenuto: 4 SEZIONI TOTALI 
+// Sezioni di contenuto: 4 SEZIONI TOTALI (Invariate)
 const SECTIONS = [
   { id: "why-this-project", title: "WHY THIS PROJECT", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
   { id: "why-this-metodology", title: "WHY THIS METODOLOGY", text: "Nunc id est ante. Ut in eleifend ex. Proin sed tortor non urna fringilla scelerisque. Vivamus quis magna sit amet urna consequat dictum. Sed luctus lacus nec tortor iaculis, at consectetur libero molestie. Curabitur vel justo sed libero pretium varius. Etiam in libero in orci vehicula rutrum vitae nec libero. Proin eu ipsum at quam varius cursus ac ut felis." },
@@ -16,28 +15,35 @@ const SECTIONS = [
   { id: "how-cpj-collected-this-dataset", title: "HOW CPJ COLLECTED THIS DATASET", text: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris euismod vel velit in dignissim. Cras tincidunt tortor in est bibendum, vitae bibendum dolor consequat. In hac habitasse platea dictumst. Sed in ex eget enim facilisis blandit. Suspendisse potenti. Nam non lectus velit." }
 ];
 
-// Dati del Team (per l'animazione) 
+// Dati del Team (Invariati)
 const TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
 const NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
+const RED_DOT_RATIO = 0.2; 
 
-// Variabili di stato 
+// Variabili di stato
 let currentSectionIndex = 0;
 let sectionTextIndices = new Array(SECTIONS.length).fill(0);
 let sectionTitleIndices = new Array(SECTIONS.length).fill(0); 
 let sectionStarted = new Array(SECTIONS.length).fill(false);
 let isTeamAnimationMode = false; 
 
-// CLASSE DOT (Versione con this.vel.add(this.acc))
+// AGGIORNATO: Ora il mouseTarget viene usato come Target di Attrazione
+let mouseTarget;
+
+// CLASSE DOT - MODIFICATO IL METODO update()
 class Dot {
   constructor(index) {
     this.initialPos = createVector(0, 0); 
     this.pos = createVector(random(width), random(height / 2)); 
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
-    this.maxSpeed = 1;
-    this.maxForce = 0.1;
+    this.maxSpeed = 1.5; // Leggermente più veloce per seguire il mouse
+    this.maxForce = 0.15; // Forza leggermente maggiore
     this.index = index;
+    this.dotColor = random(1) < RED_DOT_RATIO ? color(255, 0, 0) : 255;
   }
+  
+  // Forza attrattiva (seek) verso una posizione target
   seek(target) {
     let desired = p5.Vector.sub(target, this.pos);
     let d = desired.mag();
@@ -51,6 +57,8 @@ class Dot {
     steer.limit(this.maxForce);
     return steer;
   }
+
+  // Aggiunge un movimento casuale (tremolio) basato sul rumore Perlin (Invariata)
   applyWiggle() {
     let noiseVal = noise(this.pos.x * 0.005 + frameCount * 0.001, this.pos.y * 0.005 + frameCount * 0.001);
     let angle = map(noiseVal, 0, 1, 0, TWO_PI);
@@ -58,24 +66,34 @@ class Dot {
     wiggle.mult(this.maxForce * 0.5); 
     this.acc.add(wiggle);
   }
+
+  // AGGIORNATO: update() ora usa targetPos (che sarà mouseTarget in modalità team)
   update(targetPos) {
     this.initialPos.set(targetPos);
+    
+    // Il target di attrazione è la posizione del mouse
     let seekingForce = this.seek(this.initialPos);
     this.acc.add(seekingForce);
+    
     this.applyWiggle();
     this.vel.add(this.acc); 
     this.vel.limit(this.maxSpeed);
     this.pos.add(this.vel);
     this.acc.mult(0); 
+    
+    // Mantiene i pallini entro i limiti dello schermo
+    this.pos.x = constrain(this.pos.x, 0, width);
+    this.pos.y = constrain(this.pos.y, 0, height);
   }
+
   display() {
-    fill(DOT_COLOR);
+    fill(this.dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, DOT_RADIUS * 2, DOT_RADIUS * 2);
   }
 }
 
-// ⚙️ Setup di P5.js
+
 function setup() {
     createCanvas(windowWidth, windowHeight); 
     
@@ -85,7 +103,6 @@ function setup() {
 
     bullets = document.querySelectorAll(".bullet");
     
-    // Listener per il link "MEET THE TEAM" nell'header
     const teamLink = document.getElementById('team-link');
     if (teamLink) {
         teamLink.addEventListener('click', (event) => {
@@ -94,18 +111,24 @@ function setup() {
         });
     }
     
-    // Listener per il bottone "RETURN"
     const returnButton = document.getElementById('return-button');
     if (returnButton) {
         returnButton.addEventListener('click', exitTeamAnimation);
     }
+    
+    // Listener per aggiornare la posizione del mouse (Invariata)
+    document.addEventListener('mousemove', (event) => {
+        mouseTarget = createVector(event.clientX, event.clientY);
+    });
 
+    // Inizializza mouseTarget al centro
+    mouseTarget = createVector(width / 2, height / 2);
 
     document.addEventListener('keydown', handleKeyPress); 
     scrollToSection(currentSectionIndex); 
 }
 
-// Gestione degli eventi da tastiera
+// Gestione degli eventi da tastiera 
 function handleKeyPress(event) {
     if (event.key === "ArrowRight") {
         if (currentSectionIndex < SECTIONS.length - 1) {
@@ -114,13 +137,10 @@ function handleKeyPress(event) {
             scrollToSection(currentSectionIndex);
         }
     } else if (event.key === "ArrowLeft") {
-        // Se siamo in modalità animazione, esci usando la funzione dedicata
         if (isTeamAnimationMode) {
-            exitTeamAnimation(); // Chiama la funzione di uscita
+            exitTeamAnimation(); 
             return;
         }
-
-        // Altrimenti, scorri all'indietro
         if (currentSectionIndex > 0) {
             if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
             currentSectionIndex--;
@@ -129,18 +149,14 @@ function handleKeyPress(event) {
     }
 }
 
-// Scorrimento alla sezione
+// Scorrimento alla sezione 
 function scrollToSection(index) {
-    // Esci da animazione e ripristina la visuale
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
     document.getElementById('navigation-bullets').style.display = 'flex';
-    
-    // Nasconde il bottone RETURN quando si naviga tra le sezioni
     document.getElementById('return-button').style.opacity = '0';
     document.getElementById('return-button').style.pointerEvents = 'none';
     
-    // Logica di visualizzazione normale
     const sectionId = SECTIONS[index].id;
     const allSections = document.querySelectorAll('.about-section'); 
     
@@ -217,107 +233,73 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
     setTimeout(() => typeText(id, text, setIndex, getIndex, allowTags, speed), speed);
 }
 
-
-// Funzione per uscire dalla modalità Team
+//  Funzione per uscire dalla modalità Team 
 function exitTeamAnimation() {
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
-    document.getElementById('navigation-bullets').style.display = 'flex'; // Riabilita pallini
-    
-    // Nasconde il bottone RETURN
+    document.getElementById('navigation-bullets').style.display = 'flex'; 
     document.getElementById('return-button').style.opacity = '0';
     document.getElementById('return-button').style.pointerEvents = 'none';
 
-    // Assicuriamoci che tutte le sezioni di testo siano nascoste
     document.querySelectorAll('.about-section').forEach(section => section.style.display = 'none');
 
-    // Manteniamo e mostriamo l'ultima sezione dove eravamo (currentSectionIndex)
     const sectionIdToDisplay = SECTIONS[currentSectionIndex].id;
     const targetSection = document.getElementById(sectionIdToDisplay);
 
     if (targetSection) {
-        targetSection.style.display = 'flex'; // Ri-mostra la sezione corretta
+        targetSection.style.display = 'flex';
     }
     
-    // Aggiorniamo i pallini
     if (bullets[currentSectionIndex]) {
         bullets.forEach(b => b.classList.remove('active')); 
         bullets[currentSectionIndex].classList.add("active");
     }
 }
 
-// FUNZIONE ANIMAZIONE TEAM
+// FUNZIONE ANIMAZIONE TEAM - AVVIO
 function startTeamAnimation() {
-    // 1. Nasconde i pallini della navigazione
     document.getElementById('navigation-bullets').style.display = 'none';
-    
-    // 2. Nasconde la sezione di testo corrente 
     const currentSectionId = SECTIONS[currentSectionIndex].id;
     document.getElementById(currentSectionId).style.display = 'none';
 
-    // 3. Mostra i nomi del team
     document.getElementById('team-content').style.opacity = '1';
     
-    // Mostra il bottone RETURN
     document.getElementById('return-button').style.opacity = '1';
-    document.getElementById('return-button').style.pointerEvents = 'auto'; // Abilita il click
+    document.getElementById('return-button').style.pointerEvents = 'auto'; 
     
-    // 4. Entra in modalità animazione
     isTeamAnimationMode = true;
     
-    // 5. Resetta i pallini per l'animazione Team
+    // Resetta i pallini per l'animazione Team (sparsi in tutta la finestra)
     dots.forEach(dot => {
-        dot.pos.x = random(width);
-        dot.pos.y = random(height / 2);
+        // Assegna una posizione iniziale casuale, che funge da 'ancora' morbida
+        // L'attrazione del mouse prenderà il sopravvento.
+        dot.initialPos = createVector(random(width), random(height)); 
+        dot.vel.mult(0);
+        dot.acc.mult(0);
     });
 }
 
-function calculateTeamTargetPositions() {
-    const teamPositions = [];
-    const nameElements = document.querySelectorAll('.team-name'); 
-    
-    if (nameElements.length !== TEAM_NAMES.length) {
-        // Fallback: ritorna posizioni casuali per non bloccare draw()
-        for (let i = 0; i < DOT_COUNT; i++) {
-            teamPositions.push(createVector(random(width), random(height)));
-        }
-        return teamPositions;
-    }
 
-    nameElements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        
-        if (rect.width > 0 && rect.height > 0) {
-             const targetX = rect.left + rect.width / 2;
-             const targetY = rect.top + rect.height / 2;
-        
-             for (let i = 0; i < NAMES_PER_DOT; i++) {
-                 teamPositions.push(createVector(targetX, targetY));
-             }
-        }
-    });
-
-    while (teamPositions.length < DOT_COUNT) {
-         const lastValidPos = teamPositions.length > 0 ? teamPositions[0] : createVector(width/2, height/2);
-         teamPositions.push(lastValidPos); 
-    }
-    
-    return teamPositions;
-}
-
-
-// Draw di P5.js 
+//  Draw di P5.js 
 function draw() {
     background(25); 
 
     let targetPositions = [];
     const centerX = width / 2;
     const centerY = height / 3; 
-
+    
+    
     if (isTeamAnimationMode) {
-        // La logica Team è attiva, usa le posizioni dei nomi
-        targetPositions = calculateTeamTargetPositions();
-
+        // Modalità Team: I pallini seguono il mouseTarget
+        for (let i = 0; i < dots.length; i++) {
+            // Se il mouse si muove, usa la posizione del mouse come target.
+            // Altrimenti, i pallini si muovono verso la loro posizione casuale iniziale (effetto tremolio)
+            
+            // Per farli seguire il mouse, passiamo mouseTarget come targetPos
+            dots[i].update(mouseTarget); 
+            dots[i].display();
+        }
+        
     } else {
         // La logica delle Sezioni è attiva, usa le forme statiche
         switch (currentSectionIndex) {
@@ -353,13 +335,13 @@ function draw() {
                 }
                 break;
         }
-    }
-    
-    // Aggiorna e disegna i pallini (l'animazione è qui)
-    for (let i = 0; i < dots.length; i++) {
-        let target = targetPositions[i % targetPositions.length]; 
-        dots[i].update(target);
-        dots[i].display();
+        
+        // Aggiorna e disegna i pallini
+        for (let i = 0; i < dots.length; i++) {
+            let target = targetPositions[i % targetPositions.length]; 
+            dots[i].update(target);
+            dots[i].display();
+        }
     }
 }
 

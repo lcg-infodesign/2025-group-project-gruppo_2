@@ -7,7 +7,7 @@ html, body {
   overflow: hidden; 
 }
 
-
+/*POSIZIONAMENTO E LIVELLI DEL CANVAS (P5.js) */
 canvas {
   display: block;
   position: fixed; 
@@ -33,7 +33,7 @@ body {
   color: red;
 }
 
-/* NUOVO: BOTTONE RETURN */
+/*BOTTONE RETURN */
 #return-button {
     position: fixed;
     top: 25px; /* Spazio dall'alto */
@@ -84,18 +84,18 @@ body {
     text-decoration: none;
     font-size: 0.9rem;
     margin-left: var(--spacing-large);
-    transition: color 0.3s;
+    /* AGGIUNTO text-shadow per transizione fluida */
+    transition: color 0.3s, text-shadow 0.3s; 
     cursor: pointer;
 }
 
+/*Hover con effetto Glow */
 .nav-link:hover {
-    color: red;
+    color: rgb(255, 245, 233); 
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 255, 255, 0.5); 
 }
 
-.nav-link.red {
-    color: red;
-    font-weight: 600;
-}
+
 
 /* --- SEZIONI DI CONTENUTO TESTUALE --- */
 
@@ -153,16 +153,17 @@ body {
 }
 
 .bullet {
-    width: 8px;
-    height: 8px;
-    border: 1px solid rgb(255, 245, 233); /* Manteniamo il bordo bianco */
-    background-color: rgb(255, 245, 233); /* NUOVO: Riempimento bianco */
+    width: 10px;
+    height: 10px;
+    /* PALLINO PIENO BIANCO */
+    border: 1px solid rgb(255, 245, 233); 
+    background-color: rgb(255, 245, 233); 
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
 }
 
-
+/* Il pallino attivo resta ROSSO pieno */
 .bullet.active {
     background-color: red; 
     border-color: red;
@@ -206,9 +207,18 @@ body {
     gap: var(--spacing-large); 
     font-size: 1.5rem;
     font-weight: 300;
-    color: rgb(255, 245, 233);
+    color: rgb(255, 245, 233); 
 }
 
+/*Stili per i nomi del team (ora link mailto) */
 .team-name {
     padding: 5px 10px; 
+    text-decoration: none; /* Rimuove la sottolineatura tipica dei link */
+    color: inherit; /* Assicura che sia bianco, ereditando dal container */
+    transition: color 0.3s;
+}
+
+.team-name:hover {
+    color: red; /* L'effetto hover li colora di rosso */
+    cursor: pointer;
 }
