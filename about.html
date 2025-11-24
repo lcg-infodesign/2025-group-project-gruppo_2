@@ -13,27 +13,62 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 
     <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script> 
   </head>
 
   <body>
-    <div id="intro-container" class="section">
-      <h1 id="title"></h1>
-      <div id="about-intro"></div>
-      <div id="arrow">↓</div>
+    
+    <header id="main-header">
+        <a href="index.html" class="nav-link">HOME</a>
+        <a href="main.html" class="nav-link">DATASET</a>
+        <a href="#" id="team-link" class="nav-link">MEET THE TEAM</a> 
+    </header>
+
+    <button id="return-button">RETURN</button>
+
+    <div id="why-this-project" class="about-section" style="display: none;">
+      <h2 id="why-this-project-title"></h2>
+      <p class="about-text" id="why-this-project-text"></p>
+    </div>
+
+    <div id="why-this-metodology" class="about-section" style="display: none;">
+      <h2 id="why-this-metodology-title"></h2>
+      <p class="about-text" id="why-this-metodology-text"></p>
+    </div>
+
+    <div id="what-is-cpj" class="about-section" style="display: none;">
+      <h2 id="what-is-cpj-title"></h2>
+      <p class="about-text" id="what-is-cpj-text"></p>
+    </div>
+
+    <div id="how-cpj-collected-this-dataset" class="about-section" style="display: none;">
+      <h2 id="how-cpj-collected-this-dataset-title"></h2>
+      <p class="about-text" id="how-cpj-collected-this-dataset-text"></p>
     </div>
 
 
-    <div id="team-container" class="section">
-      <h2 id="our-team"></h2>
-      <div id="about-team"></div>
-      <div id="arrow2">↓</div>
+    <div id="team-content">
+        <h1 id="team-title">MEET THE TEAM</h1>
+        <div id="team-names-container">
+            <div class="team-row">
+                <a href="mailto:sara.allegro@mail.polimi.it" class="team-name">Sara Allegro</a>
+                <a href="mailto:filippo.garbero@mail.polimi.it" class="team-name">Filippo Garbero</a>
+                <a href="mailto:letizia.neri@mail.polimi.it" class="team-name">Letizia Neri</a>
+            </div>
+            <div class="team-row">
+                <a href="mailto:vanessa.preite@mail.polimi.it" class="team-name">Vanessa Preite</a>
+                <a href="mailto:enea.tramontana@mail.polimi.it" class="team-name">Enea Tramontana</a>
+                <a href="mailto:cristina.zheng@mail.polimi.it" class="team-name">Cristina Zheng</a>
+            </div>
+        </div>
     </div>
 
 
-    <div id="project-container" class="section">
-      <h2 id="our-project"></h2>
-      <div id="about-project"></div>
+    <div id="navigation-bullets">
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
+        <span class="bullet"></span>
     </div>
 
 
