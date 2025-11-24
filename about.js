@@ -1,29 +1,38 @@
-let DOT_COUNT = 80; 
-let DOT_RADIUS = 3;  
+// Costanti P5.js
+const DOT_COUNT = 80;         // Totale di pallini creati (AGGIORNATO)
+const SECTION_DOT_COUNT = 80; // Usiamo DOT_COUNT per tutte le sezioni normali
+const DOT_RADIUS = 3;         // Raggio del pallino (AGGIORNATO)
 let dots = []; 
 let bullets; 
 
-// distanza minima per il campo di forze 
-let MIN_DISTANCE_SQUARED = 50 * 50; 
+// Variabili per la gestione della digitazione del testo
+let typingTimeoutText = null;
+let isTypingText = false;
 
-// sezioni
-let SECTIONS = [
+// Costanti di Repulsione (Mantenute dai prompt precedenti)
+const SEPARATION_DISTANCE = 40; 
+const SEPARATION_STRENGTH = 0.5; 
+const BG_COLOR = 25; 
+
+// Costanti di Repulsione dal Mouse
+const MOUSE_REPULSION_RADIUS = 120; 
+const MOUSE_REPULSION_STRENGTH = 1.0; 
+
+
+// Sezioni di contenuto
+const SECTIONS = [
   { id: "why-this-project", title: "WHY THIS PROJECT", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
   { id: "why-this-metodology", title: "WHY THIS METODOLOGY", text: "Nunc id est ante. Ut in eleifend ex. Proin sed tortor non urna fringilla scelerisque. Vivamus quis magna sit amet urna consequat dictum. Sed luctus lacus nec tortor iaculis, at consectetur libero molestie. Curabitur vel justo sed libero pretium varius. Etiam in libero in orci vehicula rutrum vitae nec libero. Proin eu ipsum at quam varius cursus ac ut felis." },
   { id: "what-is-cpj", title: "WHAT IS CPJ", text: "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aenean vitae turpis in mi feugiat consectetur. Donec at elit tellus. Sed at metus eros. Aliquam erat volutpat. Nulla facilisi. In nec urna in elit aliquam tristique at quis ligula. Sed sit amet dolor at nibh varius placerat non nec nulla." },
   { id: "how-cpj-collected-this-dataset", title: "HOW CPJ COLLECTED THIS DATASET", text: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris euismod vel velit in dignissim. Cras tincidunt tortor in est bibendum, vitae bibendum dolor consequat. In hac habitasse platea dictumst. Sed in ex eget enim facilisis blandit. Suspendisse potenti. Nam non lectus velit." }
 ];
 
-let typingTimeoutText = null;
-let isTypingText = false;
+// Dati del Team
+const TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
+const NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
+const RED_DOT_RATIO = 0.2; 
 
-
-// dati team
-let TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
-let NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
-let RED_DOT_RATIO = 0.2; 
-
-// variabili di stato
+// Variabili di stato
 let currentSectionIndex = 0;
 let sectionTextIndices = new Array(SECTIONS.length).fill(0);
 let sectionTitleIndices = new Array(SECTIONS.length).fill(0); 
@@ -32,20 +41,21 @@ let isTeamAnimationMode = false;
 
 let mouseTarget;
 
-// pallini
+
+// CLASSE DOT
 class Dot {
   constructor(index) {
     this.initialPos = createVector(0, 0); 
     this.pos = createVector(random(width), random(height / 2)); 
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
-    this.maxSpeed = 1.5; // segue il mouse
-    this.maxForce = 0.15;
+    this.maxSpeed = 1.0; // Velocità ridotta per pallini più grandi/pesanti
+    this.maxForce = 0.1;
     this.index = index;
     this.dotColor = random(1) < RED_DOT_RATIO ? color(255, 0, 0) : 255;
   }
   
-  // forza attrattiva (seek) verso una posizione target
+  // Forza attrattiva (seek) verso una posizione target
   seek(target) {
     let desired = p5.Vector.sub(target, this.pos);
     let d = desired.mag();
@@ -59,8 +69,24 @@ class Dot {
     steer.limit(this.maxForce);
     return steer;
   }
+  
+  // Applica la repulsione dal mouse (necessaria solo in modalità Team, ma definita qui)
+  applyRepulsion(target) {
+    let desired = p5.Vector.sub(this.pos, target); 
+    let d = desired.mag();
+    
+    if (d < MOUSE_REPULSION_RADIUS && d > 0) { 
+        desired.normalize();
+        let strength = map(d, 0, MOUSE_REPULSION_RADIUS, MOUSE_REPULSION_STRENGTH, 0);
+        desired.mult(strength * 2); 
+        let steer = p5.Vector.sub(desired, this.vel);
+        steer.limit(this.maxForce * 2); 
+        return steer;
+    }
+    return createVector(0, 0);
+  }
 
-  // tremolio basato sul rumore
+  // Tremolio basato sul rumore
   applyWiggle() {
     let noiseVal = noise(this.pos.x * 0.005 + frameCount * 0.001, this.pos.y * 0.005 + frameCount * 0.001);
     let angle = map(noiseVal, 0, 1, 0, TWO_PI);
@@ -72,7 +98,6 @@ class Dot {
   update(targetPos) {
     this.initialPos.set(targetPos);
     
-    // il target di attrazione è la posizione del mouse
     let seekingForce = this.seek(this.initialPos);
     this.acc.add(seekingForce);
     
@@ -82,7 +107,6 @@ class Dot {
     this.pos.add(this.vel);
     this.acc.mult(0); 
     
-    // mantiene i pallini entro i limiti dello schermo
     this.pos.x = constrain(this.pos.x, 0, width);
     this.pos.y = constrain(this.pos.y, 0, height);
   }
@@ -98,12 +122,14 @@ class Dot {
 function setup() {
     createCanvas(windowWidth, windowHeight); 
     
+    // Inizializza tutti i pallini
     for (let i = 0; i < DOT_COUNT; i++) {
         dots.push(new Dot(i));
     }
 
     bullets = document.querySelectorAll(".bullet");
     
+    // Gestione link Team
     const teamLink = document.getElementById('team-link');
     if (teamLink) {
         teamLink.addEventListener('click', (event) => {
@@ -112,43 +138,59 @@ function setup() {
         });
     }
     
+    // Gestione tasto di ritorno
     const returnButton = document.getElementById('return-button');
     if (returnButton) {
         returnButton.addEventListener('click', exitTeamAnimation);
     }
     
-    // aggiorna la posizione del mouse
+    // Aggiorna la posizione del mouse
     document.addEventListener('mousemove', (event) => {
         mouseTarget = createVector(event.clientX, event.clientY);
     });
 
-    // mouseTarget al centro
+    // Aggiungi il listener per il doppio click per completare la digitazione del testo
+    document.addEventListener('dblclick', () => {
+        if (isTypingText) {
+            skipTextTyping();
+        }
+    });
+
     mouseTarget = createVector(width / 2, height / 2);
 
     document.addEventListener('keydown', handleKeyPress); 
     scrollToSection(currentSectionIndex); 
 }
 
-    // eventi da tastiera 
-    function handleKeyPress(event) {
-        if (event.key === "ArrowRight") {
-
-        // skip se si sta scrivendo il testo
+// Eventi da tastiera 
+function handleKeyPress(event) {
+    if (event.key === "ArrowRight") {
+        // Skip se si sta scrivendo il testo
         if (isTypingText) {
             skipTextTyping();
             return;
         }
 
-        // se non sta scrivendo, va alla sezione successiva
+        // Se non sta scrivendo, va alla sezione successiva
         if (currentSectionIndex < SECTIONS.length - 1) {
             if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active");
             currentSectionIndex++;
             scrollToSection(currentSectionIndex);
         }
+    } else if (event.key === "ArrowLeft") {
+        if (isTeamAnimationMode) {
+            exitTeamAnimation(); 
+            return;
+        }
+        if (currentSectionIndex > 0) {
+            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
+            currentSectionIndex--;
+            scrollToSection(currentSectionIndex);
+        }
     }
 }
 
-// scorrimento alla sezione 
+// Scorrimento alla sezione 
 function scrollToSection(index) {
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
@@ -203,8 +245,8 @@ function scrollToSection(index) {
 }
 
 
+// Funzione per l'effetto di digitazione del testo
 function typeText(id, text, setIndex, getIndex, allowTags, speed) {
-
     let el = document.getElementById(id);
     el.style.opacity = 1;
     let idx = getIndex();
@@ -216,7 +258,7 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
     function step() {
         let i = getIndex();
 
-        // stop immediato allo skip
+        // Stop immediato allo skip
         if (id.endsWith("-text") && !isTypingText) return;
 
         if (i >= text.length) {
@@ -224,6 +266,7 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
             return;
         }
 
+        // Gestione dei tag HTML
         if (allowTags && text[i] === "<") {
             let closing = text.indexOf(">", i);
             let tag = text.substring(i, closing + 1);
@@ -236,6 +279,7 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
             return;
         }
 
+        // Gestione del carattere newline
         if (text[i] === "\n") {
             el.innerHTML += "<br>";
             setIndex(i + 1);
@@ -256,6 +300,7 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
     step();
 }
 
+// Funzione per saltare la digitazione del testo
 function skipTextTyping() {
     const section = SECTIONS[currentSectionIndex];
     const id = section.id + "-text";
@@ -270,7 +315,7 @@ function skipTextTyping() {
 }
 
 
-//  uscire dalla modalità team 
+// Uscire dalla modalità team 
 function exitTeamAnimation() {
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
@@ -293,7 +338,7 @@ function exitTeamAnimation() {
     }
 }
 
-// avvio animazione team
+// Avvio animazione team
 function startTeamAnimation() {
     document.getElementById('navigation-bullets').style.display = 'none';
     const currentSectionId = SECTIONS[currentSectionIndex].id;
@@ -306,71 +351,114 @@ function startTeamAnimation() {
     
     isTeamAnimationMode = true;
     
-    // reset dei pallini per l'animazione team (sparsi in tutta la finestra)
+    // Reset dei pallini per l'animazione team (sparsi in tutta la finestra)
     dots.forEach(dot => {
-        // posizione iniziale casuale che poi variera in base al mouse
         dot.initialPos = createVector(random(width), random(height)); 
         dot.vel.mult(0);
         dot.acc.mult(0);
     });
 }
 
+// Funzione principale di disegno P5.js
 function draw() {
-    background(25); 
+    background(BG_COLOR, 255); 
 
     let targetPositions = [];
-    let centerX = width / 2;
-    let centerY = height / 3; 
+    
+    const animationTopOffset = height * 0.1; 
+    const animationHeight = height * 0.4; 
+
+    const centerX = width / 2;
+    const adjustedCenterY = animationTopOffset + animationHeight / 2;
     
     
     if (isTeamAnimationMode) {
-        // i pallini seguono il mouseTarget
-        for (let i = 0; i < dots.length; i++) {
-            // se il mouse si muove, usa la posizione del mouse come target,
-            // altrimenti, i pallini si muovono verso la loro posizione casuale iniziale
+        // Modalità Team: REPULSIONE E TUTTI I PALLINI (DOT_COUNT = 80) SONO VISIBILI
+        const loopCount = DOT_COUNT; 
+        
+        for (let i = 0; i < loopCount; i++) {
             
-            // i pallini seguono il mouse
-            dots[i].update(mouseTarget); 
+            // Applica la repulsione dal mouse
+            let repulsionForce = dots[i].applyRepulsion(mouseTarget);
+            dots[i].acc.add(repulsionForce);
+            
+            let target = dots[i].initialPos;
+            
+            dots[i].update(target); 
             dots[i].display();
         }
         
     } else {
+        // Logica delle Sezioni: SECTION_DOT_COUNT (80) PALLINI SONO VISIBILI
+        const loopCount = SECTION_DOT_COUNT; 
+        
         switch (currentSectionIndex) {
-            case 0: // random
-                for (let i = 0; i < DOT_COUNT; i++) {
-                    targetPositions.push(createVector(random(width * 0.2, width * 0.8), random(height * 0.1, height * 0.5)));
-                }
-                break;
-            case 1: // riga orizzontale
-                for (let i = 0; i < DOT_COUNT; i++) {
-                    let x = map(i, 0, DOT_COUNT - 1, width * 0.2, width * 0.8);
-                    targetPositions.push(createVector(x, centerY));
-                }
-                break;
-            case 2: // tre righe
-                const rowCount = 3;
-                const separation = 40; 
-                const dotsPerRow = ceil(DOT_COUNT / rowCount);
-                for (let i = 0; i < DOT_COUNT; i++) {
-                    let row = floor(i / dotsPerRow);
-                    let x = map(i % dotsPerRow, 0, dotsPerRow - 1, width * 0.2, width * 0.8);
-                    let y = centerY + (row - 1) * separation; 
+            case 0: // Onda Complessa e Dinamica (WHY THIS PROJECT)
+                const baseWaveAmplitude = 30; 
+                const baseWaveFrequency = 0.01; 
+                const waveSpeed = 0.02; 
+
+                // Modulazioni dinamiche nel tempo
+                const dynamicAmplitude = baseWaveAmplitude + sin(frameCount * 0.01) * 10; 
+                const dynamicFrequency = baseWaveFrequency + cos(frameCount * 0.005) * 0.005; 
+                
+                for (let i = 0; i < loopCount; i++) {
+                    // Mappa i pallini lungo l'asse X
+                    let x = map(i, 0, loopCount - 1, width * 0.2, width * 0.8);
+                    
+                    // Onda principale
+                    let yOffset1 = sin(x * dynamicFrequency + frameCount * waveSpeed) * dynamicAmplitude;
+                    
+                    // Onda secondaria/rumore per irregolarità
+                    let yOffset2 = sin(x * (dynamicFrequency * 3) + frameCount * (waveSpeed * 0.5)) * (dynamicAmplitude * 0.4);
+                    
+                    let y = adjustedCenterY + yOffset1 + yOffset2; // Combina le onde
                     targetPositions.push(createVector(x, y));
                 }
                 break;
-            case 3: // cerchio
-                for (let i = 0; i < DOT_COUNT; i++) {
-                    const radius = 150;
-                    let angle = map(i, 0, DOT_COUNT, 0, TWO_PI);
+            case 1: // Quadrato (Griglia) (WHY THIS METODOLOGY)
+                const dotsPerSide = ceil(sqrt(loopCount)); // 9x9 per 80 pallini
+                const gridSpacing = 20; 
+                const totalGridWidth = dotsPerSide * gridSpacing;
+
+                // Calcola l'angolo in alto a sinistra per centrare il quadrato
+                const startX = centerX - totalGridWidth / 2;
+                const startY = adjustedCenterY - totalGridWidth / 2;
+                
+                for (let i = 0; i < loopCount; i++) {
+                    const col = i % dotsPerSide;
+                    const row = floor(i / dotsPerSide);
+                    
+                    let x = startX + col * gridSpacing;
+                    let y = startY + row * gridSpacing; 
+                    
+                    targetPositions.push(createVector(x, y));
+                }
+                break;
+            case 2: // Tre righe (WHAT IS CPJ)
+                const rowCount = 3;
+                const separation = 40; 
+                const dotsPerRow = ceil(loopCount / rowCount); // Circa 27 pallini per riga
+                for (let i = 0; i < loopCount; i++) {
+                    let row = floor(i / dotsPerRow);
+                    let x = map(i % dotsPerRow, 0, dotsPerRow - 1, width * 0.2, width * 0.8);
+                    let y = adjustedCenterY + (row - 1) * separation * 0.7; 
+                    targetPositions.push(createVector(x, y));
+                }
+                break;
+            case 3: // Cerchio (HOW CPJ COLLECTED THIS DATASET)
+                for (let i = 0; i < loopCount; i++) {
+                    const radius = 120; 
+                    let angle = map(i, 0, loopCount, 0, TWO_PI);
                     let x = centerX + cos(angle) * radius;
-                    let y = centerY + sin(angle) * radius;
+                    let y = adjustedCenterY + sin(angle) * radius; 
                     targetPositions.push(createVector(x, y));
                 }
                 break;
         }
         
-        // aggiorna e disegna i pallini
-        for (let i = 0; i < dots.length; i++) {
+        // Aggiorna e disegna i pallini
+        for (let i = 0; i < loopCount; i++) {
             let target = targetPositions[i % targetPositions.length]; 
             dots[i].update(target);
             dots[i].display();
@@ -378,7 +466,7 @@ function draw() {
     }
 }
 
-// windowResized
+// Funzione windowResized
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
