@@ -48,6 +48,10 @@ function setup() {
     if (e.key === "ArrowRight" && introStarted && !isTyping) {
       nextSection();
     }
+
+    if (e.key === "ArrowLeft") {
+    prevSection();
+  }
   });
 
   // scroll al testo quando clicchi la freccia
@@ -140,6 +144,21 @@ function nextSection() {
     // quando finiscono le sezioni mostra il bottone
     showButton();
   }
+}
+
+//possibilità di tornare indietro nelle sezioni
+function prevSection() {
+  if (currentSection === 0) return; // se siamo al primo blocco non fa nulla
+
+  bullets[currentSection].classList.remove("active");
+  currentSection--;
+
+  bullets[currentSection].classList.add("active");
+  typeSection(currentSection);
+
+  // se torni indietro nasconde il bottone
+  const btn = document.getElementById("button");
+  if (btn) btn.style.opacity = "0";
 }
 
 // mostra il bottone
