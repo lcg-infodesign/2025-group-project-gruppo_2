@@ -155,14 +155,26 @@ function animateDot(i){
 }
 
 function draw() {
-  background(50);
-  
-  drawGrid();
+  background(bg); // sfondo
+
+  drawGrid(); // griglia ed etichette
+
+  // blur verticale sfumato verso sinistra con padding per separalro meglio dal grafico
+  let rightPadding = 50; // distanza tra grafico e blur
+  let xBlurStart = initialX + (mainWidth - padding - yLabelWidth) + rightPadding; // destra del grafico + padding
+  let glowWidth = 12;       // larghezza del blur
+  let maxAlpha = 120;       // opacità massima della parte più vicina al grafico
+
+  // disegna il glow sfumato verso sinistra
+  for (let i = 0; i < glowWidth; i++) {
+    stroke(255, 255, 255, map(i, 0, glowWidth, maxAlpha, 0)); // opacità decrescente verso sinistra
+    strokeWeight(1); 
+    line(xBlurStart - i, 0, xBlurStart - i, height); // linea sfumata verso sinistra
+  }
+
+  // disegna i pallini
   fill(white);
-
-  let currentYear = 1992;
-
-  for(let i = 0; i < data.getRowCount(); i ++){
-    animateDot(i, 0);
+  for (let i = 0; i < data.getRowCount(); i++) {
+    animateDot(i);
   }
 }

@@ -5,4 +5,5 @@ html, body {
 
 canvas {
   display: block;
+  background-color: #1E1E1E;
 }
