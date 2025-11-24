@@ -4,16 +4,16 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%; 
-  overflow: hidden; /* CRUCIALE: Disabilita lo scorrimento del browser */
+  overflow: hidden; 
 }
 
 /* ➡️ POSIZIONAMENTO E LIVELLI DEL CANVAS (P5.js) */
 canvas {
   display: block;
-  position: fixed; /* Fissa il canvas allo sfondo */
+  position: fixed; 
   top: 0;
   left: 0;
-  z-index: -1; /* Mette il canvas SOTTO tutti gli elementi DOM (il testo) */
+  z-index: -1; 
 }
 
 body {
@@ -25,37 +25,101 @@ body {
 /* Distanza e Colori */
 :root {
   --spacing-small: 20px;
-  --spacing-large: calc(var(--spacing-small) * 2);
+  --spacing-large: 40px; 
+  --header-height: 80px; 
 }
 
 .red {
   color: red;
 }
 
-/* ➡️ Stile per le Nuove Sezioni (Visualizzate una alla volta) */
+/* ⭐️ NUOVO: BOTTONE RETURN */
+#return-button {
+    position: fixed;
+    top: 25px; /* Spazio dall'alto */
+    left: 5%; /* Allineato con il contenuto */
+    z-index: 25; /* Sopra l'header e tutto il resto */
+    
+    /* Stile minimalista per un'azione di ritorno */
+    padding: 10px 15px;
+    background-color: transparent;
+    color: rgb(255, 245, 233);
+    font-weight: 400;
+    font-size: 0.9rem;
+    font-family: "JetBrains Mono", monospace;
+    text-decoration: none; 
+    border: 1px solid rgb(255, 245, 233); 
+    border-radius: 5px;
+    cursor: pointer;
+    
+    /* Animazione e stato iniziale */
+    opacity: 0; /* Inizialmente nascosto */
+    transition: opacity 0.4s, background-color 0.3s, color 0.3s;
+    pointer-events: none; /* Disabilita il click quando è nascosto */
+}
+
+#return-button:hover {
+    background-color: rgb(255, 245, 233);
+    color: #191919;
+}
+
+/* HEADER FISSO */
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    z-index: 20; 
+    background-color: transparent; 
+}
+
+.nav-link {
+    color: rgb(255, 245, 233);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-left: var(--spacing-large);
+    transition: color 0.3s;
+    cursor: pointer;
+}
+
+.nav-link:hover {
+    color: red;
+}
+
+.nav-link.red {
+    color: red;
+    font-weight: 600;
+}
+
+/* --- SEZIONI DI CONTENUTO TESTUALE --- */
+
 .about-section {
   width: 100vw;
-  height: 100vh; /* Ogni sezione copre l'intero viewport */
+  height: 100vh; 
   text-align: center;
   position: absolute; 
   top: 0;
   left: 0;
   
-  /* Centratura e Posizionamento in Basso del Contenuto */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* Allinea il contenuto in fondo */
+  justify-content: flex-end; 
   align-items: center;
   
-  /* Spazio e Livelli */
   padding: 5%; 
-  padding-bottom: 10vh; /* Spazio extra dal bordo inferiore per il testo */
+  padding-bottom: 10vh; 
   box-sizing: border-box;
-  background: transparent; /* Consente al canvas di essere visibile */
-  z-index: 1; /* Assicura che il testo sia SOPRA il canvas */
+  background: transparent; 
+  z-index: 1; 
+  padding-top: var(--header-height);
 }
 
-/* Stile per i Titoli H2 delle nuove sezioni */
 .about-section h2 {
     font-size: 2.4rem;
     font-weight: 400;
@@ -63,39 +127,85 @@ body {
     margin-bottom: var(--spacing-small); 
 }
 
-/* Stile per il Testo P delle nuove sezioni (usa la classe .about-text) */
 .about-text {
-  white-space: pre-line; /* Rende visibile quando il testo va a capo */
+  white-space: pre-line; 
   width: 60%;
-  max-width: 700px; /* Limite per il testo */
+  max-width: 700px; 
   margin: 0 auto;
   font-size: 1.2rem;
   line-height: 1.6;
   font-weight: 200;
   text-align: center;
-  opacity: 0; /* Il JS gestirà l'opacità per l'effetto macchina da scrivere */
+  opacity: 0; 
+  min-height: 12em; 
 }
 
-/* ⭐️ NUOVO: Stili per la navigazione a pallini */
+/* --- NAVIGAZIONE A PALLINI --- */
+
 #navigation-bullets {
     position: fixed;
-    bottom: 50px; /* Posizionamento in basso */
+    bottom: 50px; 
     left: 50%;
-    transform: translateX(-50%); /* Centra orizzontalmente */
+    transform: translateX(-50%); 
     display: flex;
-    gap: 15px; /* Spazio tra i pallini */
-    z-index: 10; /* Deve stare sopra tutto il resto */
+    gap: 15px; 
+    z-index: 10; 
 }
 
 .bullet {
     width: 10px;
     height: 10px;
-    border: 1px solid rgb(255, 245, 233); /* Bordo bianco */
+    border: 1px solid rgb(255, 245, 233); 
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
 }
 
 .bullet.active {
-    background-color: rgb(255, 245, 233); /* Riempimento bianco quando attivo */
+    background-color: rgb(255, 245, 233); 
+}
+
+/* --- SCHERMATA ANIMAZIONE TEAM --- */
+
+#team-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;
+    text-align: center;
+    opacity: 0; 
+    transition: opacity 1s;
+    z-index: 5; 
+    padding-top: var(--header-height);
+    box-sizing: border-box;
+}
+
+#team-title {
+    font-size: 3rem;
+    color: red;
+    margin-bottom: var(--spacing-large);
+}
+
+#team-names-container {
+    display: flex;
+    flex-direction: column; 
+    gap: var(--spacing-large); 
+}
+
+.team-row {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-large); 
+    font-size: 1.5rem;
+    font-weight: 300;
+    color: rgb(255, 245, 233);
+}
+
+.team-name {
+    padding: 5px 10px; 
 }
