@@ -1,4 +1,3 @@
-/* RESET E LAYOUT PRINCIPALE: Rimuove lo scorrimento e imposta il layout a schermo intero */
 html, body {
   margin: 0;
   padding: 0;
@@ -7,7 +6,6 @@ html, body {
   overflow: hidden; 
 }
 
-/* ➡️ POSIZIONAMENTO E LIVELLI DEL CANVAS (P5.js) */
 canvas {
   display: block;
   position: fixed; 
@@ -22,7 +20,7 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
-/* Distanza e Colori */
+/* distanza e colori */
 :root {
   --spacing-small: 20px;
   --spacing-large: 40px; 
@@ -33,14 +31,13 @@ body {
   color: red;
 }
 
-/* ⭐️ NUOVO: BOTTONE RETURN */
+
 #return-button {
     position: fixed;
-    top: 25px; /* Spazio dall'alto */
-    left: 5%; /* Allineato con il contenuto */
-    z-index: 25; /* Sopra l'header e tutto il resto */
+    top: 25px; 
+    left: 5%; /* allineamento con il contenuto */
+    z-index: 25;
     
-    /* Stile minimalista per un'azione di ritorno */
     padding: 10px 15px;
     background-color: transparent;
     color: rgb(255, 245, 233);
@@ -52,10 +49,10 @@ body {
     border-radius: 5px;
     cursor: pointer;
     
-    /* Animazione e stato iniziale */
-    opacity: 0; /* Inizialmente nascosto */
+    /* animazione e stato iniziale */
+    opacity: 0;
     transition: opacity 0.4s, background-color 0.3s, color 0.3s;
-    pointer-events: none; /* Disabilita il click quando è nascosto */
+    pointer-events: none;
 }
 
 #return-button:hover {
@@ -63,7 +60,6 @@ body {
     color: #191919;
 }
 
-/* HEADER FISSO */
 #main-header {
     position: fixed;
     top: 0;
@@ -97,7 +93,7 @@ body {
     font-weight: 600;
 }
 
-/* --- SEZIONI DI CONTENUTO TESTUALE --- */
+/* sezioni di testo */
 
 .about-section {
   width: 100vw;
@@ -140,7 +136,7 @@ body {
   min-height: 12em; 
 }
 
-/* --- NAVIGAZIONE A PALLINI --- */
+/* pallini di navigazione */
 
 #navigation-bullets {
     position: fixed;
@@ -165,7 +161,7 @@ body {
     background-color: rgb(255, 245, 233); 
 }
 
-/* --- SCHERMATA ANIMAZIONE TEAM --- */
+/* schermata team animazione */
 
 #team-content {
     position: absolute;
@@ -207,5 +203,7 @@ body {
 }
 
 .team-name {
-    padding: 5px 10px; 
+    padding: 5px 10px;
+    color: white;
+    text-decoration: none;
 }
