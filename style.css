@@ -14,7 +14,7 @@ canvas {
 
 
 body {
-  min-height: 150vh;
+  min-height: 200vh;
   overflow-x: hidden;
   background: #191919;
   color: rgb(255, 245, 233);
@@ -103,7 +103,7 @@ body {
 }
 
 #button {
-  margin: 40px auto;
+  margin: 70px auto;
   padding: 12px 28px;
   background-color: red;
   color: #fff;

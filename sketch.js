@@ -17,6 +17,7 @@ let isTyping = false;
 
 let introIndex = 0;
 let introStarted = false; // evita doppia animazione
+let typingTimeout = null;
 
 
 function preload() {
@@ -45,14 +46,27 @@ function setup() {
 
   // navigazione con freccia destra
   document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowRight" && introStarted && !isTyping) {
+    if (e.key === "ArrowRight" && introStarted) {
+
+      // skip durante l animazione
+      if (isTyping) {
+        isTyping = false;      // ferma animazione
+        clearTimeout(typingTimeout);
+
+        // mostra subito tutto il testo della sezione completo
+        document.getElementById("intro-text").textContent = sectionsText[currentSection];
+        return;
+      }
+
+      // se si preme la freccetta non durante il typing passa alla prossima sezione
       nextSection();
     }
 
     if (e.key === "ArrowLeft") {
-    prevSection();
-  }
+      prevSection();
+    }
   });
+
 
   // scroll al testo quando clicchi la freccia
   document.getElementById("arrow").addEventListener("click", () => {
@@ -118,10 +132,13 @@ function typeSection(index) {
   isTyping = true;
 
   function typeChar() {
+    // skip al testo gia completo
+    if (!isTyping) return;
+
     if (typingIndex < sectionsText[index].length) {
       introEl.textContent += sectionsText[index].charAt(typingIndex);
       typingIndex++;
-      setTimeout(typeChar, 30);
+      typingTimeout = setTimeout(typeChar, 30);
     } else {
       isTyping = false;
     }
@@ -129,6 +146,7 @@ function typeSection(index) {
 
   typeChar();
 }
+
 
 
 // cambio sezione e aggiornamento pallini
