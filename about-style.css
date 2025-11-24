@@ -1,130 +1,79 @@
+/* RESET E LAYOUT PRINCIPALE: Rimuove lo scorrimento e imposta il layout a schermo intero */
 html, body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%; 
+  overflow: hidden; /* CRUCIALE: Disabilita lo scorrimento del browser */
 }
 
+/* ➡️ POSIZIONAMENTO E LIVELLI DEL CANVAS (P5.js) */
 canvas {
   display: block;
+  position: fixed; /* Fissa il canvas allo sfondo */
+  top: 0;
+  left: 0;
+  z-index: -1; /* Mette il canvas SOTTO tutti gli elementi DOM (il testo) */
 }
 
 body {
-  min-height: 400vh;
   background: #191919;
   color: rgb(255, 245, 233);
   font-family: "JetBrains Mono", monospace;
-  overflow-x: hidden;
 }
 
-/* distanza tra elementi dello stesso container */
+/* Distanza e Colori */
 :root {
   --spacing-small: 20px;
   --spacing-large: calc(var(--spacing-small) * 2);
-}
-
-/* distanza tra i container */
-.section {
-  width: 100%;
-  text-align: center;
-  position: absolute;
-}
-
-/* rende visibile quando il testo va a capo */
-#about-intro, #about-team, #about-project {
-  white-space: pre-line;
 }
 
 .red {
   color: red;
 }
 
-/* ABOUT US */
-
-#intro-container {
-  top: 20%;
-}
-
-#title {
-  font-size: 3rem;
-  font-weight: 400;
-  color: red;
-  white-space: nowrap;
-  margin-bottom: var(--spacing-large);
-}
-
-#about-intro {
-  width: 60%;
-  margin: 0 auto;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  font-weight: 200;
+/* ➡️ Stile per le Nuove Sezioni (Visualizzate una alla volta) */
+.about-section {
+  width: 100vw;
+  height: 100vh; /* Ogni sezione copre l'intero viewport */
   text-align: center;
-  opacity: 0;
-  margin-bottom: var(--spacing-large);
+  position: absolute; 
+  top: 0;
+  left: 0;
+  
+  /* Centratura e Posizionamento in Basso del Contenuto */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Allinea il contenuto in fondo */
+  align-items: center;
+  
+  /* Spazio e Livelli */
+  padding: 5%; 
+  padding-bottom: 10vh; /* Spazio extra dal bordo inferiore per il testo */
+  box-sizing: border-box;
+  background: transparent; /* Consente al canvas di essere visibile */
+  z-index: 1; /* Assicura che il testo sia SOPRA il canvas */
 }
 
-#arrow {
-  font-size: 2rem;
-  color: red;
-  margin-top: 0;
-  animation: blink 1.2s infinite alternate;
-}
-
-@keyframes blink {
-  from { opacity: 1; }
-  to   { opacity: 0.3; }
-}
-
-/* OUR TEAM */
-
-#team-container {
-  top: calc(20% + 140vh);
-}
-
-#our-team {
-  font-size: 2.4rem;
-  font-weight: 400;
-  color: red;
-  margin-bottom: var(--spacing-large);
-}
-
-#about-team {
-  width: 60%;
-  margin: 0 auto;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  text-align: center;
-  font-weight: 200;
-  opacity: 0;
-  margin-bottom: var(--spacing-large);
-}
-
-#arrow2 {
-  font-size: 2rem;
-  color: red;
-  animation: blink 1.2s infinite alternate;
-}
-
-/* OUR PROJECT */
-
-#project-container {
-  top: calc(20% + 280vh);
-}
-
-#our-project {
-  font-size: 2.4rem;
-  font-weight: 400;
+/* Stile per i Titoli H2 delle nuove sezioni */
+.about-section h2 {
+    font-size: 2.4rem;
+    font-weight: 400;
     color: red;
-  margin-bottom: var(--spacing-large);
+    margin-bottom: var(--spacing-small); 
 }
 
-#about-project {
+/* Stile per il Testo P delle nuove sezioni (usa la classe .about-text) */
+.about-text {
+  white-space: pre-line; /* Rende visibile quando il testo va a capo */
   width: 60%;
+  max-width: 700px; /* Limite per il testo */
   margin: 0 auto;
   font-size: 1.2rem;
   line-height: 1.6;
-  text-align: center;
   font-weight: 200;
-  opacity: 0;
+  text-align: center;
+  opacity: 0; /* Il JS gestirà l'opacità per l'effetto macchina da scrivere */
 }
 
-
+/* Rimosse tutte le regole obsolete specifiche per lo scrollytelling (es. #intro-container, #arrow, ecc.) */
