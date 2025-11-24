@@ -76,4 +76,26 @@ body {
   opacity: 0; /* Il JS gestirà l'opacità per l'effetto macchina da scrivere */
 }
 
-/* Rimosse tutte le regole obsolete specifiche per lo scrollytelling (es. #intro-container, #arrow, ecc.) */
+/* ⭐️ NUOVO: Stili per la navigazione a pallini */
+#navigation-bullets {
+    position: fixed;
+    bottom: 50px; /* Posizionamento in basso */
+    left: 50%;
+    transform: translateX(-50%); /* Centra orizzontalmente */
+    display: flex;
+    gap: 15px; /* Spazio tra i pallini */
+    z-index: 10; /* Deve stare sopra tutto il resto */
+}
+
+.bullet {
+    width: 10px;
+    height: 10px;
+    border: 1px solid rgb(255, 245, 233); /* Bordo bianco */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.bullet.active {
+    background-color: rgb(255, 245, 233); /* Riempimento bianco quando attivo */
+}
