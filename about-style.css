@@ -7,7 +7,7 @@ html, body {
   overflow: hidden; 
 }
 
-/* ➡️ POSIZIONAMENTO E LIVELLI DEL CANVAS (P5.js) */
+
 canvas {
   display: block;
   position: fixed; 
@@ -33,7 +33,7 @@ body {
   color: red;
 }
 
-/* ⭐️ NUOVO: BOTTONE RETURN */
+/* NUOVO: BOTTONE RETURN */
 #return-button {
     position: fixed;
     top: 25px; /* Spazio dall'alto */
@@ -153,16 +153,19 @@ body {
 }
 
 .bullet {
-    width: 10px;
-    height: 10px;
-    border: 1px solid rgb(255, 245, 233); 
+    width: 8px;
+    height: 8px;
+    border: 1px solid rgb(255, 245, 233); /* Manteniamo il bordo bianco */
+    background-color: rgb(255, 245, 233); /* NUOVO: Riempimento bianco */
     border-radius: 50%;
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
 }
 
+
 .bullet.active {
-    background-color: rgb(255, 245, 233); 
+    background-color: red; 
+    border-color: red;
 }
 
 /* --- SCHERMATA ANIMAZIONE TEAM --- */
