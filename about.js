@@ -1,49 +1,51 @@
-// Costanti per P5.js (Invariate)
-const DOT_COUNT = 80; 
-const DOT_RADIUS = 3;  
+let DOT_COUNT = 80; 
+let DOT_RADIUS = 3;  
 let dots = []; 
 let bullets; 
 
-// Distanza minima per il campo di forze (Invariata)
-const MIN_DISTANCE_SQUARED = 50 * 50; 
+// distanza minima per il campo di forze 
+let MIN_DISTANCE_SQUARED = 50 * 50; 
 
-// Sezioni di contenuto: 4 SEZIONI TOTALI (Invariate)
-const SECTIONS = [
+// sezioni
+let SECTIONS = [
   { id: "why-this-project", title: "WHY THIS PROJECT", text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." },
   { id: "why-this-metodology", title: "WHY THIS METODOLOGY", text: "Nunc id est ante. Ut in eleifend ex. Proin sed tortor non urna fringilla scelerisque. Vivamus quis magna sit amet urna consequat dictum. Sed luctus lacus nec tortor iaculis, at consectetur libero molestie. Curabitur vel justo sed libero pretium varius. Etiam in libero in orci vehicula rutrum vitae nec libero. Proin eu ipsum at quam varius cursus ac ut felis." },
   { id: "what-is-cpj", title: "WHAT IS CPJ", text: "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aenean vitae turpis in mi feugiat consectetur. Donec at elit tellus. Sed at metus eros. Aliquam erat volutpat. Nulla facilisi. In nec urna in elit aliquam tristique at quis ligula. Sed sit amet dolor at nibh varius placerat non nec nulla." },
   { id: "how-cpj-collected-this-dataset", title: "HOW CPJ COLLECTED THIS DATASET", text: "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Mauris euismod vel velit in dignissim. Cras tincidunt tortor in est bibendum, vitae bibendum dolor consequat. In hac habitasse platea dictumst. Sed in ex eget enim facilisis blandit. Suspendisse potenti. Nam non lectus velit." }
 ];
 
-// Dati del Team (Invariati)
-const TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
-const NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
-const RED_DOT_RATIO = 0.2; 
+let typingTimeoutText = null;
+let isTypingText = false;
 
-// Variabili di stato
+
+// dati team
+let TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
+let NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
+let RED_DOT_RATIO = 0.2; 
+
+// variabili di stato
 let currentSectionIndex = 0;
 let sectionTextIndices = new Array(SECTIONS.length).fill(0);
 let sectionTitleIndices = new Array(SECTIONS.length).fill(0); 
 let sectionStarted = new Array(SECTIONS.length).fill(false);
 let isTeamAnimationMode = false; 
 
-// AGGIORNATO: Ora il mouseTarget viene usato come Target di Attrazione
 let mouseTarget;
 
-// CLASSE DOT - MODIFICATO IL METODO update()
+// pallini
 class Dot {
   constructor(index) {
     this.initialPos = createVector(0, 0); 
     this.pos = createVector(random(width), random(height / 2)); 
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
-    this.maxSpeed = 1.5; // Leggermente più veloce per seguire il mouse
-    this.maxForce = 0.15; // Forza leggermente maggiore
+    this.maxSpeed = 1.5; // segue il mouse
+    this.maxForce = 0.15;
     this.index = index;
     this.dotColor = random(1) < RED_DOT_RATIO ? color(255, 0, 0) : 255;
   }
   
-  // Forza attrattiva (seek) verso una posizione target
+  // forza attrattiva (seek) verso una posizione target
   seek(target) {
     let desired = p5.Vector.sub(target, this.pos);
     let d = desired.mag();
@@ -58,7 +60,7 @@ class Dot {
     return steer;
   }
 
-  // Aggiunge un movimento casuale (tremolio) basato sul rumore Perlin (Invariata)
+  // tremolio basato sul rumore
   applyWiggle() {
     let noiseVal = noise(this.pos.x * 0.005 + frameCount * 0.001, this.pos.y * 0.005 + frameCount * 0.001);
     let angle = map(noiseVal, 0, 1, 0, TWO_PI);
@@ -67,11 +69,10 @@ class Dot {
     this.acc.add(wiggle);
   }
 
-  // AGGIORNATO: update() ora usa targetPos (che sarà mouseTarget in modalità team)
   update(targetPos) {
     this.initialPos.set(targetPos);
     
-    // Il target di attrazione è la posizione del mouse
+    // il target di attrazione è la posizione del mouse
     let seekingForce = this.seek(this.initialPos);
     this.acc.add(seekingForce);
     
@@ -81,7 +82,7 @@ class Dot {
     this.pos.add(this.vel);
     this.acc.mult(0); 
     
-    // Mantiene i pallini entro i limiti dello schermo
+    // mantiene i pallini entro i limiti dello schermo
     this.pos.x = constrain(this.pos.x, 0, width);
     this.pos.y = constrain(this.pos.y, 0, height);
   }
@@ -116,40 +117,38 @@ function setup() {
         returnButton.addEventListener('click', exitTeamAnimation);
     }
     
-    // Listener per aggiornare la posizione del mouse (Invariata)
+    // aggiorna la posizione del mouse
     document.addEventListener('mousemove', (event) => {
         mouseTarget = createVector(event.clientX, event.clientY);
     });
 
-    // Inizializza mouseTarget al centro
+    // mouseTarget al centro
     mouseTarget = createVector(width / 2, height / 2);
 
     document.addEventListener('keydown', handleKeyPress); 
     scrollToSection(currentSectionIndex); 
 }
 
-// Gestione degli eventi da tastiera 
-function handleKeyPress(event) {
-    if (event.key === "ArrowRight") {
-        if (currentSectionIndex < SECTIONS.length - 1) {
-            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
-            currentSectionIndex++;
-            scrollToSection(currentSectionIndex);
-        }
-    } else if (event.key === "ArrowLeft") {
-        if (isTeamAnimationMode) {
-            exitTeamAnimation(); 
+    // eventi da tastiera 
+    function handleKeyPress(event) {
+        if (event.key === "ArrowRight") {
+
+        // skip se si sta scrivendo il testo
+        if (isTypingText) {
+            skipTextTyping();
             return;
         }
-        if (currentSectionIndex > 0) {
-            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
-            currentSectionIndex--;
+
+        // se non sta scrivendo, va alla sezione successiva
+        if (currentSectionIndex < SECTIONS.length - 1) {
+            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active");
+            currentSectionIndex++;
             scrollToSection(currentSectionIndex);
         }
     }
 }
 
-// Scorrimento alla sezione 
+// scorrimento alla sezione 
 function scrollToSection(index) {
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
@@ -205,35 +204,73 @@ function scrollToSection(index) {
 
 
 function typeText(id, text, setIndex, getIndex, allowTags, speed) {
+
     let el = document.getElementById(id);
     el.style.opacity = 1;
     let idx = getIndex();
 
-    if (idx >= text.length) return;
-
-    if (allowTags && text[idx] === "<") {
-        let closing = text.indexOf(">", idx);
-        let tag = text.substring(idx, closing + 1);
-        el.innerHTML += tag;
-        idx = closing + 1;
-        setIndex(idx);
-        setTimeout(() => typeText(id, text, setIndex, getIndex, allowTags, speed), 10);
-        return;
+    if (id.endsWith("-text")) {
+        isTypingText = true;
     }
 
-    if (text[idx] === "\n") {
-        el.innerHTML += "<br>";
-        setIndex(idx + 1);
-        setTimeout(() => typeText(id, text, setIndex, getIndex, allowTags, speed), 35);
-        return;
+    function step() {
+        let i = getIndex();
+
+        // stop immediato allo skip
+        if (id.endsWith("-text") && !isTypingText) return;
+
+        if (i >= text.length) {
+            if (id.endsWith("-text")) isTypingText = false;
+            return;
+        }
+
+        if (allowTags && text[i] === "<") {
+            let closing = text.indexOf(">", i);
+            let tag = text.substring(i, closing + 1);
+            el.innerHTML += tag;
+            setIndex(closing + 1);
+
+            if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, 10);
+            else setTimeout(step, 10);
+
+            return;
+        }
+
+        if (text[i] === "\n") {
+            el.innerHTML += "<br>";
+            setIndex(i + 1);
+
+            if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, speed);
+            else setTimeout(step, speed);
+
+            return;
+        }
+
+        el.innerHTML += text.charAt(i);
+        setIndex(i + 1);
+
+        if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, speed);
+        else setTimeout(step, speed);
     }
 
-    el.innerHTML += text.charAt(idx);
-    setIndex(idx + 1);
-    setTimeout(() => typeText(id, text, setIndex, getIndex, allowTags, speed), speed);
+    step();
 }
 
-//  Funzione per uscire dalla modalità Team 
+function skipTextTyping() {
+    const section = SECTIONS[currentSectionIndex];
+    const id = section.id + "-text";
+
+    clearTimeout(typingTimeoutText);
+    isTypingText = false;
+
+    const el = document.getElementById(id);
+    el.innerHTML = section.text;
+
+    sectionTextIndices[currentSectionIndex] = section.text.length;
+}
+
+
+//  uscire dalla modalità team 
 function exitTeamAnimation() {
     isTeamAnimationMode = false;
     document.getElementById('team-content').style.opacity = '0';
@@ -256,7 +293,7 @@ function exitTeamAnimation() {
     }
 }
 
-// FUNZIONE ANIMAZIONE TEAM - AVVIO
+// avvio animazione team
 function startTeamAnimation() {
     document.getElementById('navigation-bullets').style.display = 'none';
     const currentSectionId = SECTIONS[currentSectionIndex].id;
@@ -269,52 +306,48 @@ function startTeamAnimation() {
     
     isTeamAnimationMode = true;
     
-    // Resetta i pallini per l'animazione Team (sparsi in tutta la finestra)
+    // reset dei pallini per l'animazione team (sparsi in tutta la finestra)
     dots.forEach(dot => {
-        // Assegna una posizione iniziale casuale, che funge da 'ancora' morbida
-        // L'attrazione del mouse prenderà il sopravvento.
+        // posizione iniziale casuale che poi variera in base al mouse
         dot.initialPos = createVector(random(width), random(height)); 
         dot.vel.mult(0);
         dot.acc.mult(0);
     });
 }
 
-
-//  Draw di P5.js 
 function draw() {
     background(25); 
 
     let targetPositions = [];
-    const centerX = width / 2;
-    const centerY = height / 3; 
+    let centerX = width / 2;
+    let centerY = height / 3; 
     
     
     if (isTeamAnimationMode) {
-        // Modalità Team: I pallini seguono il mouseTarget
+        // i pallini seguono il mouseTarget
         for (let i = 0; i < dots.length; i++) {
-            // Se il mouse si muove, usa la posizione del mouse come target.
-            // Altrimenti, i pallini si muovono verso la loro posizione casuale iniziale (effetto tremolio)
+            // se il mouse si muove, usa la posizione del mouse come target,
+            // altrimenti, i pallini si muovono verso la loro posizione casuale iniziale
             
-            // Per farli seguire il mouse, passiamo mouseTarget come targetPos
+            // i pallini seguono il mouse
             dots[i].update(mouseTarget); 
             dots[i].display();
         }
         
     } else {
-        // La logica delle Sezioni è attiva, usa le forme statiche
         switch (currentSectionIndex) {
-            case 0: // Sparse 
+            case 0: // random
                 for (let i = 0; i < DOT_COUNT; i++) {
                     targetPositions.push(createVector(random(width * 0.2, width * 0.8), random(height * 0.1, height * 0.5)));
                 }
                 break;
-            case 1: // Una riga orizzontale
+            case 1: // riga orizzontale
                 for (let i = 0; i < DOT_COUNT; i++) {
                     let x = map(i, 0, DOT_COUNT - 1, width * 0.2, width * 0.8);
                     targetPositions.push(createVector(x, centerY));
                 }
                 break;
-            case 2: // Tre righe
+            case 2: // tre righe
                 const rowCount = 3;
                 const separation = 40; 
                 const dotsPerRow = ceil(DOT_COUNT / rowCount);
@@ -325,7 +358,7 @@ function draw() {
                     targetPositions.push(createVector(x, y));
                 }
                 break;
-            case 3: // Cerchio
+            case 3: // cerchio
                 for (let i = 0; i < DOT_COUNT; i++) {
                     const radius = 150;
                     let angle = map(i, 0, DOT_COUNT, 0, TWO_PI);
@@ -336,7 +369,7 @@ function draw() {
                 break;
         }
         
-        // Aggiorna e disegna i pallini
+        // aggiorna e disegna i pallini
         for (let i = 0; i < dots.length; i++) {
             let target = targetPositions[i % targetPositions.length]; 
             dots[i].update(target);
@@ -345,7 +378,7 @@ function draw() {
     }
 }
 
-// Funzione windowResized (omessa per brevità, è invariata)
+// windowResized
 function windowResized() {
     resizeCanvas(windowWidth, windowHeight);
 }
