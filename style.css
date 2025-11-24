@@ -62,9 +62,11 @@ body {
 }
 
 #bullets-text-wrapper {
-display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 25px;
+  align-items: flex-start;
+  position: relative;
 }
 
 #intro-text {
@@ -77,10 +79,14 @@ display: flex;
 }
 
 #bullets {
-    flex-direction: row;
-  margin-top: 20px;
-  margin-right: 0;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
   gap: 12px;
+  margin-top: 15px;
 }
 
 .bullet {
