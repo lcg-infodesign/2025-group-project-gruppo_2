@@ -33,10 +33,10 @@ function setup() {
   setupIntroTrigger();
 
   //estrae colonna country
-  const countries = data.getColumn("country");
+  let countries = data.getColumn("country");
 
   //valori unici
-  const uniqueCountries = new Set(countries);
+  let uniqueCountries = new Set(countries);
 
   console.log("Valori unici:", [...uniqueCountries]);
   console.log("Numero di valori unici:", uniqueCountries.size);
