@@ -84,7 +84,9 @@ body {
   cursor: pointer;
   text-decoration: none;
   transition: color 0.3s ease-in-out;
+  white-space: nowrap;
 }
+
 
 .team-name:hover {
   color: red;

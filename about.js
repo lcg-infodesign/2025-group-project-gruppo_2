@@ -20,17 +20,11 @@ let SECTIONS = [
   { id: "how-cpj-collected-this-dataset", title: "HOW CPJ COLLECTED DATA", text: "The CPJ has tracked journalist fatalities since 1992, investigating and verifying every case. They classify a death as work-related only if the cause is direct reprisal, crossfire, or a dangerous assignment. Cases with unclear motives are labeled as unconfirmed and remain under investigation." }
 ];
 
-// dati team - DA TOGLIERE
-let TEAM_NAMES = ["Sara Allegro", "Filippo Garbero", "Letizia Neri", "Vanessa Preite", "Enea Tramontana", "Cristina Zheng"];
-let NAMES_PER_DOT = Math.ceil(DOT_COUNT / TEAM_NAMES.length);
-let RED_DOT_RATIO = 0.2; 
-
 // variabili di stato
 let currentSectionIndex = 0;
 let sectionTextIndices = new Array(SECTIONS.length).fill(0);
 let sectionTitleIndices = new Array(SECTIONS.length).fill(0); 
 let sectionStarted = new Array(SECTIONS.length).fill(false);
-
 
 
 // dots da capire come togliere
@@ -67,10 +61,6 @@ function handleKeyPress(event) {
             scrollToSection(currentSectionIndex);
         }
     } else if (event.key === "ArrowLeft") {
-        if (isTeamAnimationMode) {
-            exitTeamAnimation(); 
-            return;
-        }
         if (currentSectionIndex > 0) {
             if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
             currentSectionIndex--;
@@ -81,14 +71,10 @@ function handleKeyPress(event) {
 
 // scorrimento alla sezione ?????????
 function scrollToSection(index) {
-    isTeamAnimationMode = false;
-    document.getElementById('team-content').style.opacity = '0';
     document.getElementById('navigation-bullets').style.display = 'flex';
-    document.getElementById('return-button').style.opacity = '0';
-    document.getElementById('return-button').style.pointerEvents = 'none';
     
-    const sectionId = SECTIONS[index].id;
-    const allSections = document.querySelectorAll('.about-section'); 
+    let sectionId = SECTIONS[index].id;
+    let allSections = document.querySelectorAll('.about-section'); 
     
     if (bullets[index]) {
         bullets.forEach(b => b.classList.remove('active')); 
@@ -99,7 +85,7 @@ function scrollToSection(index) {
         section.style.display = 'none'; 
     });
 
-    const targetSection = document.getElementById(sectionId);
+    let targetSection = document.getElementById(sectionId);
 
     if (targetSection) {
         targetSection.style.display = 'flex'; 
