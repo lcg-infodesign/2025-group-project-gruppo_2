@@ -14,6 +14,7 @@ let yearWidth; //larghezza di ogni colonna (corrispondente a 1 anno)
 let diam; //diametro dei pallini
 let gravity; //regola la velocità della caduta
 
+
 // colori
 let bg; // colore di sfondo (nero)
 let white;
@@ -55,7 +56,7 @@ function setup() {
   rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
   initialX = padding + yLabelWidth ;
   yearWidth = (mainWidth - 2*padding - yLabelWidth) / (2025-1992);
-  diam = 10;
+  diam = 4;
   gravity = 2;
 
   //imposto i colori
@@ -95,12 +96,13 @@ function drawGrid(){
     textFont(font);
     textAlign(RIGHT, CENTER);
     textSize(12);
-    text(categories[i], padding, y, yLabelWidth - 10);
+    let yLabelOffset = 20; // quanto spostare a sinistra le etichette
+    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
 
     //righe orizzontali delle categorie
     noFill();
     stroke(white);
-    strokeWeight(1);
+    strokeWeight(0.5);
     line(padding + yLabelWidth, y, mainWidth - padding, y);
   }
 
@@ -112,27 +114,76 @@ function drawGrid(){
     line(x, topY, x, bottomY);
   }
 
-  //etichetta e tacca spessa ogni 5 anni
-  for(let i = 0; i < ceil((2025 - 1992) / 5); i++){
-    let label = i*5 + 1995;
-    let x = initialX + 3 * ((mainWidth - 2*padding - yLabelWidth) / (2025 - 1992)) + (i * 5) * yearWidth;
+  // Tacchette verticali prima del 1992
+    let xStart = initialX;        // inizio grafico (1992)
+    let numTicks = 10;            // numero di tacchette da disegnare
+    let maxStep = yearWidth;      // passo iniziale tra le prime tacchette
+    let minStep = 5;              // passo minimo vicino all'asse Y
 
-    //etichetta
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(CENTER, TOP);
-    textSize(12);
-    text(label, x, height - padding - 32);
+   for (let i = 1; i <= numTicks; i++) {
+    // passo progressivamente più piccolo verso sinistra
+    let step = map(i, 1, numTicks, maxStep, minStep);
+    xStart -= step;
 
-    //tacca spessa
+    // disegna la tacca verticale
+    stroke(255);                  // colore bianco
+    strokeWeight(1);              // spessore linea
     let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    noFill();
-    stroke(white);
-    strokeWeight(2);
-    line(x, topY, x, bottomY);
+    let bottomY = height - padding - 40;  // stessa altezza delle tacche regolari
+    line(xStart, topY, xStart, bottomY);
   }
+
+
+  //etichetta e tacca spessa ogni 5 anni
+      for (let i = 0; i < ceil((2025 - 1992) / 5); i++){
+      let label = i*5 + 1995;
+      let x = initialX + 3 * ((mainWidth - 2*padding - yLabelWidth) / (2025 - 1992)) + (i * 5) * yearWidth;
+
+      // etichetta
+      fill(white);
+      noStroke();
+      textFont(font);
+      textAlign(CENTER, TOP);
+      textSize(12);
+      text(label, x, height - padding - 32);
+
+      // pallino con glow sfumato
+      let yPallino = height - padding - 45; // stessa posizione verticale della tacca
+      let radius = 10;      // raggio interno pieno
+      let glowWidth = 8;   // larghezza del glow
+      let maxAlpha = 120;  // trasparenza massima del glow
+
+      // disegna il glow (cerchi concentrici)
+      for (let j = glowWidth; j > 0; j--) {
+        fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
+        noStroke();
+        circle(x, yPallino, radius + j);
+      }
+
+      // cerchio interno pieno
+      fill(255);
+      noStroke();
+      circle(x, yPallino, radius);
+    }
+
+
+
+    // asse Y verticale (linea bianca del grafico)
+    stroke(white);
+    strokeWeight(0.5);
+
+    let yAxisOffset = 15;        // quanto far partire prima del 1992
+    let yStartOffset = 20;       // quanto più in alto rispetto all'asse X
+
+    let xAxisY = height - padding - xLabelHeight;
+
+    line(
+      initialX - yAxisOffset,
+      xAxisY - yStartOffset,   // parte un po' più in alto dell'asse X
+      initialX - yAxisOffset,
+      padding                  // sale verso l'alto
+    );
+
 }
 
 //funzione che disegna i pallini di un anno
