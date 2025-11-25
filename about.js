@@ -138,12 +138,6 @@ function setup() {
         });
     }
     
-    // Gestione tasto di ritorno
-    const returnButton = document.getElementById('return-button');
-    if (returnButton) {
-        returnButton.addEventListener('click', exitTeamAnimation);
-    }
-    
     // Aggiorna la posizione del mouse
     document.addEventListener('mousemove', (event) => {
         mouseTarget = createVector(event.clientX, event.clientY);

@@ -33,68 +33,33 @@ body {
   color: red;
 }
 
-/*BOTTONE RETURN */
-#return-button {
-    position: fixed;
-    top: 25px; /* Spazio dall'alto */
-    left: 5%; /* Allineato con il contenuto */
-    z-index: 25; /* Sopra l'header e tutto il resto */
-    
-    /* Stile minimalista per un'azione di ritorno */
-    padding: 10px 15px;
-    background-color: transparent;
-    color: rgb(255, 245, 233);
-    font-weight: 400;
-    font-size: 0.9rem;
-    font-family: "JetBrains Mono", monospace;
-    text-decoration: none; 
-    border: 1px solid rgb(255, 245, 233); 
-    border-radius: 5px;
-    cursor: pointer;
-    
-    /* Animazione e stato iniziale */
-    opacity: 0; /* Inizialmente nascosto */
-    transition: opacity 0.4s, background-color 0.3s, color 0.3s;
-    pointer-events: none; /* Disabilita il click quando è nascosto */
-}
-
-#return-button:hover {
-    background-color: rgb(255, 245, 233);
-    color: #191919;
-}
-
-/* HEADER FISSO */
 #main-header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    height: var(--header-height);
+    height: 80px;
     display: flex;
-    justify-content: flex-end; 
+    justify-content: flex-end;
     align-items: center;
     padding: 0 5%;
     box-sizing: border-box;
-    z-index: 20; 
-    background-color: transparent; 
+    z-index: 20;
+    background-color: transparent;
 }
 
 .nav-link {
     color: rgb(255, 245, 233);
     text-decoration: none;
     font-size: 0.9rem;
-    margin-left: var(--spacing-large);
-    /* AGGIUNTO text-shadow per transizione fluida */
-    transition: color 0.3s, text-shadow 0.3s; 
+    margin-left: 40px;
     cursor: pointer;
+    transition: color 0.2s ease-in-out;
 }
 
-/*Hover con effetto Glow */
 .nav-link:hover {
-    color: rgb(255, 245, 233); 
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.7), 0 0 10px rgba(255, 255, 255, 0.5); 
+    text-decoration: underline;
 }
-
 
 
 /* --- SEZIONI DI CONTENUTO TESTUALE --- */

@@ -17,37 +17,44 @@
   </head>
 
   <body>
-  <div id="container">
-    <!-- CANVAS P5 -->
-    <div id="sketch-container"></div>
+    <header id="main-header">
+      <a href="index.html" class="nav-link">HOME</a>
+      <a href="main.html" class="nav-link">VISUALIZATION</a>
+      <a href="about.html" class="nav-link">ABOUT</a>
+      <a href="team.html" class="nav-link">TEAM</a>
+    </header>
 
-    <!-- SIDEBAR -->
-  <div id="sidebar">
- 
-    <!-- Bottone WORLDWIDE -->
-  <div class="filter-dropdown">
-  <button class="filter-btn" id="worldwideBtn">
-    WORLDWIDE <span class="arrow">▼</span>
-  </button>
-  <div class="filter-panel" id="filterPanel">
-    <!-- Paesi inseriti dinamicamente -->
+    <div id="container">
+      <!-- CANVAS P5 -->
+      <div id="sketch-container"></div>
+
+      <!-- SIDEBAR -->
+    <div id="sidebar">
+  
+      <!-- Bottone WORLDWIDE -->
+    <div class="filter-dropdown">
+    <button class="filter-btn" id="worldwideBtn">
+      WORLDWIDE <span class="arrow">▼</span>
+    </button>
+    <div class="filter-panel" id="filterPanel">
+      <!-- Paesi inseriti dinamicamente -->
+    </div>
   </div>
-</div>
 
-  <!-- Contatore vittime -->
-  <div id="deathCounterContainer" style="display: none;">
-    <div class="death-counter-title">Number of victims</div>
-    <div id="deathCounter" class="death-counter">0</div>
+    <!-- Contatore vittime -->
+    <div id="deathCounterContainer" style="display: none;">
+      <div class="death-counter-title">Number of victims</div>
+      <div id="deathCounter" class="death-counter">0</div>
+    </div>
+
+    <!-- Bottoni HOME e ABOUT in basso -->
+    <div class="sidebar-bottom">
+      <a href="index.html" class="nav-btn">HOME</a>
+      <a href="about.html" class="nav-btn">ABOUT US</a>
+    </div>
   </div>
 
-  <!-- Bottoni HOME e ABOUT in basso -->
-  <div class="sidebar-bottom">
-    <a href="index.html" class="nav-btn">HOME</a>
-    <a href="about.html" class="nav-btn">ABOUT US</a>
-  </div>
-</div>
-
-  <script src="main.js"></script>
-</body>
+    <script src="main.js"></script>
+  </body>
 
 </html>
