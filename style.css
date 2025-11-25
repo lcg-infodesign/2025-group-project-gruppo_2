@@ -1,6 +1,6 @@
 html {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -11,7 +11,6 @@ canvas {
   left: 0;
   z-index: -1;
 }
-
 
 body {
   min-height: 200vh;
@@ -28,7 +27,6 @@ body {
   text-align: center;
 }
 
-
 #title {
   font-size: 5rem;
   font-weight: 400;
@@ -41,16 +39,16 @@ body {
   color: red;
   margin-top: 20px;
   animation: blink 1.2s infinite alternate;
+  cursor: pointer;
 }
 
 @keyframes blink {
   from { opacity: 1; }
-  to   { opacity: 0.3; }
+  to { opacity: 0.3; }
 }
 
 #intro-container {
   position: relative;
-  /*top: calc(30% + 80vh);*/
   margin-top: 50vh;
   left: 50%;
   transform: translateX(-50%);
@@ -62,75 +60,29 @@ body {
   opacity: 1;
 }
 
-#bullets-text-wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
-  align-items: flex-start;
-  position: relative;
-}
-
 #intro-text {
   opacity: 0;
   min-height: 180px;
-  width: 750px; 
+  width: 750px;
   font-size: 1.2rem;
   line-height: 1.6;
   text-align: center;
-}
-
-#bullets {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.bullet {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.667);
-  transition: background 0.3s;
-}
-
-.bullet.active {
-  background: red;
+  transition: opacity 0.6s ease;
 }
 
 #button {
-  margin: 70px auto;
+  margin: 30px auto;
   padding: 12px 28px;
   background-color: red;
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
-  text-decoration: none; 
+  text-decoration: none;
   border-radius: 12px;
   text-align: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.6s;
+  transition: opacity 0.6s ease;
   width: fit-content;
   display: block;
 }
-
-#navigation-help {
-  position: fixed;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: underline;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: none;
-}
-
-
