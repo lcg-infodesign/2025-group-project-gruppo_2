@@ -56,7 +56,7 @@ function setup() {
   rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
   initialX = padding + yLabelWidth ;
   yearWidth = (mainWidth - 2*padding - yLabelWidth) / (2025-1992);
-  diam = 10;
+  diam = 4;
   gravity = 2;
 
   //imposto i colori
@@ -102,7 +102,7 @@ function drawGrid(){
     //righe orizzontali delle categorie
     noFill();
     stroke(white);
-    strokeWeight(1);
+    strokeWeight(0.5);
     line(padding + yLabelWidth, y, mainWidth - padding, y);
   }
 
@@ -170,7 +170,7 @@ function drawGrid(){
 
     // asse Y verticale (linea bianca del grafico)
     stroke(white);
-    strokeWeight(1);
+    strokeWeight(0.5);
 
     let yAxisOffset = 15;        // quanto far partire prima del 1992
     let yStartOffset = 20;       // quanto più in alto rispetto all'asse X
