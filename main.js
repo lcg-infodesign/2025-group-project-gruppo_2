@@ -1,23 +1,23 @@
 let data;
 
 // dimensioni
-let sidebarWidth; // larghezza della barra laterale
-let mainWidth; // larghezza della zona principale
-let padding; // margini dai bordi
+let sidebarWidth; // larghezza barra laterale
+let mainWidth;    // larghezza area principale
+let padding;      // margini dai bordi
 
-let yLabelWidth; // larghezza etichette asse y
-let xLabelHeight; // altezza etichette asse x
-let rowHeight; // altezza riga
-let initialX; // posizione x del primo anno
-let yearWidth; // larghezza colonna anno
-let diam; // diametro pallini
-let gravity; // velocità caduta
+let yLabelWidth;  // larghezza etichette asse Y
+let xLabelHeight; // altezza etichette asse X
+let rowHeight;    // altezza riga
+let initialX;     // posizione X del primo anno
+let yearWidth;    // larghezza colonna anno
+let diam;         // diametro pallini
+let gravity;      // velocità caduta pallini
 
 // colori
 let bg, white, red, red_translucent, red_hover;
 let font = "JetBrains Mono";
 
-// pallini
+// oggetto pallini
 let dots = {};
 
 // filtri
@@ -36,7 +36,7 @@ let categories = [
   "Unknown"
 ];
 
-// animazione della freccia dei filtri
+// --- Barra di ricerca / toggle ---
 function toggleSearch() {
   const btn = document.getElementById("worldwideBtn");
   const panel = document.getElementById("filterPanel");
@@ -58,9 +58,9 @@ function toggleSearch() {
   input.type = "text";
   input.id = "countrySearchInput";
   input.placeholder = "Search country...";
-  input.style.flex = "1"; // input occupa tutto lo spazio possibile
+  input.style.flex = "1"; // input occupa tutto lo spazio disponibile
 
-  // Icona lente (SVG) a destra
+  // Icona lente a destra (SVG stilizzata)
   const searchIcon = document.createElement("span");
   searchIcon.innerHTML = `
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -71,7 +71,7 @@ function toggleSearch() {
   `;
   searchIcon.style.display = "inline-flex";
 
-  // X per chiudere 
+  // X per chiudere la barra
   const closeIcon = document.createElement("span");
   closeIcon.className = "close-icon";
   closeIcon.textContent = "✕";
@@ -87,14 +87,17 @@ function toggleSearch() {
 
   input.focus();
 
+  // Filtra i paesi mentre digiti
   input.addEventListener("input", function () {
     filterCountries(this.value);
   });
 
+  // Chiudi con ESC
   input.addEventListener("keydown", function (e) {
     if (e.key === "Escape") closeSearch();
   });
 
+  // Chiudi cliccando la X
   closeIcon.addEventListener("click", closeSearch);
 
   function closeSearch() {
@@ -104,6 +107,7 @@ function toggleSearch() {
   }
 }
 
+// Filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
   const countryDivs = panel.querySelectorAll("div");
@@ -114,6 +118,7 @@ function filterCountries(value) {
   });
 }
 
+// --- Caricamento dati ---
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
 }
@@ -143,7 +148,7 @@ function setup() {
 
   let nRows = data.getRowCount();
 
-  // carica dati in dots
+  // Carica i dati in dots e crea lista paesi unici
   for (let i = 0; i < nRows; i++) {
     let date = data.get(i, "entry_date");
     let year = parseInt(date.slice(-4));
@@ -156,31 +161,80 @@ function setup() {
     };
     dots[i] = journalist;
 
-    // costruisci lista paesi unici
+    // Lista paesi unici
     let country = journalist.country;
     if (!countries.includes(country)) countries.push(country);
   }
 
-  // popola tendina
+  // Ordina alfabeticamente
+  countries.sort((a, b) => a.localeCompare(b));
+
+  // Popola tendina dei paesi
   const panel = document.getElementById("filterPanel");
   countries.forEach(country => {
     const div = document.createElement("div");
     div.textContent = country;
+   
     div.onclick = () => {
       selectedCountry = country;
       panel.style.display = "none";
-
       const btn = document.getElementById("worldwideBtn");
       btn.classList.remove("search-mode");
       btn.textContent = country + " ▼";
+       // Nascondi pannello filtri
+      panel.style.display = "none";
+
+  // Mostra il quadrato e aggiorna il numero di vittime
+  updateDeathCounter(country);
+  document.getElementById("deathCounterContainer").style.display = "block";
     };
     panel.appendChild(div);
   });
 
+  // Click bottone per aprire ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
+
+  countries.forEach(country => {
+  const div = document.createElement("div");
+  div.textContent = country;
+  div.onclick = () => {
+    selectedCountry = country;
+    
+    // Aggiorna bottone
+    const btn = document.getElementById("worldwideBtn");
+    btn.classList.remove("search-mode");
+    btn.textContent = country + " ▼";
+    
+    // Aggiorna contatore vittime
+    updateDeathCounter(country);
+    
+    // Mostra il quadrato se era nascosto
+    document.getElementById("deathCounterContainer").style.display = "block";
+
+    // Chiudi il pannello
+    const panel = document.getElementById("filterPanel");
+    panel.style.display = "none";
+  };
+  panel.appendChild(div);
+});
+
+function updateDeathCounter(country) {
+  const counter = document.getElementById("deathCounter");
+  
+  // Conta il numero di vittime nel dataset per quel paese
+  let count = 0;
+  for (let i = 0; i < data.getRowCount(); i++) {
+    if (data.get(i, "country") === country) {
+      count++;
+    }
+  }
+  
+  counter.textContent = count;
 }
 
-// disegna griglia
+}
+
+// --- Disegna griglia e tacche ---
 function drawGrid() {
   // righe categorie
   for (let i = 0; i < categories.length; i++) {
@@ -225,7 +279,7 @@ function drawGrid() {
     line(xStart, topY, xStart, bottomY);
   }
 
-  // etichette ogni 5 anni
+  // etichette ogni 5 anni con pallino glow
   for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
     let label = 1992 + i * 5;
     let x = initialX + (label - 1992) * yearWidth;
@@ -237,7 +291,7 @@ function drawGrid() {
     textSize(12);
     text(label, x, height - padding - 32);
 
-    // pallino glow
+    // glow
     let yPallino = height - padding - 45;
     let radius = 10;
     let glowWidth = 8;
@@ -259,11 +313,10 @@ function drawGrid() {
   let yAxisOffset = 15;
   let yStartOffset = 20;
   let xAxisY = height - padding - xLabelHeight;
-
   line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
 }
 
-// animazione pallini
+// --- Animazione pallini ---
 function animateDot(i) {
   if (selectedCountry && dots[i].country !== selectedCountry) return;
 
@@ -273,27 +326,30 @@ function animateDot(i) {
   let maxY = padding + categoryIndex * rowHeight + rowHeight / 2;
   let x = initialX + (dots[i].year - 1992) * yearWidth;
 
+  // caduta limitata
   if (dots[i].y < maxY) {
     dots[i].y += gravity;
   } else {
     dots[i].y = maxY;
   }
+
   circle(x, dots[i].y, diam);
 }
 
+// --- Disegna ---
 function draw() {
   background(bg);
 
-  // sfumatura tra sidebar e grafico
-  let blurWidth = 12;  // larghezza sfumatura
-let maxAlpha = 200;  // opacità massima
-let blurStartX = mainWidth; // inizio blur a destra del grafico
+  // sfumatura verticale tra grafico e sidebar
+  let blurWidth = 10;
+  let maxAlpha = 200;
+  let blurStartX = mainWidth; // subito prima della sidebar
 
-for (let i = 0; i < blurWidth; i++) {
-  stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
-  strokeWeight(1);
-  line(blurStartX -i, 0, blurStartX -i, height); // +i per sfumare verso destra
-}
+  for (let i = 0; i < blurWidth; i++) {
+    stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
+    strokeWeight(1);
+    line(blurStartX + i, 0, blurStartX + i, height); // sfumatura verso destra
+  }
 
   drawGrid();
 
