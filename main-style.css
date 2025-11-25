@@ -1,8 +1,230 @@
 html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-canvas {
-  display: block;
+#container {
+  display: flex;       /* affianca canvas e sidebar */
+  height: 100vh;
+  width: 100vw;
+}
+
+#sketch-container {
+  flex: 1;             /* prende tutto lo spazio a sinistra */
+  position: relative;   
+}
+
+#sidebar {
+  width: 380px;        /* sidebarWidth */
+  background-color: #000000;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh; 
+}
+
+/* pulsanti e filtri */
+.filter-dropdown, .sidebar-bottom {
+  margin-bottom: 20px;
+}
+
+/* ================== BOTTONI ================== */
+
+/* WORLDWIDE BUTTON e simili */
+.filter-btn {
+  display: flex;                
+  align-items: center;           
+  justify-content: center;       
+  width: 100%;                   
+  margin: 5px 0;
+  padding: 12px 28px;           /* più spazio interno */
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 12px;          /* angoli arrotondati */
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  position: relative;            /* per freccia se presente */
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.filter-btn:hover {
+  transform: scale(1.03);
+  background-color: darkred;
+}
+
+/* FRECCIA DENTRO IL BOTTONE */
+.filter-btn .arrow {
+  margin-left: 8px;              
+  font-size: 14px;               
+  vertical-align: middle;        
+  transition: transform 0.3s ease;
+}
+
+.filter-dropdown.open .arrow {
+  transform: rotate(180deg);
+  display: inline-block;
+}
+
+/* INPUT BAR */
+.filter-input {
+  width: 100%;
+  padding: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  background-color: #111;
+  color: white;
+  border: 1px solid red;
+  border-radius: 12px;          /* arrotondato */
+  outline: none;             
+  box-sizing: border-box;
+}
+
+.filter-input:focus {
+  outline: none;              
+  border: 1px solid red;      
+  box-shadow: 0 0 0 1px red; 
+}
+
+/* Colore del testo placeholder */
+.filter-input::placeholder {
+  color: rgb(80, 79, 79);
+  opacity: 1; 
+}
+
+/* DROPDOWN PANEL */
+.filter-panel {
+  display: none;                 
+  max-height: 250px;             
+  overflow-y: auto;              
+  background-color: #000;        
+  color: white;
+  border: 1px solid red;         
+  box-sizing: border-box;
+  margin-top: 5px;               
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  padding: 2px 0;                
+  border-radius: 4px;            
+  z-index: 10;                   
+}
+
+.filter-panel div {
+  padding: 8px 12px;             
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.filter-panel div:hover {
+  background-color: darkred;
+  color: white;
+}
+
+/* Input di ricerca dentro il panel */
+#countrySearch {
+  width: 100%;
+  padding: 6px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  border: 1px solid red;
+  background-color: #111;
+  color: white;
+  box-sizing: border-box;
+  margin-bottom: 5px;
+  outline: none;
+}
+
+/* ================== NAV BOTTONI IN BASSO ================== */
+.nav-btn {
+  flex: 1;
+  text-align: center;
+  display: inline-block;
+  padding: 12px 0;              /* più alto */
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 12px;          /* arrotondato */
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.nav-btn:hover {
+  transform: scale(1.03);
+  background-color: darkred;
+}
+
+/* ---------------- BOTTONI BASSO SIDEBAR ---------------- */
+.sidebar-bottom {
+  display: flex;           
+  gap: 10px;               
+  margin-bottom: 20px;
+}
+
+/* ================== WORLDWIDE SEARCH MODE ================== */
+.filter-btn.search-mode {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  padding: 0 12px;              
+  background-color: #111;
+  border: 1px solid red;
+  border-radius: 12px;          /* arrotondato */
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.filter-btn.search-mode:hover {
+  border-color: darkred;
+}
+
+.filter-btn.search-mode input {
+  width: 100%;
+  padding: 0 30px;             
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  height: 100%;
+}
+
+.filter-btn.search-mode input::placeholder {
+  color: white;
+  opacity: 1;
+}
+
+/* Icone all'interno del bottone search */
+.search-icon,
+.close-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 8px;
+  user-select: none;
+}
+
+.search-icon {
+  right: 10px;  
+}
+
+.close-icon {
+  left: 10px;   
 }
