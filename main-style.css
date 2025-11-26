@@ -33,21 +33,29 @@ html, body {
     text-decoration: underline;
 }
 
-
 #container {
-  display: flex;       /* affianca canvas e sidebar */
+  display: flex;
   height: 100vh;
   width: 100vw;
+  display: flex;
+  height: calc(100vh - 80px);
+  width: 100vw;
+  padding-top: 80px;
+  box-sizing: border-box;
 }
 
 #sketch-container {
-  flex: 1;             /* prende tutto lo spazio a sinistra */
+  flex: 1;
   position: relative;   
+}
+
+#sketch-container canvas {
+    top: 80px !important;
 }
 
 #sidebar {
   width: 380px;        /* sidebarWidth */
-  background-color: #000000;
+  background-color: #151515;
   color: white;
   padding: 20px;
   box-sizing: border-box;
@@ -57,39 +65,30 @@ html, body {
   height: 100vh; 
 }
 
-/* pulsanti e filtri */
-.filter-dropdown, .sidebar-bottom {
+.filter-dropdown {
   margin-bottom: 20px;
 }
 
-/* ================== BOTTONI ================== */
-
-/* WORLDWIDE BUTTON e simili */
 .filter-btn {
   display: flex;                
   align-items: center;           
   justify-content: center;       
   width: 100%;                   
   margin: 5px 0;
-  padding: 12px 28px;           /* più spazio interno */
+  padding: 12px 28px;
   background-color: red;
   color: white;
   border: none;
-  border-radius: 12px;          /* angoli arrotondati */
+  border-radius: 12px;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
-  position: relative;            /* per freccia se presente */
+  position: relative;
   transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 100;
 }
 
-.filter-btn:hover {
-  transform: scale(1.03);
-  background-color: darkred;
-}
-
-/* FRECCIA DENTRO IL BOTTONE */
 .filter-btn .arrow {
   margin-left: 8px;              
   font-size: 14px;               
@@ -102,16 +101,14 @@ html, body {
   display: inline-block;
 }
 
-/* INPUT BAR */
 .filter-input {
   width: 100%;
   padding: 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
+  font-size: 1px;
   background-color: #111;
   color: white;
   border: 1px solid red;
-  border-radius: 12px;          /* arrotondato */
+  border-radius: 12px;
   outline: none;             
   box-sizing: border-box;
 }
@@ -122,18 +119,15 @@ html, body {
   box-shadow: 0 0 0 1px red; 
 }
 
-/* Colore del testo placeholder */
 .filter-input::placeholder {
-  color: rgb(80, 79, 79);
-  opacity: 1; 
+  color: rgba(80, 79, 79, 0.3);
 }
 
-/* DROPDOWN PANEL */
 .filter-panel {
   display: none;                 
   max-height: 250px;             
   overflow-y: auto;              
-  background-color: #000;        
+  background-color: #151515;        
   color: white;
   border: 1px solid red;         
   box-sizing: border-box;
@@ -156,12 +150,11 @@ html, body {
   color: white;
 }
 
-/* Input di ricerca dentro il panel */
 #countrySearch {
   width: 100%;
   padding: 6px 10px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
+  font-size: 12px;
   border: 1px solid red;
   background-color: #111;
   color: white;
@@ -170,36 +163,6 @@ html, body {
   outline: none;
 }
 
-/* ================== NAV BOTTONI IN BASSO ================== */
-.nav-btn {
-  flex: 1;
-  text-align: center;
-  display: inline-block;
-  padding: 12px 0;              /* più alto */
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 12px;          /* arrotondato */
-  cursor: pointer;
-  text-decoration: none;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-.nav-btn:hover {
-  transform: scale(1.03);
-  background-color: darkred;
-}
-
-/* ---------------- BOTTONI BASSO SIDEBAR ---------------- */
-.sidebar-bottom {
-  display: flex;           
-  gap: 10px;               
-  margin-bottom: 20px;
-}
-
-/* ================== WORLDWIDE SEARCH MODE ================== */
 .filter-btn.search-mode {
   position: relative;
   display: flex;
@@ -210,7 +173,7 @@ html, body {
   padding: 0 12px;              
   background-color: #111;
   border: 1px solid red;
-  border-radius: 12px;          /* arrotondato */
+  border-radius: 12px;
   box-sizing: border-box;
   transition: border-color 0.2s ease;
 }
@@ -233,13 +196,11 @@ html, body {
 }
 
 .filter-btn.search-mode input::placeholder {
-  color: white;
+  color: rgba(255, 255, 255, 0.3);
   opacity: 1;
 }
 
-/* Icone all'interno del bottone search */
-.search-icon,
-.close-icon {
+.search-icon, .close-icon {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -251,7 +212,7 @@ html, body {
 }
 
 .search-icon {
-  right: 10px;  
+  right: 15px;  
 }
 
 .close-icon {

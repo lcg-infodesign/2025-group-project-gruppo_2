@@ -1,9 +1,8 @@
 let data;
 
-// dimensioni
-let sidebarWidth; // larghezza barra laterale
-let mainWidth;    // larghezza area principale
-let padding;      // margini dai bordi
+let sidebarWidth;
+let mainWidth;
+let padding;
 
 let yLabelWidth;  // larghezza etichette asse Y
 let xLabelHeight; // altezza etichette asse X
@@ -14,7 +13,7 @@ let diam;         // diametro pallini
 let gravity;      // velocità caduta pallini
 
 // colori
-let bg, white, red, red_translucent, red_hover;
+let white, red, red_translucent, red_hover;
 let font = "JetBrains Mono";
 
 // oggetto pallini
@@ -36,7 +35,7 @@ let categories = [
   "Unknown"
 ];
 
-// --- Barra di ricerca / toggle ---
+// toggle barra di ricerca
 function toggleSearch() {
   const btn = document.getElementById("worldwideBtn");
   const panel = document.getElementById("filterPanel");
@@ -46,7 +45,7 @@ function toggleSearch() {
   btn.classList.add("search-mode");
   panel.style.display = "block";
 
-  // Wrapper input + icone
+  // wrapper input e icone
   const searchWrapper = document.createElement("div");
   searchWrapper.className = "search-wrapper";
   searchWrapper.style.display = "flex";
@@ -57,8 +56,8 @@ function toggleSearch() {
   const input = document.createElement("input");
   input.type = "text";
   input.id = "countrySearchInput";
-  input.placeholder = "Search country...";
-  input.style.flex = "1"; // input occupa tutto lo spazio disponibile
+  input.placeholder = "Search for a country...";
+  input.style.flex = "1"; // occupa tutto lo spazio disponibile
 
   // Icona lente a destra (SVG stilizzata)
   const searchIcon = document.createElement("span");
@@ -101,9 +100,15 @@ function toggleSearch() {
   closeIcon.addEventListener("click", closeSearch);
 
   function closeSearch() {
-    btn.classList.remove("search-mode");
-    panel.style.display = "none";
-    btn.textContent = selectedCountry ? selectedCountry + " ▼" : "Worldwide ▼";
+      btn.classList.remove("search-mode");
+      panel.style.display = "none";
+      
+      selectedCountry = null;
+      
+      btn.textContent = "Worldwide ▼";
+
+      // Nasconde il quadrato delle vittime
+      document.getElementById("deathCounterContainer").style.display = "none";
   }
 }
 
@@ -129,7 +134,8 @@ function setup() {
   padding = 30;
 
   let canvas = createCanvas(mainWidth, windowHeight);
-  canvas.position(0, 0);
+  canvas.position(0, 80);
+
 
   yLabelWidth = padding + 60;
   xLabelHeight = 50;
@@ -140,7 +146,6 @@ function setup() {
   gravity = 2;
 
   // colori
-  bg = color(0);
   white = color(255);
   red = color(255, 0, 0);
   red_translucent = color(255, 0, 0, 60);
@@ -338,7 +343,7 @@ function animateDot(i) {
 
 // --- Disegna ---
 function draw() {
-  background(bg);
+  background(25);
 
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;

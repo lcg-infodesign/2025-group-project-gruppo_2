@@ -1,16 +1,6 @@
-//queste non ci servono -> da togliere ma se si tolgono si sminchia tutto quindi capire
-let DOT_COUNT = 80;         // totale pallini
-let SECTION_DOT_COUNT = 80;
-let DOT_RADIUS = 3;         // raggio pallino
-let dots = []; 
-
-
-let bullets; 
-
 // variabili x animazione typing
 let typingTimeoutText = null;
 let isTypingText = false;
-
 
 // sezioni contenuto
 let SECTIONS = [
@@ -23,108 +13,94 @@ let SECTIONS = [
 // variabili di stato
 let currentSectionIndex = 0;
 let sectionTextIndices = new Array(SECTIONS.length).fill(0);
-let sectionTitleIndices = new Array(SECTIONS.length).fill(0); 
+let sectionTitleIndices = new Array(SECTIONS.length).fill(0);
 let sectionStarted = new Array(SECTIONS.length).fill(false);
 
-
-// dots da capire come togliere
-class Dot {
-}
-
 function setup() {
-    createCanvas(windowWidth, windowHeight); 
-    
-    // inizializza i pallini
-    for (let i = 0; i < DOT_COUNT; i++) {
-        dots.push(new Dot(i));
-    }
+    createCanvas(windowWidth, windowHeight);
 
-    bullets = document.querySelectorAll(".bullet");
+    // gestione tasti
+    document.addEventListener('keydown', handleKeyPress);
 
-    document.addEventListener('keydown', handleKeyPress); 
-    scrollToSection(currentSectionIndex); 
+    scrollToSection(currentSectionIndex);
 }
 
-// eventi tastiera 
+// eventi tastiera
 function handleKeyPress(event) {
+
+    // freccia destra x andare avanti
     if (event.key === "ArrowRight") {
-        // skip a testo completo
+
+        // se sta scrivendo il testo skippa al testo completo
         if (isTypingText) {
             skipTextTyping();
             return;
         }
 
-        // se non sta scrivendo passa alla sezione successiva
+        // sezione successiva
         if (currentSectionIndex < SECTIONS.length - 1) {
-            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active");
             currentSectionIndex++;
             scrollToSection(currentSectionIndex);
         }
-    } else if (event.key === "ArrowLeft") {
+    }
+
+    // freccia sinistra x tornare indietro
+    else if (event.key === "ArrowLeft") {
         if (currentSectionIndex > 0) {
-            if (bullets[currentSectionIndex]) bullets[currentSectionIndex].classList.remove("active"); 
             currentSectionIndex--;
             scrollToSection(currentSectionIndex);
         }
     }
 }
 
-// scorrimento alla sezione ?????????
+// mostra solo la sezione corretta
 function scrollToSection(index) {
-    document.getElementById('navigation-bullets').style.display = 'flex';
-    
-    let sectionId = SECTIONS[index].id;
-    let allSections = document.querySelectorAll('.about-section'); 
-    
-    if (bullets[index]) {
-        bullets.forEach(b => b.classList.remove('active')); 
-        bullets[index].classList.add("active");
-    }
 
-    allSections.forEach(section => {
-        section.style.display = 'none'; 
-    });
+    let sectionId = SECTIONS[index].id;
+    let allSections = document.querySelectorAll('.about-section');
+
+    allSections.forEach(section => section.style.display = 'none');
 
     let targetSection = document.getElementById(sectionId);
+    if (!targetSection) return;
 
-    if (targetSection) {
-        targetSection.style.display = 'flex'; 
+    targetSection.style.display = 'flex';
 
-        if (!sectionStarted[index]) {
-            sectionStarted[index] = true;
-            
-            document.getElementById(`${sectionId}-title`).textContent = "";
-            document.getElementById(`${sectionId}-text`).textContent = ""; 
-            
+    // animazione parte all apertura della pagina
+    if (!sectionStarted[index]) {
+        sectionStarted[index] = true;
+
+        document.getElementById(`${sectionId}-title`).textContent = "";
+        document.getElementById(`${sectionId}-text`).textContent = "";
+
+        // typing titolo
+        typeText(
+            `${sectionId}-title`,
+            SECTIONS[index].title,
+            (idx) => sectionTitleIndices[index] = idx,
+            () => sectionTitleIndices[index],
+            false,
+            50
+        );
+
+        // typing testo
+        setTimeout(() => {
             typeText(
-                `${sectionId}-title`, 
-                SECTIONS[index].title, 
-                (idx) => sectionTitleIndices[index] = idx, 
-                () => sectionTitleIndices[index], 
-                false, 
-                50 
-            ); 
-
-            setTimeout(() => {
-                typeText(
-                    `${sectionId}-text`, 
-                    SECTIONS[index].text, 
-                    (idx) => sectionTextIndices[index] = idx, 
-                    () => sectionTextIndices[index],
-                    true, 
-                    35 
-                );
-            }, 1000); 
-        }
+                `${sectionId}-text`,
+                SECTIONS[index].text,
+                (idx) => sectionTextIndices[index] = idx,
+                () => sectionTextIndices[index],
+                true,
+                35
+            );
+        }, 1000);
     }
 }
-
 
 // animazione typing
 function typeText(id, text, setIndex, getIndex, allowTags, speed) {
     let el = document.getElementById(id);
     el.style.opacity = 1;
-    let idx = getIndex();
 
     if (id.endsWith("-text")) {
         isTypingText = true;
@@ -133,7 +109,6 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
     function step() {
         let i = getIndex();
 
-        // skip
         if (id.endsWith("-text") && !isTypingText) return;
 
         if (i >= text.length) {
@@ -141,53 +116,46 @@ function typeText(id, text, setIndex, getIndex, allowTags, speed) {
             return;
         }
 
+        // markup
         if (allowTags && text[i] === "<") {
             let closing = text.indexOf(">", i);
-            let tag = text.substring(i, closing + 1);
-            el.innerHTML += tag;
+            el.innerHTML += text.substring(i, closing + 1);
             setIndex(closing + 1);
-
-            if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, 10);
-            else setTimeout(step, 10);
-
+            setTimeout(step, 10);
             return;
         }
 
+        // newline
         if (text[i] === "\n") {
             el.innerHTML += "<br>";
             setIndex(i + 1);
-
-            if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, speed);
-            else setTimeout(step, speed);
-
+            setTimeout(step, speed);
             return;
         }
 
         el.innerHTML += text.charAt(i);
         setIndex(i + 1);
 
-        if (id.endsWith("-text")) typingTimeoutText = setTimeout(step, speed);
-        else setTimeout(step, speed);
+        setTimeout(step, speed);
     }
 
     step();
 }
 
+// skip animazione testo
 function skipTextTyping() {
     const section = SECTIONS[currentSectionIndex];
-    const id = section.id + "-text";
+    const el = document.getElementById(section.id + "-text");
 
     clearTimeout(typingTimeoutText);
     isTypingText = false;
 
-    const el = document.getElementById(id);
     el.innerHTML = section.text;
-
     sectionTextIndices[currentSectionIndex] = section.text.length;
 }
 
 function draw() {
-    background(25);        
+    background(25);
 }
 
 function windowResized() {
