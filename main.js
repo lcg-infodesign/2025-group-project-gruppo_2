@@ -33,7 +33,7 @@ let selectedCountry = null;
 // categorie source_of_fire
 let categories = [
   "Criminal Group",
-  "Government Official",
+  "Government Officials",
   "Local Residents",
   "Military Officials",
   "Mob Violence",
