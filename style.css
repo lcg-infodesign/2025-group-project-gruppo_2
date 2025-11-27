@@ -1,6 +1,6 @@
 html {
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
 }
 
@@ -12,7 +12,6 @@ canvas {
   z-index: -1;
 }
 
-
 body {
   min-height: 200vh;
   overflow-x: hidden;
@@ -21,13 +20,41 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    z-index: 20;
+    background-color: transparent;
+}
+
+.nav-link {
+    color: rgb(255, 245, 233);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-left: 40px;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+
 #title-container {
   position: relative;
   margin-top: 30vh;
   width: 100%;
   text-align: center;
 }
-
 
 #title {
   font-size: 5rem;
@@ -41,16 +68,16 @@ body {
   color: red;
   margin-top: 20px;
   animation: blink 1.2s infinite alternate;
+  cursor: pointer;
 }
 
 @keyframes blink {
   from { opacity: 1; }
-  to   { opacity: 0.3; }
+  to { opacity: 0.3; }
 }
 
 #intro-container {
   position: relative;
-  /*top: calc(30% + 80vh);*/
   margin-top: 50vh;
   left: 50%;
   transform: translateX(-50%);
@@ -62,59 +89,29 @@ body {
   opacity: 1;
 }
 
-#bullets-text-wrapper {
-  display: flex;
-  flex-direction: row;
-  gap: 25px;
-  align-items: flex-start;
-  position: relative;
-}
-
 #intro-text {
   opacity: 0;
   min-height: 180px;
-  width: 750px; 
+  width: 750px;
   font-size: 1.2rem;
   line-height: 1.6;
   text-align: center;
-}
-
-#bullets {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: row;
-  gap: 12px;
-  margin-top: 15px;
-}
-
-.bullet {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.667);
-  transition: background 0.3s;
-}
-
-.bullet.active {
-  background: red;
+  transition: opacity 0.6s ease;
 }
 
 #button {
-  margin: 70px auto;
+  margin: 30px auto;
   padding: 12px 28px;
   background-color: red;
   color: #fff;
   font-weight: 600;
   font-size: 1rem;
-  text-decoration: none; 
+  text-decoration: none;
   border-radius: 12px;
   text-align: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.6s;
+  transition: opacity 0.6s ease;
   width: fit-content;
   display: block;
 }
@@ -133,4 +130,24 @@ body {
   transition: none;
 }
 
+.death-counter-title {
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  margin-bottom: 8px;
+  text-align: center;
+}
 
+.death-counter {
+  width: 100px;
+  height: 100px;
+  border: 2px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-family: 'JetBrains Mono', monospace;
+  color: red;        /* numero in rosso */
+  margin: 0 auto;
+  user-select: none;
+}

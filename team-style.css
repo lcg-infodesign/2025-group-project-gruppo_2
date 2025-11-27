@@ -1,0 +1,93 @@
+html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+body {
+  min-height: 200vh;
+  overflow-x: hidden;
+  background: #191919;
+  color: rgb(255, 245, 233);
+  font-family: "JetBrains Mono", monospace;
+}
+
+#main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 5%;
+    box-sizing: border-box;
+    z-index: 20;
+    background-color: transparent;
+}
+
+.nav-link {
+    color: rgb(255, 245, 233);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-left: 40px;
+    cursor: pointer;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+#team-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  opacity: 1;
+}
+
+#team-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 3rem;
+  color: red;
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+#team-names-container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.team-row {
+  display: flex;
+  justify-content: center;
+}
+
+.team-name {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.5rem;
+  color: rgb(255, 245, 233);
+  margin: 0 40px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+  white-space: nowrap;
+}
+
+
+.team-name:hover {
+  color: red;
+}
