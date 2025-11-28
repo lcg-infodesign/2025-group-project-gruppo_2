@@ -499,7 +499,7 @@ function applyForceTo(dot, force) {
 }
 
 function applyRepulsion() {
-  let minDist = diam * 3.2;      // distanza target tra i punti
+  let minDist = diam * 3;      // distanza target tra i punti
   let strength = 6.0;          // costante elastica per beeswarm
 
   for (let i = 0; i < dots.length; i++) {
