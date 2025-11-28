@@ -53,66 +53,74 @@ function toggleSearch() {
   let btn = document.getElementById("worldwideBtn");
   let panel = document.getElementById("filterPanel");
 
+  // se già in search mode, non fare nulla
   if (btn.classList.contains("search-mode")) return;
 
   btn.classList.add("search-mode");
   panel.style.display = "block";
 
-  // wrapper input e icone
-  let searchWrapper = document.createElement("div");
-  searchWrapper.className = "search-wrapper";
-  searchWrapper.style.display = "flex";
-  searchWrapper.style.alignItems = "center";
-  searchWrapper.style.gap = "5px";
+  // Crea input e icone solo se non esistono
+  if (!document.getElementById("countrySearchInput")) {
+    const searchWrapper = document.createElement("div");
+    searchWrapper.className = "search-wrapper";
+    searchWrapper.style.display = "flex";
+    searchWrapper.style.alignItems = "center";
+    searchWrapper.style.gap = "5px";
 
+  // input
   let input = document.createElement("input");
   input.type = "text";
   input.id = "countrySearchInput";
   input.placeholder = "Search for a country...";
   input.style.flex = "1"; // occupa tutto lo spazio disponibile
 
-  // icona lente
-  const searchIcon = document.createElement("span");
-  searchIcon.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    const searchIcon = document.createElement("span");
+    searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  `;
-  searchIcon.style.display = "inline-flex";
+    </svg>`;
+    searchIcon.style.display = "inline-flex";
 
-  // x per chiudere la barra
-  const closeIcon = document.createElement("span");
-  closeIcon.className = "close-icon";
-  closeIcon.textContent = "✕";
-  closeIcon.style.cursor = "pointer";
+    const closeIcon = document.createElement("span");
+    closeIcon.className = "close-icon";
+    closeIcon.textContent = "✕";
+    closeIcon.style.cursor = "pointer";
 
-  // input poi icone a destra
-  searchWrapper.appendChild(input);
-  searchWrapper.appendChild(searchIcon);
-  searchWrapper.appendChild(closeIcon);
+    searchWrapper.appendChild(input);
+    searchWrapper.appendChild(searchIcon);
+    searchWrapper.appendChild(closeIcon);
 
-  btn.innerHTML = ""; // pulisci bottone
-  btn.appendChild(searchWrapper);
+    btn.innerHTML = "";
+    btn.appendChild(searchWrapper);
 
-  input.focus();
+    input.focus();
 
-  // filtro paesi mentre si digita
-  input.addEventListener("input", function () {
-    filterCountries(this.value);
-  });
+    // Filtra i paesi mentre digiti
+    input.addEventListener("input", function () {
+      filterCountries(this.value);
+    });
 
   // chiudi con la x
   closeIcon.addEventListener("click", closeSearch);
 
-  function closeSearch() {
-      btn.classList.remove("search-mode");
-      panel.style.display = "none";
-      
-      selectedCountry = null;
-      
-      btn.textContent = "Worldwide ▼";
+function closeSearch() {
+  const btn = document.getElementById("worldwideBtn");
+  const panel = document.getElementById("filterPanel");
+
+  // Rimuovi classe search-mode e nascondi pannello
+  btn.classList.remove("search-mode");
+  panel.style.display = "none";
+
+  // Pulisci input
+  const input = document.getElementById("countrySearchInput");
+  if (input) input.value = "";
+
+  // Reset selezione paese
+  selectedCountry = null;
+
+  // Ripristina testo bottone
+  btn.textContent = "Worldwide ▼";
 
       // nasconde il quadrato delle vittime
       document.getElementById("deathCounterContainer").style.display = "none";
@@ -183,13 +191,16 @@ function setup() {
   let div = document.createElement("div");
   div.textContent = country;
    
-  div.onclick = () => {
-  selectedCountry = country;
-  panel.style.display = "none";
-  let btn = document.getElementById("worldwideBtn");
-  btn.classList.remove("search-mode");
-  btn.textContent = country + " ▼";
-  panel.style.display = "none";
+    div.onclick = () => {
+      selectedCountry = country;
+      updateDeathCounter(country);         // aggiorna contatore vittime
+      document.getElementById("deathCounterContainer").style.display = "block";
+      panel.style.display = "none";
+      const btn = document.getElementById("worldwideBtn");
+      btn.classList.remove("search-mode");
+      btn.textContent = country + " ▼";
+       // Nascondi pannello filtri
+      panel.style.display = "none";
 
   // aggiornamento numero vittime
   updateDeathCounter(country);
@@ -343,12 +354,12 @@ function draw() {
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
   let maxAlpha = 200;
-  let blurStartX = mainWidth; // subito prima della sidebar
+  let blurStartX = windowWidth - sidebarWidth; // subito prima della sidebar
 
   for (let i = 0; i < blurWidth; i++) {
     stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
     strokeWeight(1);
-    line(blurStartX + i, 0, blurStartX + i, height); // sfumatura verso destra
+    line(blurStartX -i, 0, blurStartX -i, height); // sfumatura verso destra
   }
 
   drawGrid();
@@ -422,6 +433,7 @@ class Dot {
     this.id = id;
     this.year = year;
     this.category = category;
+    this.country = journalists[id].country;
 
     // griglia per determinare la posizione
     let centerX = yearToX(year);
@@ -488,6 +500,10 @@ class Dot {
 
 
   draw() {
+     
+    // se è selezionato un paese, mostra solo i pallini di quel paese
+     if (selectedCountry && this.country !== selectedCountry) return;
+
     fill(255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
@@ -552,3 +568,5 @@ function spawnUpToCurrentYear() {
     currentYearIndex++;
   }
 }
+
+
