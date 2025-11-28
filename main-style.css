@@ -121,10 +121,7 @@ html, body {
   transition: transform 0.3s ease;
 }
 
-.filter-dropdown.open .arrow {
-  transform: rotate(180deg);
-  display: inline-block;
-}
+
 
 .filter-input {
   width: 100%;

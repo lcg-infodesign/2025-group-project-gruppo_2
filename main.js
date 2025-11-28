@@ -67,12 +67,16 @@ function toggleSearch() {
     searchWrapper.style.alignItems = "center";
     searchWrapper.style.gap = "5px";
 
-  // input
-  let input = document.createElement("input");
-  input.type = "text";
-  input.id = "countrySearchInput";
-  input.placeholder = "Search for a country...";
-  input.style.flex = "1"; // occupa tutto lo spazio disponibile
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.id = "countrySearchInput";
+    input.style.fontSize = "15px";
+    input.placeholder = "Select country...";
+    input.style.flex = "1";
+
+
+
 
     const searchIcon = document.createElement("span");
     searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -144,7 +148,7 @@ function preload() {
 }
 
 function setup() {
-  sidebarWidth = 380;
+  sidebarWidth = 300;
   mainWidth = windowWidth - sidebarWidth;
   padding = 30;
 
@@ -355,7 +359,7 @@ function draw() {
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
   let maxAlpha = 200;
-  let blurStartX = windowWidth - sidebarWidth; // subito prima della sidebar
+  let blurStartX = mainWidth; // subito prima della sidebar
 
   for (let i = 0; i < blurWidth; i++) {
     stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
