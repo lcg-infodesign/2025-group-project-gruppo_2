@@ -4,10 +4,15 @@ let sidebarWidth;
 let mainWidth;
 let padding;
 
-let yLabelWidth;  // larghezza etichette asse Y
-let xLabelHeight; // altezza etichette asse X
+let yLabelWidth;  // larghezza etichette asse y
+let xLabelHeight; // altezza etichette asse x
+
+//limiti orizzontali di disposizione delle palline 
+let minX;
+let maxX;
+
 let rowHeight;    // altezza riga
-let initialX;     // posizione X del primo anno
+let initialX;     // posizione x del primo anno
 let yearWidth;    // larghezza colonna anno
 let diam;         // diametro pallini
 let gravity;      // velocità caduta pallini
@@ -39,87 +44,91 @@ let categories = [
   "Mob Violence",
   "Paramilitary Group",
   "Political Group",
+  "Uncertain",
   "Unknown"
 ];
 
 // toggle barra di ricerca
 function toggleSearch() {
-  const btn = document.getElementById("worldwideBtn");
-  const panel = document.getElementById("filterPanel");
+  let btn = document.getElementById("worldwideBtn");
+  let panel = document.getElementById("filterPanel");
 
+  // se già in search mode, non fare nulla
   if (btn.classList.contains("search-mode")) return;
 
   btn.classList.add("search-mode");
   panel.style.display = "block";
 
-  // wrapper input e icone
-  const searchWrapper = document.createElement("div");
-  searchWrapper.className = "search-wrapper";
-  searchWrapper.style.display = "flex";
-  searchWrapper.style.alignItems = "center";
-  searchWrapper.style.gap = "5px";
+  // Crea input e icone solo se non esistono
+  if (!document.getElementById("countrySearchInput")) {
+    const searchWrapper = document.createElement("div");
+    searchWrapper.className = "search-wrapper";
+    searchWrapper.style.display = "flex";
+    searchWrapper.style.alignItems = "center";
+    searchWrapper.style.gap = "5px";
 
-  // Input
-  const input = document.createElement("input");
+  // input
+  let input = document.createElement("input");
   input.type = "text";
   input.id = "countrySearchInput";
   input.placeholder = "Search for a country...";
   input.style.flex = "1"; // occupa tutto lo spazio disponibile
 
-  // Icona lente a destra (SVG stilizzata)
-  const searchIcon = document.createElement("span");
-  searchIcon.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    const searchIcon = document.createElement("span");
+    searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  `;
-  searchIcon.style.display = "inline-flex";
+    </svg>`;
+    searchIcon.style.display = "inline-flex";
 
-  // X per chiudere la barra
-  const closeIcon = document.createElement("span");
-  closeIcon.className = "close-icon";
-  closeIcon.textContent = "✕";
-  closeIcon.style.cursor = "pointer";
+    const closeIcon = document.createElement("span");
+    closeIcon.className = "close-icon";
+    closeIcon.textContent = "✕";
+    closeIcon.style.cursor = "pointer";
 
-  // Append: input prima, poi icone (lente e X) a destra
-  searchWrapper.appendChild(input);
-  searchWrapper.appendChild(searchIcon);
-  searchWrapper.appendChild(closeIcon);
+    searchWrapper.appendChild(input);
+    searchWrapper.appendChild(searchIcon);
+    searchWrapper.appendChild(closeIcon);
 
-  btn.innerHTML = ""; // pulisci bottone
-  btn.appendChild(searchWrapper);
+    btn.innerHTML = "";
+    btn.appendChild(searchWrapper);
 
-  input.focus();
+    input.focus();
 
-  // Filtra i paesi mentre digiti
-  input.addEventListener("input", function () {
-    filterCountries(this.value);
-  });
+    // Filtra i paesi mentre digiti
+    input.addEventListener("input", function () {
+      filterCountries(this.value);
+    });
 
-  // Chiudi con ESC
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeSearch();
-  });
-
-  // Chiudi cliccando la X
+  // chiudi con la x
   closeIcon.addEventListener("click", closeSearch);
+}
 
-  function closeSearch() {
-      btn.classList.remove("search-mode");
-      panel.style.display = "none";
-      
-      selectedCountry = null;
-      
-      btn.textContent = "Worldwide ▼";
+function closeSearch() {
+  const btn = document.getElementById("worldwideBtn");
+  const panel = document.getElementById("filterPanel");
 
-      // Nasconde il quadrato delle vittime
+  // Rimuovi classe search-mode e nascondi pannello
+  btn.classList.remove("search-mode");
+  panel.style.display = "none";
+
+  // Pulisci input
+  const input = document.getElementById("countrySearchInput");
+  if (input) input.value = "";
+
+  // Reset selezione paese
+  selectedCountry = null;
+
+  // Ripristina testo bottone
+  btn.textContent = "Worldwide ▼";
+
+      // nasconde il quadrato delle vittime
       document.getElementById("deathCounterContainer").style.display = "none";
   }
 }
 
-// Filtra i paesi in base al testo
+// filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
   const countryDivs = panel.querySelectorAll("div");
@@ -130,7 +139,6 @@ function filterCountries(value) {
   });
 }
 
-// --- Caricamento dati ---
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
 }
@@ -161,29 +169,33 @@ function setup() {
   buildJournalistsFromTable();
   drawLayout();
 
+  minX = yearToX(1992)-13;
+  maxX = yearToX(2025)+20;
+
+
   dots = [];
   countries = [];
 
   let nRows = data.getRowCount();
 
-  // Carica i dati in dots e crea lista paesi unici
+  // carica i dati in dots e crea lista paesi unici
   for (let i = 0; i < nRows; i++) {
-    // Lista paesi unici
     let country = data.get(i, "country");
     if (country && !countries.includes(country)) {countries.push(country)};
   }
 
-  // Ordina alfabeticamente
+  // ordina alfabeticamente
   countries.sort((a, b) => a.localeCompare(b));
 
-  // Popola tendina dei paesi
-  const panel = document.getElementById("filterPanel");
+  let panel = document.getElementById("filterPanel");
   countries.forEach(country => {
-    const div = document.createElement("div");
-    div.textContent = country;
+  let div = document.createElement("div");
+  div.textContent = country;
    
     div.onclick = () => {
       selectedCountry = country;
+      updateDeathCounter(country);         // aggiorna contatore vittime
+      document.getElementById("deathCounterContainer").style.display = "block";
       panel.style.display = "none";
       const btn = document.getElementById("worldwideBtn");
       btn.classList.remove("search-mode");
@@ -191,7 +203,7 @@ function setup() {
        // Nascondi pannello filtri
       panel.style.display = "none";
 
-  // Mostra il quadrato e aggiorna il numero di vittime
+  // aggiornamento numero vittime
   updateDeathCounter(country);
   document.getElementById("deathCounterContainer").style.display = "block";
     };
@@ -201,7 +213,7 @@ function setup() {
   inVisualizationArea = true;
 }
 
-  // Click bottone per aprire ricerca
+  // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
 
   countries.forEach(country => {
@@ -210,18 +222,15 @@ function setup() {
   div.onclick = () => {
     selectedCountry = country;
     
-    // Aggiorna bottone
+    // aggiornamento bottone
     const btn = document.getElementById("worldwideBtn");
     btn.classList.remove("search-mode");
     btn.textContent = country + " ▼";
     
-    // Aggiorna contatore vittime
+    // aggiornamento contatore vittime
     updateDeathCounter(country);
-    
-    // Mostra il quadrato se era nascosto
-    document.getElementById("deathCounterContainer").style.display = "block";
 
-    // Chiudi il pannello
+    // chiusura pannello
     const panel = document.getElementById("filterPanel");
     panel.style.display = "none";
   };
@@ -232,7 +241,7 @@ function setup() {
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
   
-  // Conta il numero di vittime nel dataset per quel paese
+  // conteggio vittime x paese
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
     if (data.get(i, "country") === country) {
@@ -243,7 +252,7 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-// --- Disegna griglia e tacche ---
+// griglia con tacche
 function drawGrid() {
   // righe categorie
   for (let i = 0; i < categories.length; i++) {
@@ -263,7 +272,7 @@ function drawGrid() {
     line(padding + yLabelWidth, y, mainWidth - padding, y);
   }
 
-  // tacche ogni anno
+  // tacche x anno
   for (let i = 0; i <= (2025 - 1992); i++) {
     stroke(255);
     strokeWeight(0.5);
@@ -273,7 +282,7 @@ function drawGrid() {
     line(x, topY, x, bottomY);
   }
 
-  // tacche anni precedenti (non lineari)
+  // tacche anni precedenti
   let xStart = initialX;
   let numTicks = 10;
   let maxStep = yearWidth;
@@ -316,7 +325,7 @@ function drawGrid() {
     circle(x, yPallino, radius);
   }
 
-  // asse Y verticale
+  // asse y
   stroke(white);
   strokeWeight(0.5);
   let yAxisOffset = 15;
@@ -325,13 +334,12 @@ function drawGrid() {
   line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
 }
 
-// --- Disegna ---
 function draw() {
   background(25);
 
   drawGrid();
 
-  if(inVisualizationArea) { //se siamo nell'area di visualizzazione
+  if(inVisualizationArea) {
     spawnUpToCurrentYear();
   }
 
@@ -339,30 +347,33 @@ function draw() {
     dots[i].update();
   }
 
-  avoidOverlap();
+  applyRepulsion();
+
+  for (let d of dots) d.update();
+
 
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
   let maxAlpha = 200;
-  let blurStartX = mainWidth; // subito prima della sidebar
+  let blurStartX = windowWidth - sidebarWidth; // subito prima della sidebar
 
   for (let i = 0; i < blurWidth; i++) {
     stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
     strokeWeight(1);
-    line(blurStartX + i, 0, blurStartX + i, height); // sfumatura verso destra
+    line(blurStartX -i, 0, blurStartX -i, height); // sfumatura verso destra
   }
 
   drawGrid();
 }
 
-//carica i dati
+//caricamento dati
 function buildJournalistsFromTable() {
   journalists = [];
 
   for(let j = 0; j < data.getRowCount(); j++) {
-    const row = data.getRow(j);
-    const dateStr = row.get("entry_date");
-    const parts = dateStr.split("/");
+    let row = data.getRow(j);
+    let dateStr = row.get("entry_date");
+    let parts = dateStr.split("/");
     let year = Number(parts[2]);
 
     if(year < 100) {
@@ -373,7 +384,7 @@ function buildJournalistsFromTable() {
       }
     }
 
-    const journalist = {
+    let journalist = {
       id: j,
       year: year,
       category: row.get("source_of_fire") || "Unknown",
@@ -423,93 +434,113 @@ class Dot {
     this.id = id;
     this.year = year;
     this.category = category;
+    this.country = journalists[id].country;
 
-    // GRIGLIA 5 COLONNE CON RIGHE ALTERNATE SOPRA/SOTTO
-
-    let samePositionDots = journalists.filter(j => j.year === year && j.category === category);
-    let dotIndex = samePositionDots.findIndex(j => j.id === id);
-
-    // centro della categoria
-    let baseX = yearToX(year);
+    // griglia per determinare la posizione
+    let centerX = yearToX(year);
+    let jitterX = (yearWidth * 0.4) * randomGaussian(); 
     let baseY = categoryToY(category);
 
-    // griglia
-    let cols = 4;
-    let colSpacing = diam * 3;
-    let rowSpacing = diam * 2;
+    // posizione finale
 
-    // cella
-    let col = dotIndex % cols;
-    let row = Math.floor(dotIndex / cols);
+    // limiti orizzontali del grafico (1992–2025)
+    let minX = yearToX(1992);
+    let maxX = yearToX(2025);
+    this.finalX = constrain(centerX + jitterX, minX, maxX);
 
-    // offset X centrato
-    let offsetX = (col - (cols - 1) / 2) * colSpacing;
-
-    // offset Y alternato sopra-sotto
-    let direction = (row % 2 === 1) ? -1 : 1;       // righe dispari sopra, pari sotto
-    let magnitude = Math.ceil(row / 2);            // distanza crescente
-    let offsetY = (row === 0) ? 0 : direction * magnitude * rowSpacing;
-
-    // posizioni finali
-    this.finalX = baseX + offsetX;
-    this.finalY = baseY + offsetY;
+    this.finalY = baseY + random(-10, 10);
 
     let randomOffset = random(-30, 30);
     this.pos = createVector(this.finalX + randomOffset, -20);
-    this.speed = random(1, 3);
+    this.speed = random(2, 4);
     this.arrived = false;
+    this.r = diam;
+
+    let startOffset = random(-40, 40);
+    let startX = constrain(centerX + startOffset, minX, maxX);
+    this.pos = createVector(startX, -20);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.mass = 1;
+
     this.r = diam;
   }
 
   update() {
-    if(this.arrived) {
-      this.draw();
-      return;
-    }
-    
-    let dx = this.finalX - this.pos.x;
-    let dy = this.finalY - this.pos.y;
-    let distance = sqrt(dx * dx + dy * dy);
-
-    if(distance < this.speed) {
-      this.pos.x = this.finalX;
-      this.pos.y = this.finalY;
-      this.arrived = true;
-    } else {
-      this.pos.x += (dx/distance) * this.speed;
-      this.pos.y += (dy/distance) * this.speed;
-    }
-
+  if(this.arrived) {
     this.draw();
+    return;
   }
 
+  // movimento verso la posizione finale
+  let dx = this.finalX - this.pos.x;
+  let dy = this.finalY - this.pos.y;
+  let distance = sqrt(dx * dx + dy * dy);
+
+  if(distance < this.speed) {
+    this.pos.x = this.finalX;
+    this.pos.y = this.finalY;
+    this.arrived = true;
+  } else {
+    this.pos.x += (dx/distance) * this.speed;
+    this.pos.y += (dy/distance) * this.speed;
+  }
+
+  if (!this.arrived) {
+    let floorY = height - padding - xLabelHeight - 10;
+
+    if (this.pos.y > floorY) {
+      this.pos.y = floorY;
+      this.vel.y = 0;
+    }
+  }
+
+  this.draw();
+}
+
+
+
   draw() {
+     
+    // se è selezionato un paese, mostra solo i pallini di quel paese
+     if (selectedCountry && this.country !== selectedCountry) return;
+
     fill(255);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
 }
 
-function avoidOverlap() {
-  let minDist = diam * 1.05;
+function applyForceTo(dot, force) {
+  let f = p5.Vector.div(force, dot.mass);
+  dot.acc.add(f);
+}
 
-  for(let i = 0; i < dots.length; i++) {
-    for(let j = i + 1; j < dots.length; j++) {
-      let dx = dots[j].pos.x - dots[i].pos.x;
-      let dy = dots[j].pos.y - dots[i].pos.y;
-      let dist = sqrt(dx * dx + dy * dy);
+function applyRepulsion() {
+  let minDist = diam * 3;      // distanza tra i punti
+  let strength = 6.0;          // costante elastica
 
-      if(dist < minDist && dist > 0) {
-        let overlap = (minDist - dist) * 0.5;
+  for (let i = 0; i < dots.length; i++) {
 
-        let nx = dx / dist;
-        let ny = dy / dist;
+    if (!dots[i].arrived) continue;
 
-        dots[i].pos.x -= nx * overlap;
-        dots[i].pos.y -= ny * overlap;
+    for (let j = i + 1; j < dots.length; j++) {
 
-        dots[j].pos.x += nx * overlap;
-        dots[j].pos.y += ny * overlap;
+      if (!dots[j].arrived) continue;
+
+      let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
+      let d = dir.mag();
+
+      if (d < minDist && d > 0) {
+        let force = map(d, 0, minDist, strength, 0);
+        dir.normalize().mult(force);
+
+        dots[i].pos.add(dir);
+        dots[j].pos.sub(dir);
+
+        // pallini entro i limiti dopo repulsione
+        dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
+        dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
       }
     }
   }
@@ -521,10 +552,10 @@ function spawnUpToCurrentYear() {
 
   const yearLimit = years[currentYearIndex];
   let spawnedCount = 0;
-  const maxSpawnPerFrame = 3; //controlla la velocità
+  const maxSpawnPerFrame = 3; //controllo velocità
 
   for(let j of journalists) {
-    if (spawnedCount >= maxSpawnPerFrame) break; //ferma dopo max pallini
+    if (spawnedCount >= maxSpawnPerFrame) break;
     
     if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
@@ -535,6 +566,6 @@ function spawnUpToCurrentYear() {
   }
 
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
-    currentYearIndex++; //passa all'anno successivo
+    currentYearIndex++;
   }
 }

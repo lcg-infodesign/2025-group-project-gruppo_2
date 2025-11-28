@@ -56,7 +56,10 @@ html, body {
   padding-top: 60px;         /* uguale a header */
   box-sizing: border-box;
   overflow: hidden;
+
+
   background-color: #191919;
+
 }
 
 
@@ -70,7 +73,7 @@ html, body {
 }
 
 #sidebar {
-  width: 380px;        /* sidebarWidth */
+  width: 300px;        /* sidebarWidth */
   background-color: #151515;
   color: white;
   padding: 0px;
@@ -80,10 +83,15 @@ html, body {
   justify-content: space-between;
   min-height: 100%;
   margin: 0;
+  position: relative;
 }
 
 .filter-dropdown {
   margin-bottom: 20px;
+  margin-top: 40px;
+  margin-left: 20px;
+  margin-right: 20px;
+
 }
 
 .filter-btn {
@@ -122,7 +130,7 @@ html, body {
   width: 100%;
   padding: 10px;
   font-size: 1px;
-  background-color: #111;
+  background-color: #151515;
   color: white;
   border: 1px solid red;
   border-radius: 12px;
@@ -173,7 +181,7 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   border: 1px solid red;
-  background-color: #111;
+  background-color: #151515;
   color: white;
   box-sizing: border-box;
   margin-bottom: 5px;
@@ -188,7 +196,7 @@ html, body {
   width: 100%;
   height: 40px;
   padding: 0 12px;              
-  background-color: #111;
+  background-color: #151515;
   border: 1px solid red;
   border-radius: 12px;
   box-sizing: border-box;
@@ -237,24 +245,37 @@ html, body {
 }
 
 .death-counter-title {
-  color: white;
+   display: inline;          
   font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  margin-bottom: 8px;
-  text-align: center;
+  font-size: 16px;          
+  color: white;
+  margin-right: 5px;        
+  vertical-align: middle;
 }
 
+
 .death-counter {
-  width: 100px;
-  height: 100px;
-  border: 2px solid white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
+ display: inline;           
   font-family: 'JetBrains Mono', monospace;
-  color: red;        /* numero in rosso */
-  margin: 0 auto;
-  user-select: none;
+  font-size: 16px;           
+  color: red;                
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  border: none;              
+  width: auto;
+  height: auto;
+}
+
+
+#deathCounterContainer {
+  display: none;
+  position: absolute;
+  top: 55%;               
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  white-space: nowrap;       /* evita il capo del testo e numero */
 }
 
