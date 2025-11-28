@@ -4,10 +4,15 @@ let sidebarWidth;
 let mainWidth;
 let padding;
 
-let yLabelWidth;  // larghezza etichette asse Y
-let xLabelHeight; // altezza etichette asse X
+let yLabelWidth;  // larghezza etichette asse y
+let xLabelHeight; // altezza etichette asse x
+
+//limiti orizzontali di disposizione delle palline 
+let minX;
+let maxX;
+
 let rowHeight;    // altezza riga
-let initialX;     // posizione X del primo anno
+let initialX;     // posizione x del primo anno
 let yearWidth;    // larghezza colonna anno
 let diam;         // diametro pallini
 let gravity;      // velocità caduta pallini
@@ -39,13 +44,14 @@ let categories = [
   "Mob Violence",
   "Paramilitary Group",
   "Political Group",
+  "Uncertain",
   "Unknown"
 ];
 
 // toggle barra di ricerca
 function toggleSearch() {
-  const btn = document.getElementById("worldwideBtn");
-  const panel = document.getElementById("filterPanel");
+  let btn = document.getElementById("worldwideBtn");
+  let panel = document.getElementById("filterPanel");
 
   // se già in search mode, non fare nulla
   if (btn.classList.contains("search-mode")) return;
@@ -61,12 +67,16 @@ function toggleSearch() {
     searchWrapper.style.alignItems = "center";
     searchWrapper.style.gap = "5px";
 
+
     const input = document.createElement("input");
     input.type = "text";
     input.id = "countrySearchInput";
     input.style.fontSize = "15px";
     input.placeholder = "Select country...";
     input.style.flex = "1";
+
+
+
 
     const searchIcon = document.createElement("span");
     searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -95,14 +105,8 @@ function toggleSearch() {
       filterCountries(this.value);
     });
 
-    // Chiudi con ESC
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeSearch();
-    });
-
-    // Chiudi cliccando la X
-    closeIcon.addEventListener("click", closeSearch);
-  }
+  // chiudi con la x
+  closeIcon.addEventListener("click", closeSearch);
 }
 
 function closeSearch() {
@@ -123,11 +127,12 @@ function closeSearch() {
   // Ripristina testo bottone
   btn.textContent = "Worldwide ▼";
 
-  // Nascondi contatore vittime
-  document.getElementById("deathCounterContainer").style.display = "none";
+      // nasconde il quadrato delle vittime
+      document.getElementById("deathCounterContainer").style.display = "none";
+  }
 }
 
-// Filtra i paesi in base al testo
+// filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
   const countryDivs = panel.querySelectorAll("div");
@@ -138,7 +143,6 @@ function filterCountries(value) {
   });
 }
 
-// --- Caricamento dati ---
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
 }
@@ -169,26 +173,28 @@ function setup() {
   buildJournalistsFromTable();
   drawLayout();
 
+  minX = yearToX(1992)-13;
+  maxX = yearToX(2025)+20;
+
+
   dots = [];
   countries = [];
 
   let nRows = data.getRowCount();
 
-  // Carica i dati in dots e crea lista paesi unici
+  // carica i dati in dots e crea lista paesi unici
   for (let i = 0; i < nRows; i++) {
-    // Lista paesi unici
     let country = data.get(i, "country");
     if (country && !countries.includes(country)) {countries.push(country)};
   }
 
-  // Ordina alfabeticamente
+  // ordina alfabeticamente
   countries.sort((a, b) => a.localeCompare(b));
 
-  // Popola tendina dei paesi
-  const panel = document.getElementById("filterPanel");
+  let panel = document.getElementById("filterPanel");
   countries.forEach(country => {
-    const div = document.createElement("div");
-    div.textContent = country;
+  let div = document.createElement("div");
+  div.textContent = country;
    
     div.onclick = () => {
       selectedCountry = country;
@@ -201,7 +207,7 @@ function setup() {
        // Nascondi pannello filtri
       panel.style.display = "none";
 
-  // Mostra il quadrato e aggiorna il numero di vittime
+  // aggiornamento numero vittime
   updateDeathCounter(country);
   document.getElementById("deathCounterContainer").style.display = "block";
     };
@@ -211,7 +217,7 @@ function setup() {
   inVisualizationArea = true;
 }
 
-  // Click bottone per aprire ricerca
+  // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
 
   countries.forEach(country => {
@@ -220,18 +226,15 @@ function setup() {
   div.onclick = () => {
     selectedCountry = country;
     
-    // Aggiorna bottone
+    // aggiornamento bottone
     const btn = document.getElementById("worldwideBtn");
     btn.classList.remove("search-mode");
     btn.textContent = country + " ▼";
     
-    // Aggiorna contatore vittime
+    // aggiornamento contatore vittime
     updateDeathCounter(country);
-    
-    // Mostra il quadrato se era nascosto
-    document.getElementById("deathCounterContainer").style.display = "block";
 
-    // Chiudi il pannello
+    // chiusura pannello
     const panel = document.getElementById("filterPanel");
     panel.style.display = "none";
   };
@@ -242,7 +245,7 @@ function setup() {
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
   
-  // Conta il numero di vittime nel dataset per quel paese
+  // conteggio vittime x paese
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
     if (data.get(i, "country") === country) {
@@ -253,7 +256,7 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-// --- Disegna griglia e tacche ---
+// griglia con tacche
 function drawGrid() {
   // righe categorie
   for (let i = 0; i < categories.length; i++) {
@@ -273,7 +276,7 @@ function drawGrid() {
     line(padding + yLabelWidth, y, mainWidth - padding, y);
   }
 
-  // tacche ogni anno
+  // tacche x anno
   for (let i = 0; i <= (2025 - 1992); i++) {
     stroke(255);
     strokeWeight(0.5);
@@ -283,7 +286,7 @@ function drawGrid() {
     line(x, topY, x, bottomY);
   }
 
-  // tacche anni precedenti (non lineari)
+  // tacche anni precedenti
   let xStart = initialX;
   let numTicks = 10;
   let maxStep = yearWidth;
@@ -326,7 +329,7 @@ function drawGrid() {
     circle(x, yPallino, radius);
   }
 
-  // asse Y verticale
+  // asse y
   stroke(white);
   strokeWeight(0.5);
   let yAxisOffset = 15;
@@ -335,13 +338,12 @@ function drawGrid() {
   line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
 }
 
-// --- Disegna ---
 function draw() {
   background(25);
 
   drawGrid();
 
-  if(inVisualizationArea) { //se siamo nell'area di visualizzazione
+  if(inVisualizationArea) {
     spawnUpToCurrentYear();
   }
 
@@ -368,7 +370,7 @@ function draw() {
   drawGrid();
 }
 
-//carica i dati
+//caricamento dati
 function buildJournalistsFromTable() {
   journalists = [];
 
@@ -444,7 +446,12 @@ class Dot {
     let baseY = categoryToY(category);
 
     // posizione finale
-    this.finalX = centerX + jitterX;
+
+    // limiti orizzontali del grafico (1992–2025)
+    let minX = yearToX(1992);
+    let maxX = yearToX(2025);
+    this.finalX = constrain(centerX + jitterX, minX, maxX);
+
     this.finalY = baseY + random(-10, 10);
 
     let randomOffset = random(-30, 30);
@@ -454,7 +461,8 @@ class Dot {
     this.r = diam;
 
     let startOffset = random(-40, 40);
-    this.pos = createVector(centerX + startOffset, -20);
+    let startX = constrain(centerX + startOffset, minX, maxX);
+    this.pos = createVector(startX, -20);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
     this.mass = 1;
@@ -468,7 +476,7 @@ class Dot {
     return;
   }
 
-  // movimento verso la posizione finale (tua animazione attuale)
+  // movimento verso la posizione finale
   let dx = this.finalX - this.pos.x;
   let dy = this.finalY - this.pos.y;
   let distance = sqrt(dx * dx + dy * dy);
@@ -482,7 +490,6 @@ class Dot {
     this.pos.y += (dy/distance) * this.speed;
   }
 
-  // ⬇️ Aggiungi questo blocco per impedire di scendere troppo
   if (!this.arrived) {
     let floorY = height - padding - xLabelHeight - 10;
 
@@ -514,8 +521,8 @@ function applyForceTo(dot, force) {
 }
 
 function applyRepulsion() {
-  let minDist = diam * 3;      // distanza target tra i punti
-  let strength = 6.0;          // costante elastica per beeswarm
+  let minDist = diam * 3;      // distanza tra i punti
+  let strength = 6.0;          // costante elastica
 
   for (let i = 0; i < dots.length; i++) {
 
@@ -534,15 +541,14 @@ function applyRepulsion() {
 
         dots[i].pos.add(dir);
         dots[j].pos.sub(dir);
+
+        // pallini entro i limiti dopo repulsione
+        dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
+        dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
       }
     }
   }
 }
-
-
-
-
-
 
 function spawnUpToCurrentYear() {
   if(!years.length || currentYearIndex >= years.length) return;
@@ -550,10 +556,10 @@ function spawnUpToCurrentYear() {
 
   const yearLimit = years[currentYearIndex];
   let spawnedCount = 0;
-  const maxSpawnPerFrame = 3; //controlla la velocità
+  const maxSpawnPerFrame = 3; //controllo velocità
 
   for(let j of journalists) {
-    if (spawnedCount >= maxSpawnPerFrame) break; //ferma dopo max pallini
+    if (spawnedCount >= maxSpawnPerFrame) break;
     
     if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
@@ -564,8 +570,6 @@ function spawnUpToCurrentYear() {
   }
 
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
-    currentYearIndex++; //passa all'anno successivo
+    currentYearIndex++;
   }
 }
-
-
