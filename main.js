@@ -141,7 +141,7 @@ function setup() {
   padding = 30;
 
   let canvas = createCanvas(mainWidth, windowHeight);
-  canvas.position(0, 40);
+  canvas.position(0, 30);
 
 
   yLabelWidth = padding + 60;

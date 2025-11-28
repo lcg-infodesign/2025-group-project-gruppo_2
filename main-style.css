@@ -4,6 +4,7 @@ html, body {
   height: 100%;
   font-family: 'JetBrains Mono', monospace;
   overflow: hidden;
+  background-color: #0f0f0f;
 }
 
 
@@ -38,8 +39,8 @@ html, body {
 #container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - 40px); /* altezza header reale */
-  padding-top: 40px;         /* uguale a header */
+  height: calc(100vh - 30px); /* altezza header reale */
+  padding-top: 30px;         /* uguale a header */
   box-sizing: border-box;
   overflow: hidden;
   background-color: #0f0f0f;
