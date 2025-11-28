@@ -348,7 +348,10 @@ function draw() {
     dots[i].update();
   }
 
-  avoidOverlap();
+  applyRepulsion();
+
+  for (let d of dots) d.update();
+
 
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
@@ -369,9 +372,9 @@ function buildJournalistsFromTable() {
   journalists = [];
 
   for(let j = 0; j < data.getRowCount(); j++) {
-    const row = data.getRow(j);
-    const dateStr = row.get("entry_date");
-    const parts = dateStr.split("/");
+    let row = data.getRow(j);
+    let dateStr = row.get("entry_date");
+    let parts = dateStr.split("/");
     let year = Number(parts[2]);
 
     if(year < 100) {
@@ -382,7 +385,7 @@ function buildJournalistsFromTable() {
       }
     }
 
-    const journalist = {
+    let journalist = {
       id: j,
       year: year,
       category: row.get("source_of_fire") || "Unknown",
@@ -434,64 +437,64 @@ class Dot {
     this.category = category;
     this.country = journalists[id].country;
 
-    // GRIGLIA 5 COLONNE CON RIGHE ALTERNATE SOPRA/SOTTO
-
-    let samePositionDots = journalists.filter(j => j.year === year && j.category === category);
-    let dotIndex = samePositionDots.findIndex(j => j.id === id);
-
-    // centro della categoria
-    let baseX = yearToX(year);
+    // griglia per determinare la posizione
+    let centerX = yearToX(year);
+    let jitterX = (yearWidth * 0.4) * randomGaussian(); 
     let baseY = categoryToY(category);
 
-    // griglia
-    let cols = 4;
-    let colSpacing = diam * 3;
-    let rowSpacing = diam * 2;
-
-    // cella
-    let col = dotIndex % cols;
-    let row = Math.floor(dotIndex / cols);
-
-    // offset X centrato
-    let offsetX = (col - (cols - 1) / 2) * colSpacing;
-
-    // offset Y alternato sopra-sotto
-    let direction = (row % 2 === 1) ? -1 : 1;       // righe dispari sopra, pari sotto
-    let magnitude = Math.ceil(row / 2);            // distanza crescente
-    let offsetY = (row === 0) ? 0 : direction * magnitude * rowSpacing;
-
-    // posizioni finali
-    this.finalX = baseX + offsetX;
-    this.finalY = baseY + offsetY;
+    // posizione finale
+    this.finalX = centerX + jitterX;
+    this.finalY = baseY + random(-10, 10);
 
     let randomOffset = random(-30, 30);
     this.pos = createVector(this.finalX + randomOffset, -20);
-    this.speed = random(1, 3);
+    this.speed = random(2, 4);
     this.arrived = false;
+    this.r = diam;
+
+    let startOffset = random(-40, 40);
+    this.pos = createVector(centerX + startOffset, -20);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.mass = 1;
+
     this.r = diam;
   }
 
   update() {
-    if(this.arrived) {
-      this.draw();
-      return;
-    }
-    
-    let dx = this.finalX - this.pos.x;
-    let dy = this.finalY - this.pos.y;
-    let distance = sqrt(dx * dx + dy * dy);
-
-    if(distance < this.speed) {
-      this.pos.x = this.finalX;
-      this.pos.y = this.finalY;
-      this.arrived = true;
-    } else {
-      this.pos.x += (dx/distance) * this.speed;
-      this.pos.y += (dy/distance) * this.speed;
-    }
-
+  if(this.arrived) {
     this.draw();
+    return;
   }
+
+  // movimento verso la posizione finale (tua animazione attuale)
+  let dx = this.finalX - this.pos.x;
+  let dy = this.finalY - this.pos.y;
+  let distance = sqrt(dx * dx + dy * dy);
+
+  if(distance < this.speed) {
+    this.pos.x = this.finalX;
+    this.pos.y = this.finalY;
+    this.arrived = true;
+  } else {
+    this.pos.x += (dx/distance) * this.speed;
+    this.pos.y += (dy/distance) * this.speed;
+  }
+
+  // ⬇️ Aggiungi questo blocco per impedire di scendere troppo
+  if (!this.arrived) {
+    let floorY = height - padding - xLabelHeight - 10;
+
+    if (this.pos.y > floorY) {
+      this.pos.y = floorY;
+      this.vel.y = 0;
+    }
+  }
+
+  this.draw();
+}
+
+
 
   draw() {
      
@@ -504,30 +507,41 @@ class Dot {
   }
 }
 
-function avoidOverlap() {
-  let minDist = diam * 1.05;
+function applyForceTo(dot, force) {
+  let f = p5.Vector.div(force, dot.mass);
+  dot.acc.add(f);
+}
 
-  for(let i = 0; i < dots.length; i++) {
-    for(let j = i + 1; j < dots.length; j++) {
-      let dx = dots[j].pos.x - dots[i].pos.x;
-      let dy = dots[j].pos.y - dots[i].pos.y;
-      let dist = sqrt(dx * dx + dy * dy);
+function applyRepulsion() {
+  let minDist = diam * 3;      // distanza target tra i punti
+  let strength = 6.0;          // costante elastica per beeswarm
 
-      if(dist < minDist && dist > 0) {
-        let overlap = (minDist - dist) * 0.5;
+  for (let i = 0; i < dots.length; i++) {
 
-        let nx = dx / dist;
-        let ny = dy / dist;
+    if (!dots[i].arrived) continue;
 
-        dots[i].pos.x -= nx * overlap;
-        dots[i].pos.y -= ny * overlap;
+    for (let j = i + 1; j < dots.length; j++) {
 
-        dots[j].pos.x += nx * overlap;
-        dots[j].pos.y += ny * overlap;
+      if (!dots[j].arrived) continue;
+
+      let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
+      let d = dir.mag();
+
+      if (d < minDist && d > 0) {
+        let force = map(d, 0, minDist, strength, 0);
+        dir.normalize().mult(force);
+
+        dots[i].pos.add(dir);
+        dots[j].pos.sub(dir);
       }
     }
   }
 }
+
+
+
+
+
 
 function spawnUpToCurrentYear() {
   if(!years.length || currentYearIndex >= years.length) return;
