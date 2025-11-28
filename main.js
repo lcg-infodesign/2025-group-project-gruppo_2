@@ -103,6 +103,7 @@ function toggleSearch() {
 
   // chiudi con la x
   closeIcon.addEventListener("click", closeSearch);
+}
 
 function closeSearch() {
   const btn = document.getElementById("worldwideBtn");
@@ -568,5 +569,3 @@ function spawnUpToCurrentYear() {
     currentYearIndex++;
   }
 }
-
-
