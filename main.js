@@ -174,7 +174,7 @@ function setup() {
   drawLayout();
 
   minX = yearToX(1992)-13;
-  maxX = yearToX(2025)+20;
+  maxX = yearToX(2025)+15;
 
 
   dots = [];
