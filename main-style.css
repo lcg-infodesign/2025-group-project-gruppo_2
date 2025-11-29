@@ -4,49 +4,49 @@ html, body {
   height: 100%;
   font-family: 'JetBrains Mono', monospace;
   overflow: hidden;
-  background-color: #0f0f0f;
+  background-color: #191919;
 }
 
 
 #main-header { /* testi header */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 0 5%;
-    box-sizing: border-box;
-    z-index: 20;
-    background-color: #191919;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  z-index: 20;
+  background-color: #191919;
 }
 
 .logo {
-    color: rgb(255, 245, 233);
-    font-size: 1.2rem; /* Un po' più grande dei link */
-    font-weight: bold;
-    letter-spacing: -1px;
+  color: rgb(255, 245, 233);
+  font-size: 1.2rem; /* Un po' più grande dei link */
+  font-weight: bold;
+  letter-spacing: -1px;
 }
 
 /* Contenitore per i link (per tenerli vicini tra loro a destra) */
 .nav-menu {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .nav-link { /* sempre qualcosa legato all'header */
-    color: rgb(255, 245, 233);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-left: 40px;
-    cursor: pointer;
-    transition: color 0.2s ease-in-out;
+  color: rgb(255, 245, 233);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-left: 40px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
 }
 
 .nav-link:hover { /* sottolineatura */
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 #container {
@@ -74,7 +74,7 @@ html, body {
 
 #sidebar {
   width: 300px;        /* sidebarWidth */
-  background-color: #151515;
+  background-color: #191919;
   color: white;
   padding: 0px;
   box-sizing: border-box;
@@ -127,7 +127,7 @@ html, body {
   width: 100%;
   padding: 10px;
   font-size: 1px;
-  background-color: #151515;
+  background-color: #191919;
   color: white;
   border: 1px solid red;
   border-radius: 12px;
@@ -149,7 +149,7 @@ html, body {
   display: none;                 
   max-height: 250px;             
   overflow-y: auto;              
-  background-color: #151515;        
+  background-color: #191919;        
   color: white;
   border: 1px solid red;         
   box-sizing: border-box;
@@ -178,7 +178,7 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   border: 1px solid red;
-  background-color: #151515;
+  background-color: #191919;
   color: white;
   box-sizing: border-box;
   margin-bottom: 5px;
@@ -193,7 +193,7 @@ html, body {
   width: 100%;
   height: 40px;
   padding: 0 12px;              
-  background-color: #151515;
+  background-color: #191919;
   border: 1px solid red;
   border-radius: 12px;
   box-sizing: border-box;
