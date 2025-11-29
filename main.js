@@ -48,6 +48,8 @@ let categories = [
   "Unknown"
 ];
 
+
+
 // toggle barra di ricerca
 function toggleSearch() {
   let btn = document.getElementById("worldwideBtn");
@@ -61,12 +63,12 @@ function toggleSearch() {
 
   // Crea input e icone solo se non esistono
   if (!document.getElementById("countrySearchInput")) {
+
     const searchWrapper = document.createElement("div");
     searchWrapper.className = "search-wrapper";
     searchWrapper.style.display = "flex";
     searchWrapper.style.alignItems = "center";
     searchWrapper.style.gap = "5px";
-
 
     const input = document.createElement("input");
     input.type = "text";
@@ -74,9 +76,6 @@ function toggleSearch() {
     input.style.fontSize = "15px";
     input.placeholder = "Select country...";
     input.style.flex = "1";
-
-
-
 
     const searchIcon = document.createElement("span");
     searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -105,8 +104,12 @@ function toggleSearch() {
       filterCountries(this.value);
     });
 
-  // chiudi con la x
-  closeIcon.addEventListener("click", closeSearch);
+    // chiudi con la x
+    closeIcon.addEventListener("click", function(e) {
+      e.stopPropagation(); // ← fermiamo la propagazione al bottone
+      closeSearch();
+    });
+  }
 }
 
 function closeSearch() {
@@ -127,10 +130,12 @@ function closeSearch() {
   // Ripristina testo bottone
   btn.textContent = "Worldwide ▼";
 
-      // nasconde il quadrato delle vittime
-      document.getElementById("deathCounterContainer").style.display = "none";
-  }
+  // nasconde il quadrato delle vittime
+  document.getElementById("deathCounterContainer").style.display = "none";
 }
+
+
+
 
 // filtra i paesi in base al testo
 function filterCountries(value) {
@@ -220,27 +225,8 @@ function setup() {
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
 
-  countries.forEach(country => {
-  const div = document.createElement("div");
-  div.textContent = country;
-  div.onclick = () => {
-    selectedCountry = country;
-    
-    // aggiornamento bottone
-    const btn = document.getElementById("worldwideBtn");
-    btn.classList.remove("search-mode");
-    btn.textContent = country + " ▼";
-    
-    // aggiornamento contatore vittime
-    updateDeathCounter(country);
-
-    // chiusura pannello
-    const panel = document.getElementById("filterPanel");
-    panel.style.display = "none";
-  };
-  panel.appendChild(div);
-});
-
+  
+  
 
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
