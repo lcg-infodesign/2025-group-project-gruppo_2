@@ -106,7 +106,6 @@ document.getElementById("arrow").addEventListener("click", () => {
 });
 
 
-
 function draw() {
   background(25);
 
