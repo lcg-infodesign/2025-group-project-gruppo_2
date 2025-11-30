@@ -49,19 +49,17 @@ let categories = [
 ];
 
 
-
 // toggle barra di ricerca
 function toggleSearch() {
   let btn = document.getElementById("worldwideBtn");
   let panel = document.getElementById("filterPanel");
 
-  // se già in search mode, non fare nulla
   if (btn.classList.contains("search-mode")) return;
 
   btn.classList.add("search-mode");
   panel.style.display = "block";
 
-  // Crea input e icone solo se non esistono
+  // crea input e icone
   if (!document.getElementById("countrySearchInput")) {
 
     const searchWrapper = document.createElement("div");
@@ -99,14 +97,14 @@ function toggleSearch() {
 
     input.focus();
 
-    // Filtra i paesi mentre digiti
+    // filtra i paesi mentre si digita
     input.addEventListener("input", function () {
       filterCountries(this.value);
     });
 
-    // chiudi con la x
+    // chiudere con la x
     closeIcon.addEventListener("click", function(e) {
-      e.stopPropagation(); // ← fermiamo la propagazione al bottone
+      e.stopPropagation();
       closeSearch();
     });
   }
@@ -116,21 +114,16 @@ function closeSearch() {
   const btn = document.getElementById("worldwideBtn");
   const panel = document.getElementById("filterPanel");
 
-  // Rimuovi classe search-mode e nascondi pannello
   btn.classList.remove("search-mode");
   panel.style.display = "none";
 
-  // Pulisci input
   const input = document.getElementById("countrySearchInput");
   if (input) input.value = "";
 
-  // Reset selezione paese
   selectedCountry = null;
 
-  // Ripristina testo bottone
   btn.textContent = "Worldwide ▼";
 
-  // nasconde il quadrato delle vittime
   document.getElementById("deathCounterContainer").style.display = "none";
 }
 
@@ -492,7 +485,7 @@ class Dot {
 
   draw() {
      
-    // se è selezionato un paese, mostra solo i pallini di quel paese
+    // mostra solo i pallini del paese selezionato
      if (selectedCountry && this.country !== selectedCountry) return;
 
     fill(255);

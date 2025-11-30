@@ -7,7 +7,7 @@ html, body {
   overflow: hidden;
 }
 
-#main-header { /* testi header */
+#main-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -24,18 +24,17 @@ html, body {
 
 .logo {
   color: rgb(255, 245, 233);
-  font-size: 1.2rem; /* Un po' più grande dei link */
+  font-size: 1.2rem;
   font-weight: bold;
   letter-spacing: -1px;
 }
 
-/* Contenitore per i link (per tenerli vicini tra loro a destra) */
 .nav-menu {
   display: flex;
   align-items: center;
 }
 
-.nav-link { /* sempre qualcosa legato all'header */
+.nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
   font-size: 0.9rem;
@@ -44,7 +43,7 @@ html, body {
   transition: color 0.2s ease-in-out;
 }
 
-.nav-link:hover { /* sottolineatura */
+.nav-link:hover {
   text-decoration: underline;
 }
 
