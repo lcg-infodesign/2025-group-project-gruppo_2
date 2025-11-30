@@ -9,8 +9,8 @@ function preload() {
 function setup() {
   let mainWidth = windowWidth - sidebarWidth;
   let canvas = createCanvas(mainWidth, windowHeight);
-  canvas.parent("sketch-container");
   canvas.position(0, 30);
+
 
   buildBubbles();
 }
@@ -18,12 +18,18 @@ function setup() {
 function draw() {
   background(25);
 
+  // controllo hover
+  for (let b of bubbles) {
+    let d = dist(mouseX, mouseY, b.x, b.y);
+    b.isHovered = (d < b.r); 
+  }
+
   for (let b of bubbles) {
     b.update();
     b.show();
   }
 
-  // riga luminosa tra sketch e sidebar
+  // linea luminosa
   let blurWidth = 10, maxAlpha = 200;
   let blurStartX = width;
   for (let i = 0; i < blurWidth; i++) {
@@ -31,6 +37,7 @@ function draw() {
     line(blurStartX - i, 0, blurStartX - i, height);
   }
 }
+
 
 function buildBubbles() {
   if (!table) return;
@@ -62,7 +69,7 @@ function buildBubbles() {
 
   // layout
   let cx = width / 2;
-  let cy = height /3;
+  let cy = height / 2;
   let offset = 200; // distanza tra i vertici
 
   const positions = [
@@ -102,6 +109,7 @@ class Bubble {
     this.r = r;
     this.category = category;
     this.count = total;
+    this.isHovered = false;
 
     this.points = [];
 
@@ -118,11 +126,23 @@ class Bubble {
   }
 
   update() {
+    let speedFactor = 1; // velocita normale
+
+    // rallenta all hover
+    if (this.isHovered) {
+      speedFactor = 0.45; // nuova velocita
+    }
+
     for (let p of this.points) {
-      p.angle += p.speed;
-      p.rad = constrain(p.rad + sin((frameCount + p.offset) * 0.01) * 0.2, 0, this.r);
+      p.angle += p.speed * speedFactor;
+      p.rad = constrain(
+        p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
+        0,
+        this.r
+      );
     }
   }
+
 
   show() {
     noStroke();
@@ -140,6 +160,7 @@ class Bubble {
     noStroke();
     textAlign(CENTER, BOTTOM);
     textSize(12);
+    textFont("JetBrains Mono");
     text(`${this.category}`, this.x, this.y - this.r - 8);
   }
 }
