@@ -69,7 +69,6 @@ body {
   display: inline-block;
 }
 
-/* Il contenuto del menu (i due link) */
 .dropdown-content {
   display: none; 
   position: absolute;
@@ -77,11 +76,10 @@ body {
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
   z-index: 9999;
-  top: 100%; /* Si posiziona subito sotto visualizations */
+  top: 100%;
   padding-top: 10px;
 }
 
-/* Link dentro la tendina */
 .dropdown-content a {
   color: rgb(255, 245, 233);
   padding: 15px 16px;
@@ -91,11 +89,9 @@ body {
 }
 
 .dropdown-content a:hover {
-  background-color: #2a2a2a;
   text-decoration: underline;
 }
 
-/* si mostra la finestra solo in hover */
 .dropdown:hover .dropdown-content {
   display: block;
 }
