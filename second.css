@@ -118,3 +118,72 @@ html, body {
   position: relative;
 }
 
+#headline {
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  z-index: 20;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgb(255, 245, 233);
+  font-size: 17px;
+}
+
+#arrow, #arrow-next {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 5px 11px;
+  border: 2px solid rgb(255, 245, 233);
+  border-radius: 2px;
+  width: 30px;
+  text-align: center;
+  font-size: 15pt;
+  color: rgb(255, 245, 233);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#headline-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
+}
+
+.section-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  height: 100%;
+  text-align: center;
+  padding: 20px;
+  color: rgb(255, 245, 233);
+  display: none;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-title {
+  visibility: hidden;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.section-body {
+  visibility: hidden;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#arrow-next {
+  visibility: hidden;
+}
+
+.red {
+  color: red;
+  font-weight: bold;
+}

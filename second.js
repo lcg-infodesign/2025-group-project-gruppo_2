@@ -15,6 +15,98 @@ function setup() {
   buildBubbles();
 }
 
+function typeWriter(element, speed = 20, callback = null) {
+    const html = element.innerHTML.trim();
+    let output = "";
+    let i = 0;
+    let insideTag = false;
+    let buffer = "";
+
+    element.innerHTML = "";  
+    element.style.visibility = "visible";
+
+    function type() {
+        if (i >= html.length) {
+            if (callback) callback();
+            return;
+        }
+
+        const char = html[i];
+
+        if (char === "<") {
+            insideTag = true;
+            buffer = "<";
+        } 
+        else if (char === ">") {
+            insideTag = false;
+            buffer += ">";
+            output += buffer;
+            element.innerHTML = output;
+            buffer = "";
+        } 
+        else if (insideTag) {
+            buffer += char;
+        }
+        else {
+            output += char;
+            element.innerHTML = output;
+        }
+
+        i++;
+        setTimeout(type, speed);
+    }
+
+    type();
+}
+
+
+window.onload = () => {
+    let headline = document.getElementById("headline");
+    let arrow = document.getElementById("arrow");
+
+    let text = "Have you ever wondered if crimes against journalists are actually punished?";
+
+    typeWriter(headline, 35, () => {
+        arrow.style.opacity = "1";
+    });
+};
+
+document.getElementById("arrow").addEventListener("click", () => {
+    document.getElementById("headline-wrapper").style.display = "none";
+    document.getElementById("unknown-wrapper").style.display = "flex";
+
+    for (let b of bubbles) {
+        b.dimmed = b.category.toLowerCase() !== "unknown";
+    }
+
+    let titleEl = document.getElementById("unknown-title");
+    let bodyEl = document.getElementById("unknown-body");
+    let arrowNext = document.getElementById("arrow-next");
+
+    // tutto nascosto inizialmente
+    titleEl.style.visibility = "hidden";
+    bodyEl.style.visibility = "hidden";
+    arrowNext.style.visibility = "hidden";
+    arrowNext.style.opacity = "0";
+
+    // prendi il contenuto dall html e mantiene lo span
+    let titleHTML = titleEl.innerHTML;
+    let bodyHTML = bodyEl.innerHTML;
+
+    // resetta il contenuto
+    titleEl.innerHTML = titleHTML;
+    bodyEl.innerHTML = bodyHTML;
+
+    typeWriter(titleEl, 35, () => {
+        typeWriter(bodyEl, 15, () => {
+            arrowNext.style.visibility = "visible";
+            arrowNext.style.opacity = "1";
+        });
+    });
+});
+
+
+
 function draw() {
   background(25);
 
@@ -62,7 +154,7 @@ function buildBubbles() {
     data[v].push(r);
   }
 
-  const order = ["Unknown", "Full Justice", "Complete Impunity", "Partial Impunity"];
+  let order = ["Unknown", "Full Justice", "Complete Impunity", "Partial Impunity"];
   let cats = order.filter(c => data[c]);
 
   bubbles = [];
@@ -72,7 +164,7 @@ function buildBubbles() {
   let cy = height / 2;
   let offset = 200; // distanza tra i vertici
 
-  const positions = [
+  let positions = [
     { x: cx - offset, y: cy },     // sinistra
     { x: cx,         y: cy - offset }, // alto
     { x: cx + offset, y: cy },     // destra
@@ -146,7 +238,13 @@ class Bubble {
 
   show() {
     noStroke();
-    fill("white");
+
+    if (this.dimmed) {
+        fill(255, 255, 255, 40); // 30% circa
+    } else {
+        fill(255);
+    }
+
 
     for (let p of this.points) {
       let rr = p.rad + sin(frameCount * 0.01 + p.offset) * 0.8;
@@ -155,7 +253,7 @@ class Bubble {
       circle(px, py, 3);
     }
 
-    // label
+    // label -> MEMO: FARE IN MODO CHE LE LABEL COMPAIANO SOLO ALLA FINE DI TUTTI I TESTI
     fill(255);
     noStroke();
     textAlign(CENTER, BOTTOM);
