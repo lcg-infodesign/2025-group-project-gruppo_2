@@ -18,7 +18,7 @@ html, body {
   align-items: center;
   padding: 0 5%;
   box-sizing: border-box;
-  z-index: 20;
+  z-index: 1000;
   background-color: #191919;
 }
 
@@ -38,13 +38,53 @@ html, body {
   color: rgb(255, 245, 233);
   text-decoration: none;
   font-size: 0.9rem;
-  margin-left: 40px;
   cursor: pointer;
   transition: color 0.2s ease-in-out;
 }
 
+.nav-menu > .nav-link, 
+.dropdown {
+  margin-left: 40px;
+}
+
 .nav-link:hover {
   text-decoration: underline;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Il contenuto del menu (i due link) */
+.dropdown-content {
+  display: none; 
+  position: absolute;
+  background-color: #191919;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 9999;
+  top: 100%; /* Si posiziona subito sotto visualizations */
+  padding-top: 10px;
+}
+
+/* Link dentro la tendina */
+.dropdown-content a {
+  color: rgb(255, 245, 233);
+  padding: 15px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+}
+
+.dropdown-content a:hover {
+  background-color: #2a2a2a;
+  text-decoration: underline;
+}
+
+/* si mostra la finestra solo in hover */
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 
