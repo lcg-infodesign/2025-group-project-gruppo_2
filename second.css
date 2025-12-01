@@ -128,7 +128,7 @@ html, body {
   font-size: 17px;
 }
 
-#arrow, #arrow-next {
+.arrow {
   opacity: 0;
   transition: opacity 0.5s ease;
   padding: 5px 11px;
@@ -151,6 +151,14 @@ html, body {
   justify-content: center;
   gap: 5px;
   height: 100%;
+}
+
+#closure-wrapper {
+    display: none;
+    text-align: center;
+    color: rgb(255,245,233);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 30px;
 }
 
 .section-wrapper {
@@ -179,11 +187,11 @@ html, body {
   line-height: 1.5;
 }
 
-#arrow-next {
-  visibility: hidden;
-}
-
 .red {
   color: red;
+  font-weight: bold;
+}
+
+.bold {
   font-weight: bold;
 }
