@@ -122,7 +122,7 @@ function closeSearch() {
 
   selectedCountry = null;
 
-  btn.textContent = "Worldwide ▼";
+  btn.textContent = "WORLDWIDE ▼";
 
   document.getElementById("deathCounterContainer").style.display = "none";
 }
@@ -213,6 +213,8 @@ function setup() {
   });
 
   inVisualizationArea = true;
+
+  
 }
 
   // apertura ricerca
@@ -294,8 +296,8 @@ function drawGrid() {
 
     // glow
     let yPallino = height - padding - 45;
-    let radius = 10;
-    let glowWidth = 8;
+    let radius = 8;
+    let glowWidth = 6;
     let maxAlpha = 120;
 
     for (let j = glowWidth; j > 0; j--) {
@@ -341,7 +343,7 @@ function draw() {
   let blurStartX = mainWidth; // subito prima della sidebar
 
   for (let i = 0; i < blurWidth; i++) {
-    stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
+    stroke(128, 128, 128, map(i, 0, blurWidth, maxAlpha, 0));
     strokeWeight(1);
     line(blurStartX -i, 0, blurStartX -i, height); // sfumatura verso destra
   }
@@ -485,12 +487,19 @@ class Dot {
 
   draw() {
      
-    // mostra solo i pallini del paese selezionato
-     if (selectedCountry && this.country !== selectedCountry) return;
+   // controlla se il pallino deve essere visibile
+  let visible = !selectedCountry || this.country === selectedCountry;
+  if (!visible) return;
 
-    fill(255);
-    noStroke();
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
+  // colore
+  if (selectedCountry) {
+    fill(255, 0, 0); // rosso se c'è filtro
+  } else {
+    fill(255); // bianco se worldwide
+  }
+
+  noStroke();
+  ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
 }
 
