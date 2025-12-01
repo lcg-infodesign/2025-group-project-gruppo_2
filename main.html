@@ -16,7 +16,8 @@
     <script src="libraries/p5.sound.min.js"></script>
   </head>
 
-<header id="main-header">
+  <body>
+    <header id="main-header">
     <div class="logo">STOLEN VOICES</div>
      
     <nav class="nav-menu">
@@ -33,7 +34,7 @@
         <a href="about.html" class="nav-link">ABOUT</a>
         <a href="team.html" class="nav-link">TEAM</a>
     </nav>
-</header>
+    </header>
 
 
     <div id="container">
@@ -49,9 +50,28 @@
       <div id="deathCounterContainer" style="display: none;">
         <div class="death-counter-title">Number of victims</div>
         <div id="deathCounter" class="death-counter">0</div>
-        
-        
       </div>
+
+    <!--bottoni di navigazione-->
+    <div class="navigation-arrows" id="navigationArrows">
+      <button class="arrow-btn" id="prevBtn">←</button>
+      <button class="arrow-btn" id="nextBtn">→</button>
+    </div>
+
+    <!--bottone per continuare dopo l'animazione)-->
+    <button class="view-data-btn" id="viewDataBtn" style="display: none;">
+    VIEW THE DATA
+    </button>
+
+    <!--bottone next finale-->
+    <button class="next-final-btn" id="nextBtnFinal" style="display: none;">
+    NEXT
+    </button>
+
+    <div id="deathCounterContainer" style="display: none;">
+      <div class="death-counter-title">Number of victims</div>
+      <div id="deathCounter" class="death-counter">0</div>
+    </div>
 
     
     </div>
