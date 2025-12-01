@@ -48,6 +48,9 @@ let categories = [
   "Unknown"
 ];
 
+let activeCard = null; //variabile che stabilisce se/quale card mostrare
+let photos = []; //conterrà le foto per le card
+
 // toggle barra di ricerca
 function toggleSearch() {
   let btn = document.getElementById("worldwideBtn");
@@ -145,6 +148,13 @@ function filterCountries(value) {
 
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
+
+  console.log("Row count: " + data.getRowCount());
+  // carica tutte le foto dei giornalisti
+  for (let i = 0; i < data.getRowCount(); i++) {
+    photos[i] = loadImage("assets/images/" + i + ".jpg");
+  }
+  console.log("photos " + photos);
 }
 
 function setup() {
@@ -368,6 +378,11 @@ function draw() {
   }
 
   drawGrid();
+
+  if (activeCard) {
+    drawCard(activeCard);
+  }
+
 }
 
 //caricamento dati
@@ -388,20 +403,39 @@ function buildJournalistsFromTable() {
       }
     }
 
+    let workRelated = "Unknown";
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Confirmed"){
+      workRelated = "Confirmed";
+    }
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Unconfirmed"){
+      workRelated = "Unconfirmed";
+    }
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Media Worker"){
+      workRelated = "Media Worker";
+    }
+
     let journalist = {
       id: j,
       year: year,
+      date: row.get("entry_date"),
+      ambiguousEntryDate: row.get("ambiguous_entry_date"),
       category: row.get("source_of_fire") || "Unknown",
       name: row.get("journalist/media worker_name") || "",
       country: row.get("country") || "",
       motive: row.get("motive") || "",
       role: row.get("role") || "",
       city: row.get("city") || "",
+      typeOfDeath: row.get("type_of_death"),
       impunity: row.get("impunity") || "",
+      organization: row.get("organization"),
       medium: row.get("mediums") || "",
       beats: row.get("beats_covered") || "",
       job: row.get("job") || "",
-      url: row.get("cpj.org_url") || ""
+      url: row.get("cpj.org_url") || "",
+      workRelated: workRelated,
+      threatened: row.get("threatened") || "Unknown",
+      tortured: row.get("tortured") || "Unknown",
+      heldCaptive: row.get("held_captive") || "Unknown"
     };
 
     journalists.push(journalist);
@@ -500,8 +534,7 @@ class Dot {
   }
 
   this.draw();
-}
-
+  }
 
 
   draw() {
@@ -513,6 +546,13 @@ class Dot {
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
+
+  //funzione che restituisce true se il mouse è sul pallino
+  isHovered() {
+  let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+  return d < this.r;
+  }
+
 }
 
 function applyForceTo(dot, force) {
@@ -572,4 +612,134 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
+}
+
+function mousePressed() {
+  for (let d of dots) {
+
+    // se c'è un filtro per paese, ignora i pallini nascosti:
+    if (selectedCountry && d.country !== selectedCountry) continue;
+
+    if (d.isHovered()) {
+      activeCard = d;
+      return;
+    }
+  }
+}
+
+function drawCard(dot){
+  let journalist = journalists[dot.id];
+
+  //Imposto tutte le variabili con le informazioni per la card
+  let id = journalist.id;
+  let name = journalist.name;
+  let date = journalist.date;
+  let ambiguous, dateIcon; //Queste variabili servono per mettere un'icona e un tooltip che spiega se la data è certa o meno
+  if(!journalist.ambiguousEntryDate){
+    dateIcon = "tick";
+    ambiguous = "The date is confirmed";
+  }else{
+    dateIcon = "?";
+    ambiguous = "The date is ambiguous. Plausible dates: " + journalist.ambiguousEntryDate;
+  }
+  let place = journalist.city + ", " + journalist.country;
+  let org;
+  if(journalist.organization !== ""){
+    org = journalist.organization;
+  }else{
+    org = "Unknown";
+  }
+  let job = journalist.job;
+  if(journalist.job !== ""){
+    job = journalist.job;
+  }else{
+    job = "Unknown";
+  }
+  let workRelated = journalist.workRelated;
+  let typeOfDeath;
+  if(journalist.typeOfDeath !== ""){
+    typeOfDeath = journalist.typeOfDeath;
+  }else{
+    typeOfDeath = "Unknown";
+  }
+  let threatened, tortured, heldCaptive;
+  if(journalist.threatened !== ""){
+    threatened = journalist.threatened;
+  }else{
+    threatened = "Unknown";
+  }
+  if(journalist.tortured !== ""){
+    tortured = journalist.tortured;
+  }else{
+    tortured = "Unknown";
+  }
+  if(journalist.heldCaptive !== ""){
+    heldCaptive = journalist.heldCaptive;
+  }else{
+    heldCaptive = "Unknown";
+  }
+  let impunity = journalist.impunity;
+  let url = journalist.url;
+
+  //fondo nero trasparente
+  noStroke();
+  fill(0,0,0,175);
+  rectMode(CORNER);
+  rect(0,0, width, height);
+
+  // DISEGNO LA CARD
+
+  //variabili per le dimensioni
+  let cardWidth = 600;
+  let cardHeight = 550;
+  let cardX = width/2;
+  let cardY = height/2;
+  let padding = 30;
+  let leftX = cardX - cardWidth/2 + padding;
+  let topY = cardY - cardHeight/2 + padding;
+  let rightX = cardX + cardWidth/2 - padding;
+  let bottomY = cardY + cardHeight/2 - padding;
+
+  let bg = color(19,19,19);
+  let grey = color(38,38,38);
+
+  //rettangolo di base
+  stroke(grey);
+  strokeWeight(2);
+  fill(bg);
+  rectMode(CENTER);
+  rect(cardX, cardY, cardWidth, cardHeight, 20);
+
+  //foto
+  let photo = photos[id];
+  let photoWidth = 180;
+  let photoHeight = 190;
+  imageMode(CORNER);
+  if(photo){
+    image(photo, leftX, topY, photoWidth, photoHeight);
+  }else{
+    rectMode(CORNER);
+    rect(leftX, topY, photoWidth, photoHeight, 10);
+  }
+
+  // X per chiudere la card
+  noFill();
+  stroke(red);
+  let crossWidth = 16;
+  line(rightX - crossWidth, topY, rightX, topY + crossWidth);
+  line(rightX, topY, rightX - crossWidth, topY + crossWidth);
+  let crossCenterX = rightX - crossWidth/2;
+  let crossCenterY = topY + crossWidth/2;
+  let d = dist(mouseX, mouseY, crossCenterX, crossCenterY);
+  //mo faccio un ciclo if per l'interazione
+
+  //testi
+  textAlign(LEFT);
+  textFont(font);
+  textWrap(WORD);
+  fill(white);
+  noStroke();
+
+  textSize(35);
+  text(name, leftX + photoWidth + padding, topY, cardWidth - 3*padding - photoWidth);
 }
