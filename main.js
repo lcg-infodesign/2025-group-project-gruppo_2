@@ -49,6 +49,7 @@ let categories = [
 ];
 
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
+let closeCard = null;
 let photos = []; //conterrà le foto per le card
 //variabili per la navigazione
 let currentStep = 0;
@@ -788,8 +789,13 @@ function mousePressed() {
 
     if (d.isHovered()) {
       activeCard = d;
-      return;
     }
+  }
+
+  if(closeCard){
+    activeCard = null;
+    closeCard = null;
+    cursor(ARROW);
   }
 }
 
@@ -856,8 +862,8 @@ function drawCard(dot){
   // DISEGNO LA CARD
 
   //variabili per le dimensioni
-  let cardWidth = 600;
-  let cardHeight = 550;
+  let cardWidth = 700;
+  let cardHeight = 600;
   let cardX = width/2;
   let cardY = height/2;
   let padding = 30;
@@ -897,19 +903,57 @@ function drawCard(dot){
   let crossCenterX = rightX - crossWidth/2;
   let crossCenterY = topY + crossWidth/2;
   let d = dist(mouseX, mouseY, crossCenterX, crossCenterY);
-  //mo faccio un ciclo if per l'interazione
+  if(d <= crossWidth){
+    closeCard = true;
+    cursor(HAND);
+  }else{
+    closeCard = null;
+    cursor(ARROW);
+  }
+
+  //grafica della card
+
+  let verticalOffset = 40;
+  noFill();
+  stroke(red);
+  strokeWeight(0.5);
+  line(leftX + photoWidth + padding, topY + 80, leftX + cardWidth - 2*padding, topY + 80); //nome
+  line(leftX + photoWidth + padding, topY + 80 + 50, leftX + cardWidth - 2*padding, topY + 80 + 50); //data
+  line(leftX + photoWidth + padding, topY + 80 + 97, leftX + cardWidth - 2*padding, topY + 80 + 97); //luogo
+  rectMode(CORNER);
+  fill(grey);
+  rect(leftX, topY + photoHeight + padding, cardWidth - 2*padding, 3*padding + 40, 3);
+  noFill();
+  line(width/2 + verticalOffset, topY + photoHeight + padding, width/2 + verticalOffset, topY + photoHeight + padding + 3*padding + 40); //divisore verticale
+  line(leftX + padding, topY + photoHeight + 2*padding + 20, width/2 + verticalOffset - padding, topY + photoHeight + 2*padding + 20); //org
+  line(leftX + padding, topY + photoHeight + 3*padding + 37, width/2 + verticalOffset - padding, topY + photoHeight + 3*padding + 37); //job
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
+  rectMode(CORNERS);
+  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3);
 
   //testi
-  textAlign(LEFT);
+  textAlign(LEFT, BOTTOM);
   textFont(font);
   textWrap(WORD);
   fill(white);
   noStroke();
 
   textSize(35);
-  text(name, leftX + photoWidth + padding, topY, cardWidth - 3*padding - photoWidth);
+  text(name, leftX + photoWidth + padding, topY + 80, cardWidth - 3*padding - photoWidth);
+
+  textSize(20);
+  text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
+  text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
+  text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+
+  textSize(14);
+  text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
+  text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
+  text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
 
 }
+
 function drawYAxis() {
   stroke(white);
   strokeWeight(0.5);
