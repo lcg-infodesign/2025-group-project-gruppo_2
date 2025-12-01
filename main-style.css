@@ -306,9 +306,12 @@ html, body {
 }
 
 .navigation-arrows {
-  display: flex;
+  display: inline-flex;
   gap: 8px;
   margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  justify-content: center;
 }
 
 .arrow-btn {
@@ -346,6 +349,8 @@ html, body {
   width: 48px !important;
   height: 48px;
   margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
   background-color: #191919;
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -364,12 +369,16 @@ html, body {
 
 /*bottoni testo rossi*/
 .view-data-btn:not(.arrow-mode),
-.next-final-btn {
-  width: 100%;
-  padding: 15px;
+.next-final-btn.red-button {
+  width: calc(100% - 40px);
+  max-width: 260px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 12px 28px;
   background-color: #8B0000;
   color: white;
-  border-radius: 30px;
+  border-radius: 12px;
   border: 1px solid #ff0000;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
