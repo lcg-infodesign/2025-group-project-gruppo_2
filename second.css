@@ -2,58 +2,92 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  background-color: #191919;
   font-family: 'JetBrains Mono', monospace;
   overflow: hidden;
-  background-color: #0f0f0f;
 }
 
-
-#main-header { /* testi header */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 0 5%;
-    box-sizing: border-box;
-    z-index: 20;
-    background-color: #191919;
+#main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  z-index: 1000;
+  background-color: #191919;
 }
 
 .logo {
-    color: rgb(255, 245, 233);
-    font-size: 1.2rem; /* Un po' più grande dei link */
-    font-weight: bold;
-    letter-spacing: -1px;
+  color: rgb(255, 245, 233);
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: -1px;
 }
 
-/* Contenitore per i link (per tenerli vicini tra loro a destra) */
 .nav-menu {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
-.nav-link { /* sempre qualcosa legato all'header */
-    color: rgb(255, 245, 233);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-left: 40px;
-    cursor: pointer;
-    transition: color 0.2s ease-in-out;
+.nav-link {
+  color: rgb(255, 245, 233);
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
 }
 
-.nav-link:hover { /* sottolineatura */
-    text-decoration: underline;
+.nav-menu > .nav-link, 
+.dropdown {
+  margin-left: 40px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none; 
+  position: absolute;
+  background-color: #191919;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 9999;
+  top: 100%;
+  padding-top: 10px;
+}
+
+.dropdown-content a {
+  color: rgb(255, 245, 233);
+  padding: 15px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+}
+
+.dropdown-content a:hover {
+  text-decoration: underline;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 #container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - 60px); /* altezza header reale */
-  padding-top: 60px;         /* uguale a header */
+  height: calc(100vh - 60px);
+  padding-top: 60px;
   box-sizing: border-box;
   overflow: hidden;
   background-color: #191919;
@@ -62,9 +96,94 @@ html, body {
 
 #sketch-container {
   flex: 1;
-  position: relative;   
+  position: relative;
 }
 
 #sketch-container canvas {
-    top: 80px !important;
+  top: 80px !important;
+  position: absolute;
+}
+
+#sidebar {
+  width: 300px;
+  background-color: #191919;
+  color: white;
+  padding: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100%;
+  margin: 0;
+  position: relative;
+}
+
+#headline {
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  z-index: 20;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgb(255, 245, 233);
+  font-size: 17px;
+}
+
+#arrow, #arrow-next {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 5px 11px;
+  border: 2px solid rgb(255, 245, 233);
+  border-radius: 2px;
+  width: 30px;
+  text-align: center;
+  font-size: 15pt;
+  color: rgb(255, 245, 233);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#headline-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
+}
+
+.section-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  height: 100%;
+  text-align: center;
+  padding: 20px;
+  color: rgb(255, 245, 233);
+  display: none;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.section-title {
+  visibility: hidden;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.section-body {
+  visibility: hidden;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#arrow-next {
+  visibility: hidden;
+}
+
+.red {
+  color: red;
+  font-weight: bold;
 }

@@ -4,62 +4,93 @@ html, body {
   height: 100%;
   font-family: 'JetBrains Mono', monospace;
   overflow: hidden;
-  background-color: #0f0f0f;
+  background-color: #191919;
 }
 
-
-#main-header { /* testi header */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 0 5%;
-    box-sizing: border-box;
-    z-index: 20;
-    background-color: #191919;
+#main-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0 5%;
+  box-sizing: border-box;
+  z-index: 1000;
+  background-color: #191919;
 }
 
 .logo {
-    color: rgb(255, 245, 233);
-    font-size: 1.2rem; /* Un po' più grande dei link */
-    font-weight: bold;
-    letter-spacing: -1px;
+  color: rgb(255, 245, 233);
+  font-size: 1.2rem;
+  font-weight: bold;
+  letter-spacing: -1px;
 }
 
-/* Contenitore per i link (per tenerli vicini tra loro a destra) */
 .nav-menu {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
-.nav-link { /* sempre qualcosa legato all'header */
-    color: rgb(255, 245, 233);
-    text-decoration: none;
-    font-size: 0.9rem;
-    margin-left: 40px;
-    cursor: pointer;
-    transition: color 0.2s ease-in-out;
+.nav-link {
+  color: rgb(255, 245, 233);
+  text-decoration: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
 }
 
-.nav-link:hover { /* sottolineatura */
-    text-decoration: underline;
+.nav-menu > .nav-link, 
+.dropdown {
+  margin-left: 40px;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none; 
+  position: absolute;
+  background-color: #191919;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 9999;
+  top: 100%;
+  padding-top: 10px;
+}
+
+.dropdown-content a {
+  color: rgb(255, 245, 233);
+  padding: 15px 16px;
+  text-decoration: none;
+  display: block;
+  font-size: 0.85rem;
+}
+
+.dropdown-content a:hover {
+  text-decoration: underline;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
 }
 
 #container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - 60px); /* altezza header reale */
-  padding-top: 60px;         /* uguale a header */
+  height: calc(100vh - 60px);
+  padding-top: 60px;
   box-sizing: border-box;
   overflow: hidden;
-
-
   background-color: #191919;
-
 }
 
 
@@ -73,8 +104,8 @@ html, body {
 }
 
 #sidebar {
-  width: 300px;        /* sidebarWidth */
-  background-color: #151515;
+  width: 300px;
+  background-color: #191919;
   color: white;
   padding: 0px;
   box-sizing: border-box;
@@ -88,7 +119,7 @@ html, body {
 
 .filter-dropdown {
   margin-bottom: 20px;
-  margin-top: 40px;
+  margin-top: 10px;
   margin-left: 20px;
   margin-right: 20px;
 
@@ -101,9 +132,9 @@ html, body {
   width: 100%;                   
   margin: 5px 0;
   padding: 12px 28px;
-  background-color: red;
+  background-color: #191919;
   color: white;
-  border: none;
+  border: 2px solid red;
   border-radius: 12px;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
@@ -121,13 +152,11 @@ html, body {
   transition: transform 0.3s ease;
 }
 
-
-
 .filter-input {
   width: 100%;
   padding: 10px;
   font-size: 1px;
-  background-color: #151515;
+  background-color: #191919;
   color: white;
   border: 1px solid red;
   border-radius: 12px;
@@ -149,7 +178,7 @@ html, body {
   display: none;                 
   max-height: 250px;             
   overflow-y: auto;              
-  background-color: #151515;        
+  background-color: #191919;        
   color: white;
   border: 1px solid red;         
   box-sizing: border-box;
@@ -178,7 +207,7 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   border: 1px solid red;
-  background-color: #151515;
+  background-color: #191919;
   color: white;
   box-sizing: border-box;
   margin-bottom: 5px;
@@ -193,7 +222,7 @@ html, body {
   width: 100%;
   height: 40px;
   padding: 0 12px;              
-  background-color: #151515;
+  background-color: #191919;
   border: 1px solid red;
   border-radius: 12px;
   box-sizing: border-box;
@@ -273,6 +302,130 @@ html, body {
   transform: translate(-50%, -50%);
   text-align: center;
   z-index: 5;
-  white-space: nowrap;       /* evita il capo del testo e numero */
+  white-space: nowrap;
 }
 
+
+/* bottone in fondo alla sidebar */
+#sidebar .impunity-btn {
+  position: absolute;
+  bottom: 5px;
+  left: 20px;
+  width: calc(100% - 40px);  
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 28px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* scritta bianca indicativa sotto il bottone IMPUNITY STATUS */
+#sidebar .impunity-hint {
+  position: absolute;
+  bottom: 70px;  /* regola la distanza dal bottone */
+  left: 20px;
+  width: calc(100% - 40px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
+}
+.navigation-arrows {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  justify-content: center;
+}
+
+.arrow-btn {
+  padding: 4px 8px;
+  background-color: #191919;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.arrow-btn:hover:not(:disabled) {
+  background-color: #252525;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.arrow-btn:disabled {
+  background-color: #191919;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+/* bottone freccia dopo VIEW THE DATA*/
+.view-data-btn.arrow-mode {
+  width: 48px !important;
+  height: 48px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #191919;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  flex: none;
+}
+
+.view-data-btn.arrow-mode:hover {
+  background-color: #252525;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/*bottoni testo rossi*/
+.view-data-btn:not(.arrow-mode),
+.next-final-btn.red-button {
+  width: calc(100% - 40px);
+  max-width: 260px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 12px 28px;
+  background-color: #8B0000;
+  color: white;
+  border-radius: 12px;
+  border: 1px solid #ff0000;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.view-data-btn:not(.arrow-mode):hover,
+.next-final-btn:hover {
+  background-color: #a00000;
+  border-color: #ff3333;
+
+}

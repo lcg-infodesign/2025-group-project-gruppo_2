@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Stolen Voices</title>
+    <title>Visualizations</title>
 
     <link rel="stylesheet" type="text/css" href="main-style.css">
 
@@ -18,31 +18,61 @@
 
   <body>
     <header id="main-header">
-     <div class="logo">STOLEN VOICES</div>
+    <div class="logo">STOLEN VOICES</div>
      
-     <nav class="nav-menu">
-      <a href="index.html" class="nav-link">HOME</a>
-      <a href="main.html" class="nav-link">VISUALIZATIONS</a>
-      <a href="about.html" class="nav-link">ABOUT</a>
-      <a href="team.html" class="nav-link">TEAM</a>
-      </nav>
+    <nav class="nav-menu">
+        <a href="index.html" class="nav-link">HOME</a>
+        
+        <div class="dropdown">
+            <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
+            <div class="dropdown-content">
+                <a href="main.html">SOURCE OF FIRE</a>
+                <a href="second.html">IMPUNITY</a>
+            </div>
+        </div>
+
+        <a href="about.html" class="nav-link">ABOUT</a>
+        <a href="team.html" class="nav-link">TEAM</a>
+    </nav>
     </header>
 
 
     <div id="container">
       <div id="sketch-container"></div>
 
-    <div id="sidebar">
-  
-    <div class="filter-dropdown">
-      <button class="filter-btn" id="worldwideBtn">WORLDWIDE<span class="arrow">▼</span></button>
-      <div class="filter-panel" id="filterPanel"></div>
+      <div id="sidebar">
+    
+      <div class="filter-dropdown">
+        <button class="filter-btn" id="worldwideBtn">WORLDWIDE<span class="arrow">▼</span></button>
+        <div class="filter-panel" id="filterPanel"></div>
+      </div>
+
+      <div id="deathCounterContainer" style="display: none;">
+        <div class="death-counter-title">Number of victims</div>
+        <div id="deathCounter" class="death-counter">0</div>
+      </div>
+
+    <!--bottoni di navigazione-->
+    <div class="navigation-arrows" id="navigationArrows">
+      <button class="arrow-btn" id="prevBtn">←</button>
+      <button class="arrow-btn" id="nextBtn">→</button>
     </div>
+
+    <!--bottone per continuare dopo l'animazione)-->
+    <button class="view-data-btn" id="viewDataBtn" style="display: none;">
+    VIEW THE DATA
+    </button>
+
+    <!--bottone next finale-->
+    <button class="next-final-btn" id="nextBtnFinal" style="display: none;">
+    NEXT
+    </button>
 
     <div id="deathCounterContainer" style="display: none;">
       <div class="death-counter-title">Number of victims</div>
       <div id="deathCounter" class="death-counter">0</div>
     </div>
+
     
     </div>
     <script src="main.js"></script>

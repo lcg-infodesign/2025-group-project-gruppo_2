@@ -5,8 +5,7 @@ let titleIndex = 0;
 
 // singola sezione di testo
 let introTextContent =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
-
+  "Every story deserves justice. Every year, dozens of journalists are killed for informing the world."
 let typingIndex = 0;
 let typingTimeout = null;
 let isTyping = false;
@@ -82,7 +81,7 @@ function typeIntro() {
     if (typingIndex < introTextContent.length) {
       introEl.textContent += introTextContent.charAt(typingIndex);
       typingIndex++;
-      typingTimeout = setTimeout(typeChar, 30);
+      typingTimeout = setTimeout(typeChar, 50);
     } else {
       isTyping = false;
       showButton();

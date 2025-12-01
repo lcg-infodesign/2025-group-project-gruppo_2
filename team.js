@@ -38,13 +38,12 @@ function setup() {
 
     titleElement = document.getElementById("team-title");
 
-    // prende tutti gli elementi dei nomi
     nameElements = Array.from(document.querySelectorAll(".team-name"));
 
     titleElement.innerHTML = "";
     nameElements.forEach(el => el.innerHTML = "");
 
-    // avvia animazione del titolo immediatamente
+    // avvia animazione titolo
     typeTitle();
 }
 
