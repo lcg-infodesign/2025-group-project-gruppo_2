@@ -50,12 +50,13 @@ let categories = [
 
 //variabili per la navigazione
 let currentStep = 0;
-const totalSteps = 10;
+const totalSteps = 12;
 let showYAxis = false;
 let showXAxis = false;
 let showGridLines = false;
 let animationStarted = false;
 let animationCompleted = false;
+let showAllDots = false;
 
 //evidenzia pallini
 let highlightMaguindanao = false;
@@ -63,6 +64,7 @@ let highlightPalestina = false;
 let highlightIraq = false;
 let highlightUncertain = false;
 let highlightUnknown = false;
+let highlightNone = false;
 
 // toggle barra di ricerca
 function toggleSearch() {
@@ -271,6 +273,23 @@ function setup() {
       updateNavigationUI();
     }
   });
+  //bottone COUNTRY
+  document.getElementById('nextBtnFinal').addEventListener('click', function() {
+    if(currentStep === 9) {
+      currentStep = 10;
+      updateVisualization();
+      updateNavigationUI();
+
+      //nascondi COUNTRY e mostra frecce
+      document.getElementById('nextBtnFinal').style.display = 'none';
+      document.getElementById('navigationArrows').style.display = 'flex';
+    }
+  });
+  //bottone SHOW ALL
+  document.getElementById('showAllBtn').addEventListener('click', function() {
+    showAllDotsImmediately();
+    this.style.display = 'none';
+  })
 
   updateVisualization();
   updateNavigationUI();
@@ -539,10 +558,17 @@ class Dot {
   }
 
   update() {
-  if(this.arrived) {
-    this.draw();
-    return;
-  }
+  // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
+    if(showAllDots && !this.arrived) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    }
+
+    if(this.arrived) {
+      this.draw();
+      return;
+    }
 
   // movimento verso la posizione finale
   let dx = this.finalX - this.pos.x;
@@ -618,6 +644,13 @@ class Dot {
       }
     }
 
+    //caso 10 tutti i pallini grigi
+    if(currentStep === 10) {
+      dotColor = color(150);
+    }
+
+    //caso 11 tutti i pallini bianchi
+
     fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
@@ -671,10 +704,16 @@ function applyRepulsion() {
 }
 
 function spawnUpToCurrentYear() {
-  if(!years.length || currentYearIndex >= years.length) {
-    if(!animationCompleted && currentStep === 3) {
-      animationCompleted = true;
+  //se showAllDots è true, non fare l'animazione di caduta
+  if(showAllDots) {
+    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
+    if(dots.length === 0 && journalists.length > 0) {
+      showAllDotsImmediately();
     }
+    return;
+  }
+
+  if(!years.length || currentYearIndex >= years.length) {
     return;
   }
 
@@ -777,6 +816,25 @@ function goToPreviousStep() {
   }
 }
 
+//mostrare i pallini immediatamente
+function showAllDotsImmediately() {
+  showAllDots = true;
+  spawnedIds.clear();
+  dots = [];
+  currentYearIndex = years.length - 1; //vai all'ultimo anno
+
+  for(let j of journalists) {
+    let dot = new Dot(j.id, j.year, j.category);
+    // IMPOSTA IL PALLINO COME ARRIVATO SUBITO
+    dot.pos.x = dot.finalX;
+    dot.pos.y = dot.finalY;
+    dot.arrived = true;
+
+    dots.push(dot);
+    spawnedIds.add(j.id);
+  }
+}
+
 //aggiorna la schermata
 function updateVisualization() {
   //reset tutto
@@ -790,6 +848,12 @@ function updateVisualization() {
   highlightIraq = false;
   highlightUncertain = false;
   highlightUnknown = false;
+  highlightNone = false;
+
+  // Resetta showAllDots solo se non siamo nello step 3 (dove è attivo il bottone SHOW ALL)
+  if(currentStep !== 3) {
+    showAllDots = false;
+  }
 
   //attiva in base allo step corrente
   switch(currentStep) {
@@ -861,6 +925,25 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightUnknown = true;
       break;
+    case 10: //mostra filtro paese
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+    case 11: //tutti i pallini bianchi
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+  }
+
+  //se showalldots è true, mostra tutti i pallini
+  if(showAllDots) {
+    showAllDotsImmediately();
   }
 }
 
@@ -869,11 +952,15 @@ function updateNavigationUI() {
   const navigationArrows = document.getElementById('navigationArrows');
   const viewDataBtn = document.getElementById('viewDataBtn');
   const nextBtnFinal = document.getElementById('nextBtnFinal');
+  const worldwideBtnContainer = document.querySelector('.filter-dropdown');
+  const showAllBtnElement = document.getElementById('showAllBtn');
 
   nextBtnFinal.style.display = 'none';
   nextBtnFinal.classList.remove('red-button');
   viewDataBtn.classList.remove('arrow-mode');
-  viewDataBtn.style.width = '100%'
+  viewDataBtn.style.width = '100%';
+
+  worldwideBtnContainer.style.display = 'none';
 
   if(currentStep === 2) {
     //mostra frecce e nascondi bottone finale
@@ -881,8 +968,12 @@ function updateNavigationUI() {
     viewDataBtn.style.display = 'block';
     viewDataBtn.textContent = 'VIEW THE DATA';
     viewDataBtn.classList.remove('arrow-mode');
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
   } else if(currentStep === 3) {
     //dopo animazione, mostra bottone x continuare
+    if (showAllBtnElement) {
+        showAllBtnElement.style.display = 'block';
+    }
     navigationArrows.style.display = 'none';
     viewDataBtn.style.display = 'block';
     viewDataBtn.textContent = "→";
@@ -892,20 +983,35 @@ function updateNavigationUI() {
     navigationArrows.style.display = 'flex';
     viewDataBtn.style.display = 'none';
     nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
   } else if(currentStep === 9) {
     // nascondi tutto, mostra COUNTRY
     navigationArrows.style.display = 'none';
     viewDataBtn.style.display = 'none';
     nextBtnFinal.style.display = 'block';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
     nextBtnFinal.textContent = "COUNTRY";
     nextBtnFinal.classList.add('red-button');
+  } else if(currentStep === 10) {
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+    worldwideBtnContainer.style.display = 'block';
+  } else if(currentStep === 11) {
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+    worldwideBtnContainer.style.display = 'block';
   } else {
     // normale navigazione
     navigationArrows.style.display = 'flex';
     viewDataBtn.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
   }
 
   //disabilita frecce quando necessario
   document.getElementById('prevBtn').disabled = (currentStep === 0);
-  document.getElementById('nextBtn').disabled = (currentStep >= 10);
+  document.getElementById('nextBtn').disabled = (currentStep >= 11);
 }
