@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizations</title>
+
+    <link rel="stylesheet" href="second.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+
+
+    <script src="libraries/p5.min.js"></script>
+</head>
+
+<body>
+<header id="main-header">
+    <div class="logo">STOLEN VOICES</div>
+     
+    <nav class="nav-menu">
+        <a href="index.html" class="nav-link">HOME</a>
+        
+        <div class="dropdown">
+            <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
+            <div class="dropdown-content">
+                <a href="main.html">SOURCE OF FIRE</a>
+                <a href="second.html">IMPUNITY</a>
+            </div>
+        </div>
+
+        <a href="about.html" class="nav-link">ABOUT</a>
+        <a href="team.html" class="nav-link">TEAM</a>
+    </nav>
+</header>
+
+    <div id="container">
+        <div id="sketch-container"></div>
+        <div id="sidebar">
+            <div id="headline-wrapper">
+                <div id="headline">
+                    Have you ever wondered if crimes against journalists are actually punished?
+                </div>
+                <div class="arrow" id="arrow">→</div>
+            </div>
+
+            <div class="section-wrapper" id="unknown-wrapper">
+                <div class="section-title" id="unknown-title">UNKNOWN</div>
+                <div class="section-body" id="unknown-body">
+                    <span class="red">1,468</span> journalists have been killed with unknown accountability.
+                    Not knowing who committed the crime leaves a disturbing gap and threatens press freedom.
+                </div>
+                <div class="arrow" id="arrow-next">→</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="second.js"></script>
+</body>
+</html>

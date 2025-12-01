@@ -1,23 +1,10 @@
-html {
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  background-color: #191919;
+  font-family: 'JetBrains Mono', monospace;
   overflow: hidden;
-}
-
-canvas {
-  display: block;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -1;
-}
-
-body {
-  min-height: 200vh;
-  overflow-x: hidden;
-  background: #191919;
-  color: rgb(255, 245, 233);
-  font-family: "JetBrains Mono", monospace;
 }
 
 #main-header {
@@ -109,53 +96,94 @@ body {
 
 #sketch-container {
   flex: 1;
-  position: relative;   
+  position: relative;
 }
 
 #sketch-container canvas {
-    top: 80px !important;
-}
-
-#team-content {
+  top: 80px !important;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  opacity: 1;
 }
 
-#team-title {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 3rem;
-  color: red;
-  font-weight: 300;
-  margin-bottom: 40px;
-}
-
-#team-names-container {
+#sidebar {
+  width: 300px;
+  background-color: #191919;
+  color: white;
+  padding: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  justify-content: space-between;
+  min-height: 100%;
+  margin: 0;
+  position: relative;
 }
 
-.team-row {
+#headline {
+  padding: 28px;
   display: flex;
+  align-items: center;
+  z-index: 20;
+  font-family: 'JetBrains Mono', monospace;
+  color: rgb(255, 245, 233);
+  font-size: 17px;
+}
+
+#arrow, #arrow-next {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  padding: 5px 11px;
+  border: 2px solid rgb(255, 245, 233);
+  border-radius: 2px;
+  width: 30px;
+  text-align: center;
+  font-size: 15pt;
+  color: rgb(255, 245, 233);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
 }
 
-.team-name {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 1.5rem;
-  color: rgb(255, 245, 233);
-  margin: 0 40px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: color 0.3s ease-in-out;
-  white-space: nowrap;
+#headline-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 100%;
 }
 
+.section-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  height: 100%;
+  text-align: center;
+  padding: 20px;
+  color: rgb(255, 245, 233);
+  display: none;
+  font-family: 'JetBrains Mono', monospace;
+}
 
-.team-name:hover {
+.section-title {
+  visibility: hidden;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.section-body {
+  visibility: hidden;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#arrow-next {
+  visibility: hidden;
+}
+
+.red {
   color: red;
+  font-weight: bold;
 }

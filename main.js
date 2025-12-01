@@ -4,15 +4,15 @@ let sidebarWidth;
 let mainWidth;
 let padding;
 
-let yLabelWidth;  // larghezza etichette asse Y
-let xLabelHeight; // altezza etichette asse X
+let yLabelWidth;  // larghezza etichette asse y
+let xLabelHeight; // altezza etichette asse x
 
 //limiti orizzontali di disposizione delle palline 
 let minX;
 let maxX;
 
 let rowHeight;    // altezza riga
-let initialX;     // posizione X del primo anno
+let initialX;     // posizione x del primo anno
 let yearWidth;    // larghezza colonna anno
 let diam;         // diametro pallini
 let gravity;      // velocità caduta pallini
@@ -66,85 +66,86 @@ let highlightUnknown = false;
 
 // toggle barra di ricerca
 function toggleSearch() {
-  const btn = document.getElementById("worldwideBtn");
-  const panel = document.getElementById("filterPanel");
+  let btn = document.getElementById("worldwideBtn");
+  let panel = document.getElementById("filterPanel");
 
   if (btn.classList.contains("search-mode")) return;
 
   btn.classList.add("search-mode");
   panel.style.display = "block";
 
-  // wrapper input e icone
-  const searchWrapper = document.createElement("div");
-  searchWrapper.className = "search-wrapper";
-  searchWrapper.style.display = "flex";
-  searchWrapper.style.alignItems = "center";
-  searchWrapper.style.gap = "5px";
+  // crea input e icone
+  if (!document.getElementById("countrySearchInput")) {
 
-  // Input
-  const input = document.createElement("input");
-  input.type = "text";
-  input.id = "countrySearchInput";
-  input.placeholder = "Search for a country...";
-  input.style.flex = "1"; // occupa tutto lo spazio disponibile
+    const searchWrapper = document.createElement("div");
+    searchWrapper.className = "search-wrapper";
+    searchWrapper.style.display = "flex";
+    searchWrapper.style.alignItems = "center";
+    searchWrapper.style.gap = "5px";
 
-  // Icona lente a destra (SVG stilizzata)
-  const searchIcon = document.createElement("span");
-  searchIcon.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    const input = document.createElement("input");
+    input.type = "text";
+    input.id = "countrySearchInput";
+    input.style.fontSize = "15px";
+    input.placeholder = "Select country...";
+    input.style.flex = "1";
+
+    const searchIcon = document.createElement("span");
+    searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  `;
-  searchIcon.style.display = "inline-flex";
+    </svg>`;
+    searchIcon.style.display = "inline-flex";
 
-  // X per chiudere la barra
-  const closeIcon = document.createElement("span");
-  closeIcon.className = "close-icon";
-  closeIcon.textContent = "✕";
-  closeIcon.style.cursor = "pointer";
+    const closeIcon = document.createElement("span");
+    closeIcon.className = "close-icon";
+    closeIcon.textContent = "✕";
+    closeIcon.style.cursor = "pointer";
 
-  // Append: input prima, poi icone (lente e X) a destra
-  searchWrapper.appendChild(input);
-  searchWrapper.appendChild(searchIcon);
-  searchWrapper.appendChild(closeIcon);
+    searchWrapper.appendChild(input);
+    searchWrapper.appendChild(searchIcon);
+    searchWrapper.appendChild(closeIcon);
 
-  btn.innerHTML = ""; // pulisci bottone
-  btn.appendChild(searchWrapper);
+    btn.innerHTML = "";
+    btn.appendChild(searchWrapper);
 
-  input.focus();
+    input.focus();
 
-  // Filtra i paesi mentre digiti
-  input.addEventListener("input", function () {
-    filterCountries(this.value);
-  });
+    // filtra i paesi mentre si digita
+    input.addEventListener("input", function () {
+      filterCountries(this.value);
+    });
 
-  // Chiudi con ESC
-  input.addEventListener("keydown", function (e) {
-    if (e.key === "Escape") closeSearch();
-  });
-
-  // Chiudi cliccando la X
-  closeIcon.addEventListener("click", function(e) {
-    e.stopPropagation();
-    closeSearch();
-  });
-
-  function closeSearch() {
-    btn.classList.remove("search-mode");
-    panel.style.display = "none";
-    
-    selectedCountry = null;
-    
-    btn.textContent = "Worldwide ▼";
-
-    // Nasconde il quadrato delle vittime
-    document.getElementById("deathCounterContainer").style.display = "none";
+    // chiudere con la x
+    closeIcon.addEventListener("click", function(e) {
+      e.stopPropagation();
+      closeSearch();
+    });
   }
 }
 
-// Filtra i paesi in base al testo
+function closeSearch() {
+  const btn = document.getElementById("worldwideBtn");
+  const panel = document.getElementById("filterPanel");
+
+  btn.classList.remove("search-mode");
+  panel.style.display = "none";
+
+  const input = document.getElementById("countrySearchInput");
+  if (input) input.value = "";
+
+  selectedCountry = null;
+
+  btn.textContent = "WORLDWIDE ▼";
+
+  document.getElementById("deathCounterContainer").style.display = "none";
+}
+
+
+
+
+// filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
   const countryDivs = panel.querySelectorAll("div");
@@ -155,18 +156,17 @@ function filterCountries(value) {
   });
 }
 
-// --- Caricamento dati ---
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
 }
 
 function setup() {
-  sidebarWidth = 380;
+  sidebarWidth = 300;
   mainWidth = windowWidth - sidebarWidth;
   padding = 30;
 
   let canvas = createCanvas(mainWidth, windowHeight);
-  canvas.position(0, 80);
+  canvas.position(0, 30);
 
 
   yLabelWidth = padding + 60;
@@ -194,31 +194,32 @@ function setup() {
 
   let nRows = data.getRowCount();
 
-  // Carica i dati in dots e crea lista paesi unici
+  // carica i dati in dots e crea lista paesi unici
   for (let i = 0; i < nRows; i++) {
-    // Lista paesi unici
     let country = data.get(i, "country");
     if (country && !countries.includes(country)) {countries.push(country)};
   }
 
-  // Ordina alfabeticamente
+  // ordina alfabeticamente
   countries.sort((a, b) => a.localeCompare(b));
 
   // Popola tendina dei paesi
   const panel = document.getElementById("filterPanel");
   panel.innerHTML = "";
   countries.forEach(country => {
-    const div = document.createElement("div");
-    div.textContent = country;
+  let div = document.createElement("div");
+  div.textContent = country;
    
     div.onclick = () => {
       selectedCountry = country;
+      updateDeathCounter(country);         // aggiorna contatore vittime
+      document.getElementById("deathCounterContainer").style.display = "block";
       panel.style.display = "none";
       const btn = document.getElementById("worldwideBtn");
       btn.classList.remove("search-mode");
       btn.textContent = country + " ▼";
 
-  // Mostra il quadrato e aggiorna il numero di vittime
+  // aggiornamento numero vittime
   updateDeathCounter(country);
   document.getElementById("deathCounterContainer").style.display = "block";
     };
@@ -248,15 +249,14 @@ function setup() {
   updateVisualization();
   updateNavigationUI();
 
-  // Click bottone per aprire ricerca
+  // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
 }
-
 
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
   
-  // Conta il numero di vittime nel dataset per quel paese
+  // conteggio vittime x paese
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
     if (data.get(i, "country") === country) {
@@ -267,7 +267,7 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-// --- Disegna griglia e tacche ---
+// griglia con tacche
 function drawGrid() {
   // righe categorie
   for (let i = 0; i < categories.length; i++) {
@@ -287,7 +287,7 @@ function drawGrid() {
     line(padding + yLabelWidth, y, mainWidth - padding, y);
   }
 
-  // tacche ogni anno
+  // tacche x anno
   for (let i = 0; i <= (2025 - 1992); i++) {
     stroke(255);
     strokeWeight(0.5);
@@ -297,7 +297,7 @@ function drawGrid() {
     line(x, topY, x, bottomY);
   }
 
-  // tacche anni precedenti (non lineari)
+  // tacche anni precedenti
   let xStart = initialX;
   let numTicks = 10;
   let maxStep = yearWidth;
@@ -326,8 +326,8 @@ function drawGrid() {
 
     // glow
     let yPallino = height - padding - 45;
-    let radius = 10;
-    let glowWidth = 8;
+    let radius = 8;
+    let glowWidth = 6;
     let maxAlpha = 120;
 
     for (let j = glowWidth; j > 0; j--) {
@@ -340,7 +340,7 @@ function drawGrid() {
     circle(x, yPallino, radius);
   }
 
-  // asse Y verticale
+  // asse y
   stroke(white);
   strokeWeight(0.5);
   let yAxisOffset = 15;
@@ -349,7 +349,6 @@ function drawGrid() {
   line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
 }
 
-// --- Disegna ---
 function draw() {
   background(25);
 
@@ -390,8 +389,10 @@ function draw() {
       dots[i].update();
     }
 
-    applyRepulsion();
-  }
+  applyRepulsion();
+
+  for (let d of dots) d.update();
+
 
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
@@ -399,20 +400,21 @@ function draw() {
   let blurStartX = mainWidth; // subito prima della sidebar
 
   for (let i = 0; i < blurWidth; i++) {
-    stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
+    stroke(128, 128, 128, map(i, 0, blurWidth, maxAlpha, 0));
     strokeWeight(1);
     line(blurStartX - i, 0, blurStartX - i, height); // sfumatura verso destra
   }
+  }
 }
 
-//carica i dati
+//caricamento dati
 function buildJournalistsFromTable() {
   journalists = [];
 
   for(let j = 0; j < data.getRowCount(); j++) {
-    const row = data.getRow(j);
-    const dateStr = row.get("entry_date");
-    const parts = dateStr.split("/");
+    let row = data.getRow(j);
+    let dateStr = row.get("entry_date");
+    let parts = dateStr.split("/");
     let year = Number(parts[2]);
 
     if(year < 100) {
@@ -423,7 +425,7 @@ function buildJournalistsFromTable() {
       }
     }
 
-    const journalist = {
+    let journalist = {
       id: j,
       year: year,
       category: row.get("source_of_fire") || "Unknown",
@@ -586,6 +588,17 @@ class Dot {
     fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
+     
+   // controlla se il pallino deve essere visibile
+  let visible = !selectedCountry || this.country === selectedCountry;
+  if (!visible) return;
+
+  // colore
+  if (selectedCountry) {
+    fill(255, 0, 0); // rosso se c'è filtro
+  } else {
+    fill(255); // bianco se worldwide
+  }
   }
 }
 
@@ -635,10 +648,10 @@ function spawnUpToCurrentYear() {
 
   const yearLimit = years[currentYearIndex];
   let spawnedCount = 0;
-  const maxSpawnPerFrame = 3; //controlla la velocità
+  const maxSpawnPerFrame = 3; //controllo velocità
 
   for(let j of journalists) {
-    if (spawnedCount >= maxSpawnPerFrame) break; //ferma dopo max pallini
+    if (spawnedCount >= maxSpawnPerFrame) break;
     
     if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
@@ -649,7 +662,7 @@ function spawnUpToCurrentYear() {
   }
 
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
-    currentYearIndex++; //passa all'anno successivo
+    currentYearIndex++;
   }
 }
 
