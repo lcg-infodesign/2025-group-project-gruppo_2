@@ -6,6 +6,11 @@ let padding;
 
 let yLabelWidth;  // larghezza etichette asse Y
 let xLabelHeight; // altezza etichette asse X
+
+//limiti orizzontali di disposizione delle palline 
+let minX;
+let maxX;
+
 let rowHeight;    // altezza riga
 let initialX;     // posizione X del primo anno
 let yearWidth;    // larghezza colonna anno
@@ -39,8 +44,25 @@ let categories = [
   "Mob Violence",
   "Paramilitary Group",
   "Political Group",
+  "Uncertain",
   "Unknown"
 ];
+
+//variabili per la navigazione
+let currentStep = 0;
+const totalSteps = 10;
+let showYAxis = false;
+let showXAxis = false;
+let showGridLines = false;
+let animationStarted = false;
+let animationCompleted = false;
+
+//evidenzia pallini
+let highlightMaguindanao = false;
+let highlightPalestina = false;
+let highlightIraq = false;
+let highlightUncertain = false;
+let highlightUnknown = false;
 
 // toggle barra di ricerca
 function toggleSearch() {
@@ -104,18 +126,21 @@ function toggleSearch() {
   });
 
   // Chiudi cliccando la X
-  closeIcon.addEventListener("click", closeSearch);
+  closeIcon.addEventListener("click", function(e) {
+    e.stopPropagation();
+    closeSearch();
+  });
 
   function closeSearch() {
-      btn.classList.remove("search-mode");
-      panel.style.display = "none";
-      
-      selectedCountry = null;
-      
-      btn.textContent = "Worldwide ▼";
+    btn.classList.remove("search-mode");
+    panel.style.display = "none";
+    
+    selectedCountry = null;
+    
+    btn.textContent = "Worldwide ▼";
 
-      // Nasconde il quadrato delle vittime
-      document.getElementById("deathCounterContainer").style.display = "none";
+    // Nasconde il quadrato delle vittime
+    document.getElementById("deathCounterContainer").style.display = "none";
   }
 }
 
@@ -161,6 +186,9 @@ function setup() {
   buildJournalistsFromTable();
   drawLayout();
 
+  minX = yearToX(1992)-13;
+  maxX = yearToX(2025)+15;
+
   dots = [];
   countries = [];
 
@@ -178,6 +206,7 @@ function setup() {
 
   // Popola tendina dei paesi
   const panel = document.getElementById("filterPanel");
+  panel.innerHTML = "";
   countries.forEach(country => {
     const div = document.createElement("div");
     div.textContent = country;
@@ -188,8 +217,6 @@ function setup() {
       const btn = document.getElementById("worldwideBtn");
       btn.classList.remove("search-mode");
       btn.textContent = country + " ▼";
-       // Nascondi pannello filtri
-      panel.style.display = "none";
 
   // Mostra il quadrato e aggiorna il numero di vittime
   updateDeathCounter(country);
@@ -199,34 +226,31 @@ function setup() {
   });
 
   inVisualizationArea = true;
-}
+
+  //gestione frecce navigazione
+  document.getElementById('prevBtn').addEventListener('click', goToPreviousStep);
+  document.getElementById('nextBtn').addEventListener('click', goToNextStep);
+  //bottone VIEW THE DATA  che avvia l'animazione
+  document.getElementById('viewDataBtn').addEventListener('click', function() {
+    if(currentStep === 2) {
+      //attiva l'animazione - step3
+      currentStep = 3;
+      updateVisualization();
+      updateNavigationUI();
+    } else if (currentStep === 3) {
+      //vai al caso maguindanao
+      currentStep = 4;
+      updateVisualization();
+      updateNavigationUI();
+    }
+  });
+
+  updateVisualization();
+  updateNavigationUI();
 
   // Click bottone per aprire ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
-
-  countries.forEach(country => {
-  const div = document.createElement("div");
-  div.textContent = country;
-  div.onclick = () => {
-    selectedCountry = country;
-    
-    // Aggiorna bottone
-    const btn = document.getElementById("worldwideBtn");
-    btn.classList.remove("search-mode");
-    btn.textContent = country + " ▼";
-    
-    // Aggiorna contatore vittime
-    updateDeathCounter(country);
-    
-    // Mostra il quadrato se era nascosto
-    document.getElementById("deathCounterContainer").style.display = "block";
-
-    // Chiudi il pannello
-    const panel = document.getElementById("filterPanel");
-    panel.style.display = "none";
-  };
-  panel.appendChild(div);
-});
+}
 
 
 function updateDeathCounter(country) {
@@ -329,17 +353,45 @@ function drawGrid() {
 function draw() {
   background(25);
 
-  drawGrid();
+  //disegna in base allo step
+  if(showYAxis) {
+    if(currentStep >= 1) {
+      //asse y opaco 0.5
+      drawingContext.globalAlpha = 0.5;
+    }
+    drawYAxis();
+    drawingContext.globalAlpha = 1;
+  }
 
-  if(inVisualizationArea) { //se siamo nell'area di visualizzazione
+  if(showXAxis) {
+    if(currentStep >= 2) {
+      drawingContext.globalAlpha = 0.5;
+    }
+    drawXAxis();
+    drawingContext.globalAlpha = 1;
+  }
+
+  if(showGridLines) {
+    if(currentStep >= 2) {
+      drawingContext.globalAlpha = 0.5;
+    }
+    drawCategoryLines();
+    drawingContext.globalAlpha = 1;
+  }
+
+  if(animationStarted) {
+    drawGrid(); //griglia solo durante l'animazione
+
+    if(inVisualizationArea) { //se siamo nell'area di visualizzazione
     spawnUpToCurrentYear();
-  }
+    }
 
-  for(let i = 0; i < dots.length; i++) {
-    dots[i].update();
-  }
+    for(let i = 0; i < dots.length; i++) {
+      dots[i].update();
+    }
 
-  avoidOverlap();
+    applyRepulsion();
+  }
 
   // sfumatura verticale tra grafico e sidebar
   let blurWidth = 10;
@@ -349,10 +401,8 @@ function draw() {
   for (let i = 0; i < blurWidth; i++) {
     stroke(255, 255, 255, map(i, 0, blurWidth, maxAlpha, 0));
     strokeWeight(1);
-    line(blurStartX + i, 0, blurStartX + i, height); // sfumatura verso destra
+    line(blurStartX - i, 0, blurStartX - i, height); // sfumatura verso destra
   }
-
-  drawGrid();
 }
 
 //carica i dati
@@ -423,100 +473,164 @@ class Dot {
     this.id = id;
     this.year = year;
     this.category = category;
+    this.country = journalists[id].country;
 
-    // GRIGLIA 5 COLONNE CON RIGHE ALTERNATE SOPRA/SOTTO
-
-    let samePositionDots = journalists.filter(j => j.year === year && j.category === category);
-    let dotIndex = samePositionDots.findIndex(j => j.id === id);
-
-    // centro della categoria
-    let baseX = yearToX(year);
+    // griglia per determinare la posizione
+    let centerX = yearToX(year);
+    let jitterX = (yearWidth * 0.4) * randomGaussian(); 
     let baseY = categoryToY(category);
 
-    // griglia
-    let cols = 4;
-    let colSpacing = diam * 3;
-    let rowSpacing = diam * 2;
-
-    // cella
-    let col = dotIndex % cols;
-    let row = Math.floor(dotIndex / cols);
-
-    // offset X centrato
-    let offsetX = (col - (cols - 1) / 2) * colSpacing;
-
-    // offset Y alternato sopra-sotto
-    let direction = (row % 2 === 1) ? -1 : 1;       // righe dispari sopra, pari sotto
-    let magnitude = Math.ceil(row / 2);            // distanza crescente
-    let offsetY = (row === 0) ? 0 : direction * magnitude * rowSpacing;
-
-    // posizioni finali
-    this.finalX = baseX + offsetX;
-    this.finalY = baseY + offsetY;
+    // posizione finale
+    // limiti orizzontali del grafico (1992–2025)
+    let minX = yearToX(1992);
+    let maxX = yearToX(2025);
+    this.finalX = constrain(centerX + jitterX, minX, maxX);
+    this.finalY = baseY + random(-10, 10);
 
     let randomOffset = random(-30, 30);
     this.pos = createVector(this.finalX + randomOffset, -20);
-    this.speed = random(1, 3);
+    this.speed = random(2, 4);
     this.arrived = false;
+    this.r = diam;
+
+    let startOffset = random(-40, 40);
+    let startX = constrain(centerX + startOffset, minX, maxX);
+    this.pos = createVector(startX, -20);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.mass = 1;
+
     this.r = diam;
   }
 
   update() {
-    if(this.arrived) {
-      this.draw();
-      return;
-    }
-    
-    let dx = this.finalX - this.pos.x;
-    let dy = this.finalY - this.pos.y;
-    let distance = sqrt(dx * dx + dy * dy);
-
-    if(distance < this.speed) {
-      this.pos.x = this.finalX;
-      this.pos.y = this.finalY;
-      this.arrived = true;
-    } else {
-      this.pos.x += (dx/distance) * this.speed;
-      this.pos.y += (dy/distance) * this.speed;
-    }
-
+  if(this.arrived) {
     this.draw();
+    return;
   }
 
+  // movimento verso la posizione finale
+  let dx = this.finalX - this.pos.x;
+  let dy = this.finalY - this.pos.y;
+  let distance = sqrt(dx * dx + dy * dy);
+
+  if(distance < this.speed) {
+    this.pos.x = this.finalX;
+    this.pos.y = this.finalY;
+    this.arrived = true;
+  } else {
+    this.pos.x += (dx/distance) * this.speed;
+    this.pos.y += (dy/distance) * this.speed;
+  }
+
+  if (!this.arrived) {
+    let floorY = height - padding - xLabelHeight - 10;
+
+    if (this.pos.y > floorY) {
+      this.pos.y = floorY;
+      this.vel.y = 0;
+      }
+    }
+
+  this.draw();
+}
+
   draw() {
-    fill(255);
+    // mostra solo i pallini del paese selezionato
+    if (selectedCountry && this.country !== selectedCountry) return;
+
+    let dotColor = color(255);
+
+    //caso 4 maguindanao
+    if(highlightMaguindanao && this.year === 2009 && this.category === "Government Officials") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 5 palestina
+    if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 6 iraq
+    if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 7 uncertain e unknownù
+    if(currentStep === 7) {
+      if(this.category === "Uncertain" || this.category === "Unknown") {
+        dotColor = color(255);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    //caso 8 uncertain
+    if(currentStep === 8) {
+      if(this.category === "Uncertain") {
+        dotColor = color(255, 0, 0);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    //caso 9 tutti opachi 0.5 tranne uncertain e unknown
+    if(currentStep === 9) {
+      if(this.category === "Unknown") {
+        dotColor = color(255, 0, 0);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
 }
 
-function avoidOverlap() {
-  let minDist = diam * 1.05;
+function applyForceTo(dot, force) {
+  let f = p5.Vector.div(force, dot.mass);
+  dot.acc.add(f);
+}
 
-  for(let i = 0; i < dots.length; i++) {
-    for(let j = i + 1; j < dots.length; j++) {
-      let dx = dots[j].pos.x - dots[i].pos.x;
-      let dy = dots[j].pos.y - dots[i].pos.y;
-      let dist = sqrt(dx * dx + dy * dy);
+function applyRepulsion() {
+  let minDist = diam * 3;      // distanza tra i punti
+  let strength = 6.0;          // costante elastica
 
-      if(dist < minDist && dist > 0) {
-        let overlap = (minDist - dist) * 0.5;
+  for (let i = 0; i < dots.length; i++) {
 
-        let nx = dx / dist;
-        let ny = dy / dist;
+    if (!dots[i].arrived) continue;
 
-        dots[i].pos.x -= nx * overlap;
-        dots[i].pos.y -= ny * overlap;
+    for (let j = i + 1; j < dots.length; j++) {
 
-        dots[j].pos.x += nx * overlap;
-        dots[j].pos.y += ny * overlap;
+      if (!dots[j].arrived) continue;
+
+      let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
+      let d = dir.mag();
+
+      if (d < minDist && d > 0) {
+        let force = map(d, 0, minDist, strength, 0);
+        dir.normalize().mult(force);
+
+        dots[i].pos.add(dir);
+        dots[j].pos.sub(dir);
+
+        // pallini entro i limiti dopo repulsione
+        dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
+        dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
       }
     }
   }
 }
 
 function spawnUpToCurrentYear() {
-  if(!years.length || currentYearIndex >= years.length) return;
+  if(!years.length || currentYearIndex >= years.length) {
+    if(!animationCompleted && currentStep === 3) {
+      animationCompleted = true;
+    }
+    return;
+  }
 
 
   const yearLimit = years[currentYearIndex];
@@ -537,4 +651,215 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++; //passa all'anno successivo
   }
+}
+
+function drawYAxis() {
+  stroke(white);
+  strokeWeight(0.5);
+  let yAxisOffset = 15;
+  let yStartOffset = 20;
+  let xAxisY = height - padding - xLabelHeight;
+
+  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
+
+  // Etichette Y
+  for(let i = 0; i < categories.length; i++) {
+    let y = padding + i * rowHeight + rowHeight / 2;
+    
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(RIGHT, CENTER);
+    textSize(12);
+    let yLabelOffset = 20;
+    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
+  }
+}
+
+function drawXAxis() {
+  // Tacche anni
+  for(let i = 0; i <= (2025 - 1992); i++) {
+    stroke(255);
+    strokeWeight(0.5);
+    let x = initialX + i * yearWidth;
+    let topY = height - padding - xLabelHeight;
+    let bottomY = height - padding - 40;
+    line(x, topY, x, bottomY);
+  }
+  
+  // Etichette anni ogni 5
+  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+    let label = 1992 + i * 5;
+    let x = initialX + (label - 1992) * yearWidth;
+
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(label, x, height - padding - 32);
+  }
+}
+
+//disegna linee categorie
+function drawCategoryLines() {
+  for(let i = 0; i < categories.length; i++) {
+    let y = padding + i * rowHeight + rowHeight / 2;
+
+    noFill();
+    stroke(white);
+    strokeWeight(0.5);
+    line(padding + yLabelWidth, y, mainWidth - padding, y);
+  }
+}
+
+//navigazione andare avanti
+function goToNextStep() {
+  if(currentStep < totalSteps - 1) {
+    currentStep++;
+    updateVisualization();
+    updateNavigationUI();
+  }
+}
+
+//navigazione tornare indietro
+function goToPreviousStep() {
+  if(currentStep > 0) {
+    currentStep--;
+    updateVisualization();
+    updateNavigationUI();
+  }
+}
+
+//aggiorna la schermata
+function updateVisualization() {
+  //reset tutto
+  showXAxis = false;
+  showYAxis = false;
+  showGridLines = false;
+  animationStarted = false;
+  inVisualizationArea = false;
+  highlightMaguindanao = false;
+  highlightPalestina = false;
+  highlightIraq = false;
+  highlightUncertain = false;
+  highlightUnknown = false;
+
+  //attiva in base allo step corrente
+  switch(currentStep) {
+    case 0: //solo asse y
+      showYAxis = true;
+      break;
+    case 1: //assi x e y
+      showYAxis = true;
+      showXAxis = true;
+      break;
+    case 2: //linee categorie
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      break;
+    case 3: //animaizone completa
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+    case 4: //caso maguindanao
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightMaguindanao = true;
+      break;
+    case 5: //caso palestina
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightPalestina = true;
+      break;
+    case 6: //caso iraq
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightIraq = true;
+      break;
+    case 7: //caso uncertain e unknown
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUncertain = true;
+      highlightUnknown = true;
+      break;
+    case 8: //caso uncertain
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUncertain = true;
+      break;
+    case 9: //caso unknown
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUnknown = true;
+      break;
+  }
+}
+
+//abilita o disabilita i bottoni
+function updateNavigationUI() {
+  const navigationArrows = document.getElementById('navigationArrows');
+  const viewDataBtn = document.getElementById('viewDataBtn');
+  const nextBtnFinal = document.getElementById('nextBtnFinal');
+
+  nextBtnFinal.style.display = 'none';
+  nextBtnFinal.classList.remove('red-button');
+  viewDataBtn.classList.remove('arrow-mode');
+  viewDataBtn.style.width = '100%'
+
+  if(currentStep === 2) {
+    //mostra frecce e nascondi bottone finale
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'block';
+    viewDataBtn.textContent = 'VIEW THE DATA';
+    viewDataBtn.classList.remove('arrow-mode');
+  } else if(currentStep === 3) {
+    //dopo animazione, mostra bottone x continuare
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'block';
+    viewDataBtn.textContent = "→";
+    viewDataBtn.classList.add('arrow-mode');
+  } else if(currentStep >= 4 && currentStep <= 8) {
+    //mostra frecce di navigazione x i casi
+    navigationArrows.style.display = 'flex';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+  } else if(currentStep === 9) {
+    // nascondi tutto, mostra COUNTRY
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'block';
+    nextBtnFinal.textContent = "COUNTRY";
+    nextBtnFinal.classList.add('red-button');
+  } else {
+    // normale navigazione
+    navigationArrows.style.display = 'flex';
+    viewDataBtn.style.display = 'none';
+  }
+
+  //disabilita frecce quando necessario
+  document.getElementById('prevBtn').disabled = (currentStep === 0);
+  document.getElementById('nextBtn').disabled = (currentStep >= 10);
 }
