@@ -99,7 +99,6 @@ function activateSection(wrapperId, categoryFilter) {
 
 function activateClosure() {
 
-    // Nasconde tutte le sezioni
     document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
 
     const wrapper = document.getElementById("closure-wrapper");
@@ -107,20 +106,15 @@ function activateClosure() {
 
     wrapper.style.display = "flex";
 
-    // Le bolle tornano normali e mostrano le etichette
     for (let b of bubbles) b.dimmed = false;
     showLabels = true;
 
-    // Reset visibilità
     bodyEl.style.visibility = "hidden";
 
-    // Salvo HTML
     const bodyHTML = bodyEl.innerHTML;
 
-    // Reset contenuto
     bodyEl.innerHTML = bodyHTML;
 
-    // Typewriter sul body
     typeWriter(bodyEl, 20);
 }
 
@@ -155,6 +149,22 @@ document.getElementById("arrow-full").addEventListener("click", () => {
 
 
 function draw() {
+  let hoveringLabel = false;
+
+    for (let b of bubbles) {
+        if (showLabels && b.labelClicked(mouseX, mouseY)) {
+            hoveringLabel = true;
+            break;
+        }
+    }
+
+    // pointer
+    if (hoveringLabel) {
+        cursor(HAND);
+    } else {
+        cursor(ARROW);
+    }
+
     background(25);
 
     for (let b of bubbles) {
@@ -282,7 +292,44 @@ class Bubble {
             text(this.category, this.x, this.y - this.r - 8);
         }
     }
+
+    labelClicked(mx, my) {
+        textSize(12);
+        textFont("JetBrains Mono");
+        let tw = textWidth(this.category);
+        let th = 14;
+
+        let lx = this.x - tw / 2;
+        let ly = this.y - this.r - 8;
+
+        return mx > lx && mx < lx + tw && my > ly - th && my < ly;
+    }
+
 }
+
+function mousePressed() {
+    for (let b of bubbles) {
+        if (showLabels && b.labelClicked(mouseX, mouseY)) {
+            triggerSectionFromLabel(b.category);
+        }
+    }
+}
+
+function triggerSectionFromLabel(cat) {
+    const map = {
+        "Unknown":      ["unknown-wrapper", "Unknown"],
+        "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
+        "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
+        "Full Justice":      ["full-wrapper", "Full Justice"]
+    };
+
+    if (!map[cat]) return;
+    
+    const [wrapperId, filter] = map[cat];
+
+    activateSection(wrapperId, filter);
+}
+
 
 function windowResized() {
     resizeCanvas(windowWidth - sidebarWidth, windowHeight);
