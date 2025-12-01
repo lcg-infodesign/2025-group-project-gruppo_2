@@ -228,6 +228,32 @@ function setup() {
 
   inVisualizationArea = true;
 
+
+  function addImpunityButton() {
+  const sidebar = document.getElementById("sidebar");
+
+  // bottone
+  const impunityBtn = document.createElement("button");
+  impunityBtn.className = "filter-btn impunity-btn"; 
+  impunityBtn.textContent = "IMPUNITY STATUS";
+
+  // click porta a second.html
+  impunityBtn.addEventListener("click", () => {
+    window.location.href = "second.html";
+  });
+
+  sidebar.appendChild(impunityBtn);
+
+  // scritta indicativa sotto il bottone
+  const hintText = document.createElement("div");
+  hintText.className = "impunity-hint";
+  hintText.textContent = "Click the IMPUNITY STATUS button to switch to another visualization";
+
+  sidebar.appendChild(hintText);
+
+  
+}
+
   //gestione frecce navigazione
   document.getElementById('prevBtn').addEventListener('click', goToPreviousStep);
   document.getElementById('nextBtn').addEventListener('click', goToNextStep);
@@ -248,6 +274,13 @@ function setup() {
 
   updateVisualization();
   updateNavigationUI();
+
+
+
+// chiama la funzione dopo il setup
+addImpunityButton();
+
+
 
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
