@@ -94,7 +94,6 @@ html, body {
   background-color: #191919;
 }
 
-
 #sketch-container {
   flex: 1;
   position: relative;   
@@ -126,8 +125,8 @@ html, body {
 
 }
 
-
 .filter-btn {
+  max-width: 260px;
   display: flex;                
   align-items: center;           
   justify-content: center;       
@@ -145,6 +144,10 @@ html, body {
   position: relative;
   transition: transform 0.2s ease, background-color 0.2s ease;
   z-index: 100;
+}
+
+.filter-btn:hover {
+  border-color: darkred;
 }
 
 .filter-btn .arrow {
@@ -297,7 +300,6 @@ html, body {
   height: auto;
 }
 
-
 #deathCounterContainer {
   display: none;
   position: absolute;
@@ -315,18 +317,21 @@ html, body {
   bottom: 5px;
   left: 20px;
   width: calc(100% - 40px);  
+  padding: 12px 28px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
-  background-color: #8B0000;
+  background-color: #a00000;
   color: white;
   border: none;
   border-radius: 60px;
   border: 1px solid #ff0000;
-  border-radius: 12px;
-  padding: 12px 28px;
   cursor: pointer;
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+#sidebar .impunity-btn:hover {
+  background-color: #cc0000;
 }
 
 /* scritta bianca indicativa sotto il bottone IMPUNITY STATUS */
@@ -431,9 +436,7 @@ html, body {
 
 .view-data-btn:not(.arrow-mode):hover,
 .next-final-btn:hover {
-  background-color: #a00000;
-  border-color: #ff3333;
-
+  background-color: #cc0000;
 }
 
 /* Bottone SHOW ALL */
@@ -448,7 +451,6 @@ html, body {
   color: white;
   border: none;
   border-radius: 60px;
-  border-radius: 12px;
   border: 1px solid #ff0000;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
