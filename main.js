@@ -355,109 +355,12 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-// griglia con tacche
-function drawGrid() {
-  // righe categorie
-  for (let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(RIGHT, CENTER);
-    textSize(12);
-    let yLabelOffset = 12; //quanto spostare a sx le etichette
-    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
-
-    noFill();
-    stroke(white);
-    strokeWeight(0.5);
-    line(padding + yLabelWidth, y, mainWidth - padding, y);
-  }
-
-  // tacche x anno
-  for (let i = 0; i <= (2025 - 1992); i++) {
-    stroke(255);
-    strokeWeight(0.5);
-    let x = initialX + i * yearWidth;
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(x, topY, x, bottomY);
-  }
-
-  // tacche anni precedenti
-  let xStart = initialX;
-  let numTicks = 10;
-  let maxStep = yearWidth;
-  let minStep = 5;
-  for (let i = 1; i <= numTicks; i++) {
-    let step = map(i, 1, numTicks, maxStep, minStep);
-    xStart -= step;
-    stroke(255);
-    strokeWeight(1);
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(xStart, topY, xStart, bottomY);
-  }
-
-  // etichette ogni 5 anni con pallino glow
-  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-    let label = 1992 + i * 5;
-    let x = initialX + (label - 1992) * yearWidth;
-
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(CENTER, TOP);
-    textSize(12);
-    text(label, x, height - padding - 32);
-
-  // Pallino semplice (senza glow)
-  let yPallino = height - padding - 45;
-  let radius = 10;
-  let glowWidth = 6;
-  let maxAlpha = 120;
-  
-
-    for (let j = glowWidth; j > 0; j--) {
-      fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
-      noStroke();
-      circle(x, yPallino, radius + j);
-    }
-    fill(255);
-    noStroke();
-    circle(x, yPallino, radius);
-  }
-
-  // asse y
-  stroke(white);
-  strokeWeight(0.5);
-  let yAxisOffset = 15;
-  let yStartOffset = 20;
-  let xAxisY = height - padding - xLabelHeight;
-  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
-}
-
 function draw() {
   background(25);
 
-    if (showYAxis) {
-    drawYAxis();
-  }
-  
-  if (showXAxis) {
-    drawXAxis();
-  }
-  
-  if (showGridLines) {
-    drawCategoryLines();
-  }
-
-  // Se animationStarted è true, disegna la griglia completa
-  if (animationStarted && showGridLines) {
-    drawGrid(); // Questa disegna la griglia completa con etichette, assi, ecc.
-  }
-
+  //disegna sempre la griglia  completa
+  //ma controlla cosa rendere visibile in base allo step
+  drawGridWithSteps();
 
   if(inVisualizationArea) {
     spawnUpToCurrentYear();
@@ -662,7 +565,6 @@ class Dot {
   }
 }
 
-// --- NON C’È PIÙ CODICE DENTRO LA CLASSE O DOPO DI ESSA ---
 
 function applyForceTo(dot, force) {
   let f = p5.Vector.div(force, dot.mass);
@@ -953,64 +855,84 @@ function drawCard(dot){
 
 }
 
-function drawYAxis() {
-  stroke(white);
-  strokeWeight(0.5);
-  let yAxisOffset = 15;
-  let yStartOffset = 20;
-  let xAxisY = height - padding - xLabelHeight;
+function drawGridWithSteps() {
+  drawingContext.globalAlpha = 1.0;
 
-  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
-
-  // Etichette Y
-  for(let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-    
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(RIGHT, CENTER);
-    textSize(12);
-    let yLabelOffset = 12;
-    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
-  }
-}
-
-function drawXAxis() {
-  // Tacche anni
-  for(let i = 0; i <= (2025 - 1992); i++) {
-    stroke(255);
-    strokeWeight(0.5);
-    let x = initialX + i * yearWidth;
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(x, topY, x, bottomY);
-  }
-  
-  // Etichette anni ogni 5
-  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-    let label = 1992 + i * 5;
-    let x = initialX + (label - 1992) * yearWidth;
-
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(CENTER, TOP);
-    textSize(12);
-    text(label, x, height - padding - 32);
-  }
-}
-
-//disegna linee categorie
-function drawCategoryLines() {
-  for(let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-
-    noFill();
+  //asse y
+  if(showYAxis) {
     stroke(white);
     strokeWeight(0.5);
-    line(padding + yLabelWidth, y, mainWidth - padding, y);
+    let yAxisOffset = 15;
+    let yStartOffset = 20;
+    let xAxisY = height - padding - xLabelHeight;
+    line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
+
+    // Etichette Y
+    for(let i = 0; i < categories.length; i++) {
+      let y = padding + i * rowHeight + rowHeight / 2;
+      fill(white);
+      noStroke();
+      textFont(font);
+      textAlign(RIGHT, CENTER);
+      textSize(12);
+      let yLabelOffset = 12;
+      text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
+    }
   }
+
+  // 2. ASSE X E PALLINI GLOW (step 1)
+  if (showXAxis) {
+    // Tacche anni
+    for(let i = 0; i <= (2025 - 1992); i++) {
+      stroke(white);
+      strokeWeight(0.5);
+      let x = initialX + i * yearWidth;
+      let topY = height - padding - xLabelHeight;
+      let bottomY = height - padding - 40;
+      line(x, topY, x, bottomY);
+    }
+    
+    // Etichette anni ogni 5 con pallini glow
+    for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+      let label = 1992 + i * 5;
+      let x = initialX + (label - 1992) * yearWidth;
+
+    fill(white);
+      noStroke();
+      textFont(font);
+      textAlign(CENTER, TOP);
+      textSize(12);
+      text(label, x, height - padding - 32);
+      
+      // Pallini glow
+      let yPallino = height - padding - 45;
+      let radius = 8;
+      let glowWidth = 6;
+      let maxAlpha = 120;
+
+      for (let j = glowWidth; j > 0; j--) {
+        fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
+        noStroke();
+        circle(x, yPallino, radius + j);
+      }
+      fill(255);
+      noStroke();
+      circle(x, yPallino, radius);
+    }
+  }
+
+  // 3. LINEE CATEGORIE (step 2)
+  if (showGridLines) {
+    for(let i = 0; i < categories.length; i++) {
+      let y = padding + i * rowHeight + rowHeight / 2;
+      noFill();
+      stroke(white);
+      strokeWeight(0.5);
+      line(padding + yLabelWidth, y, mainWidth - padding, y);
+    }
+  }
+  
+  drawingContext.globalAlpha = 1.0;
 }
 
 //navigazione andare avanti
