@@ -147,9 +147,6 @@ function closeSearch() {
   document.getElementById("deathCounterContainer").style.display = "none";
 }
 
-
-
-
 // filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
@@ -313,9 +310,6 @@ addImpunityButton();
 
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
-
-  
-  
 
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
@@ -600,8 +594,6 @@ class Dot {
   this.draw();
 }
 
-
-
   draw() {
     // mostra solo i pallini del paese selezionato
     if (selectedCountry && this.country !== selectedCountry) return;
@@ -681,7 +673,6 @@ class Dot {
   let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
   return d < this.r;
   }
-
 }
 
 function applyForceTo(dot, force) {
