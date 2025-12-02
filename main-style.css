@@ -315,9 +315,9 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
-  background-color: red;
+  background-color: #8B0000;
   color: white;
-  border: none;
+  border: 1px solid #ff0000;
   border-radius: 12px;
   padding: 12px 28px;
   cursor: pointer;
@@ -336,6 +336,7 @@ html, body {
   text-align: center;
   line-height: 1.2;
 }
+
 .navigation-arrows {
   display: inline-flex;
   gap: 8px;
