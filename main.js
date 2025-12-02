@@ -431,16 +431,7 @@ function draw() {
   for (let d of dots) d.update();
 
 
-  // sfumatura verticale tra grafico e sidebar
-  let blurWidth = 10;
-  let maxAlpha = 200;
-  let blurStartX = mainWidth; // subito prima della sidebar
-
-  for (let i = 0; i < blurWidth; i++) {
-    stroke(128, 128, 128, map(i, 0, blurWidth, maxAlpha, 0));
-    strokeWeight(1);
-    line(blurStartX -i, 0, blurStartX -i, height); // sfumatura verso destra
-  }
+  
 
   drawGrid();
 
