@@ -318,10 +318,12 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
-  background-color: red;
+  background-color: #8B0000;
   color: white;
   border: none;
   border-radius: 60px;
+  border: 1px solid #ff0000;
+  border-radius: 12px;
   padding: 12px 28px;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease;
@@ -339,6 +341,7 @@ html, body {
   text-align: center;
   line-height: 1.2;
 }
+
 .navigation-arrows {
   display: inline-flex;
   gap: 8px;
@@ -436,12 +439,17 @@ html, body {
 /* Bottone SHOW ALL */
 .show-all-btn {
   width: calc(100% - 40px);
-  margin: 10px 20px;
+ max-width: 260px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
   padding: 12px 28px;
-  background-color: #ff0000;
+  background-color:#a00000;
   color: white;
   border: none;
   border-radius: 60px;
+  border-radius: 12px;
+  border: 1px solid #ff0000;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
@@ -457,6 +465,7 @@ html, body {
 .show-all-btn:hover {
   background-color: #cc0000;
 }
+
 
 
 
