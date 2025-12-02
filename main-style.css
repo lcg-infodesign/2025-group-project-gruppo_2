@@ -286,7 +286,6 @@ html, body {
   vertical-align: middle;
 }
 
-
 .death-counter {
  display: inline;           
   font-family: 'JetBrains Mono', monospace;
@@ -411,7 +410,8 @@ html, body {
 
 /*bottoni testo rossi*/
 .view-data-btn:not(.arrow-mode),
-.next-final-btn.red-button {
+.next-final-btn.red-button,
+.show-all-btn {
   width: calc(100% - 40px);
   max-width: 260px;
   margin-left: 20px;
@@ -436,36 +436,7 @@ html, body {
 }
 
 .view-data-btn:not(.arrow-mode):hover,
-.next-final-btn:hover {
-  background-color: #cc0000;
-}
-
-/* Bottone SHOW ALL */
-.show-all-btn {
-  width: calc(100% - 40px);
- max-width: 260px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 20px;
-  margin-top: 15px;
-  padding: 12px 28px;
-  background-color:#a00000;
-  color: white;
-  border: none;
-  border-radius: 60px;
-  border: 1px solid #ff0000;
-  cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  text-align: center;
-  transition: all 0.2s ease;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
+.next-final-btn:hover, 
 .show-all-btn:hover {
   background-color: #cc0000;
 }
