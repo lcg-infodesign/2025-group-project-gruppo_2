@@ -336,8 +336,6 @@ html, body {
   text-align: center;
   line-height: 1.2;
 }
-<<<<<<< HEAD
-=======
 .navigation-arrows {
   display: inline-flex;
   gap: 8px;
@@ -456,4 +454,3 @@ html, body {
 .show-all-btn:hover {
   background-color: #cc0000;
 }
->>>>>>> 35629a8f5346408042ea88a0dc0ae9059c2fcdf1
