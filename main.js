@@ -50,8 +50,12 @@ let categories = [
 
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
-let photos = []; //conterrà le foto per le card
-
+let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
+let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
+let cpjUrl;
+let photo;
+let hasLoadedPhoto = null;
+let maskGraphics;
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -70,11 +74,11 @@ let highlightUnknown = false;
 let highlightNone = false;
 
 
-
-// funzione barra di ricerca tutta da fare
-
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
+  cpjLogo = loadImage("assets/cpj_logo.svg");
+  defaultPhoto = loadImage("assets/default_photo.jpg");
+
 
   console.log("Row count: " + data.getRowCount());
   // carica tutte le foto dei giornalisti
@@ -188,6 +192,16 @@ function setup() {
 
   inVisualizationArea = true;
 
+  //cliccando su source of fire va alla pagina con i pallini disposti
+  const urlParams = new URLSearchParams(window.location.search);
+  const isDirectMode = urlParams.get('direct') === 'true';
+
+  if(isDirectMode) {
+    currentStep = 10;
+    showAllDots = true;
+    showAllDotsImmediately();
+  }
+
 
   //gestione frecce navigazione
   document.getElementById('prevBtn').addEventListener('click', goToPreviousStep);
@@ -224,102 +238,12 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-// griglia con tacche
-function drawGrid() {
-  // righe categorie
-  for (let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(RIGHT, CENTER);
-    textSize(12);
-    let yLabelOffset = 12; //quanto spostare a sx le etichette
-    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
-
-    noFill();
-    stroke(white);
-    strokeWeight(0.5);
-    line(padding + yLabelWidth, y, mainWidth - padding, y);
-  }
-
-  // tacche x anno
-  for (let i = 0; i <= (2025 - 1992); i++) {
-    stroke(255);
-    strokeWeight(0.5);
-    let x = initialX + i * yearWidth;
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(x, topY, x, bottomY);
-  }
-
-  // tacche anni precedenti
-  let xStart = initialX;
-  let numTicks = 10;
-  let maxStep = yearWidth;
-  let minStep = 5;
-  for (let i = 1; i <= numTicks; i++) {
-    let step = map(i, 1, numTicks, maxStep, minStep);
-    xStart -= step;
-    stroke(255);
-    strokeWeight(1);
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(xStart, topY, xStart, bottomY);
-  }
-
- // etichette ogni 5 anni con pallino 
-for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-  let label = 1992 + i * 5;
-  let x = initialX + (label - 1992) * yearWidth;
-
-  // Testo anno
-  fill(white);
-  noStroke();
-  textFont(font);
-  textAlign(CENTER, TOP);
-  textSize(12);
-  text(label, x, height - padding - 32);
-
-  // Pallino semplice (senza glow)
-  let yPallino = height - padding - 45;
-  let radius = 8;
-
-  fill(255);
-  noStroke();
-  circle(x, yPallino, radius);
-}
-
-  // asse y
-  stroke(white);
-  strokeWeight(0.5);
-  let yAxisOffset = 15;
-  let yStartOffset = 20;
-  let xAxisY = height - padding - xLabelHeight;
-  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
-}
-
 function draw() {
   background(25);
 
-  if (showYAxis) {
-    drawYAxis();
-  }
-  
-  if (showXAxis) {
-    drawXAxis();
-  }
-  
-  if (showGridLines) {
-    drawCategoryLines();
-  }
-
-  // Se animationStarted è true, disegna la griglia completa
-  if (animationStarted && showGridLines) {
-    drawGrid(); // Questa disegna la griglia completa con etichette, assi, ecc.
-  }
-
+  //disegna sempre la griglia  completa
+  //ma controlla cosa rendere visibile in base allo step
+  drawGridWithSteps();
 
   if(inVisualizationArea) {
     spawnUpToCurrentYear();
@@ -402,6 +326,7 @@ function buildJournalistsFromTable() {
   console.log("Sample journalist:", journalists[0]);
 }
 
+//calcola le dimensioni dell'area del grafico
 function drawLayout() {
   graphWidth = mainWidth - 2 * padding - yLabelWidth;
   graphHeight = height - 2 * padding - xLabelHeight;
@@ -409,6 +334,7 @@ function drawLayout() {
   yAxisStart = height - padding - xLabelHeight;
 }
 
+//converti un anno in una coordinata x sullo schermo
 function yearToX(year) {
   if (years.length === 0) return width / 2;
   let minYear = min(years);
@@ -416,80 +342,69 @@ function yearToX(year) {
   return map(year, minYear, maxYear, xAxisStart, xAxisStart + graphWidth);
 }
 
+//converti una categoria in una coordinata Y
 function categoryToY(category) {
   let index = categories.indexOf(category);
   if(index === -1) index = categories.indexOf("Unknown");
   return padding + index * rowHeight + rowHeight / 2;
 }
 
+//crea pallini
 class Dot {
   constructor(id, year, category) {
     this.id = id;
     this.year = year;
     this.category = category;
-    this.country = journalists[id].country;
+    this.country = journalists[id] ? journalists[id].country : "";
 
-    // griglia per determinare la posizione
     let centerX = yearToX(year);
     let jitterX = (yearWidth * 0.4) * randomGaussian(); 
     let baseY = categoryToY(category);
 
-    // posizione finale
+    let minX_local = yearToX(1992);
+    let maxX_local = yearToX(2025);
 
-    // limiti orizzontali del grafico (1992–2025)
-    let minX = yearToX(1992);
-    let maxX = yearToX(2025);
-    this.finalX = constrain(centerX + jitterX, minX, maxX);
-
+    this.finalX = constrain(centerX + jitterX, minX_local, maxX_local);
     this.finalY = baseY + random(-10, 10);
 
-    let randomOffset = random(-30, 30);
-    this.pos = createVector(this.finalX + randomOffset, -20);
-    this.speed = random(2, 4);
-    this.arrived = false;
-    this.r = diam;
-
     let startOffset = random(-40, 40);
-    let startX = constrain(centerX + startOffset, minX, maxX);
+    let startX = constrain(centerX + startOffset, minX_local, maxX_local);
+
     this.pos = createVector(startX, -20);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
+    this.speed = random(2, 4);
+    this.arrived = false;
     this.mass = 1;
-
     this.r = diam;
   }
 
   update() {
 
-  // movimento verso la posizione finale
-  let dx = this.finalX - this.pos.x;
-  let dy = this.finalY - this.pos.y;
-  let distance = sqrt(dx * dx + dy * dy);
+    let dx = this.finalX - this.pos.x;
+    let dy = this.finalY - this.pos.y;
+    let distance = sqrt(dx * dx + dy * dy);
 
-  if(distance < this.speed) {
-    this.pos.x = this.finalX;
-    this.pos.y = this.finalY;
-    this.arrived = true;
-  } else {
-    this.pos.x += (dx/distance) * this.speed;
-    this.pos.y += (dy/distance) * this.speed;
-  }
+    if (distance < this.speed) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    } else {
+      this.pos.x += (dx / distance) * this.speed;
+      this.pos.y += (dy / distance) * this.speed;
+    }
 
-  if (!this.arrived) {
     let floorY = height - padding - xLabelHeight - 10;
-
     if (this.pos.y > floorY) {
       this.pos.y = floorY;
       this.vel.y = 0;
     }
-      }
-  
 
-  this.draw();
-}
+    this.draw();
+  }
 
   draw() {
-    // mostra solo i pallini del paese selezionato
+    //cambiare raggio in base alla selezione
     if (selectedCountry && this.country !== selectedCountry) return;
 
     let dotColor = color(255);
@@ -503,7 +418,6 @@ class Dot {
     if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
       dotColor = color(255, 0, 0);
     }
-
     // IRAQ
     if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
       dotColor = color(255, 0, 0);
@@ -548,42 +462,42 @@ class Dot {
     ellipse(this.pos.x, this.pos.y, this.r * 2);
      
    // controlla se il pallino deve essere visibile
-  let visible = !selectedCountry || this.country === selectedCountry;
-  if (!visible) return;
+    let visible = !selectedCountry || this.country === selectedCountry;
+    if (!visible) return;
 
-  // colore in base al filtro
-  if (selectedCountry) {
-    fill(255, 0, 0); // rosso se c'è filtro
-  } else {
-    fill(255); // bianco se worldwide
-  }
+    // cosa cambiare in base al filtro
+    /*
+    if (selectedCountry) {
+      ; paese selezionato
+    } else {
+      ; nessun paese selezionato
+    }*/
 
-  noStroke();
-  ellipse(this.pos.x, this.pos.y, this.r * 2);
-  }
+    noStroke();
+    ellipse(this.pos.x, this.pos.y, this.r * 2);
+    }
 
   //funzione che restituisce true se il mouse è sul pallino
-  isHovered() {
-  let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
-  return d < this.r;
+    isHovered() {
+    return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
   }
 }
 
+//applica campo di forze
 function applyForceTo(dot, force) {
   let f = p5.Vector.div(force, dot.mass);
   dot.acc.add(f);
 }
 
+//applica campo di forze
 function applyRepulsion() {
-  let minDist = diam * 3;      // distanza tra i punti
-  let strength = 6.0;          // costante elastica
+  let minDist = diam * 3;
+  let strength = 6.0;
 
   for (let i = 0; i < dots.length; i++) {
-
     if (!dots[i].arrived) continue;
 
     for (let j = i + 1; j < dots.length; j++) {
-
       if (!dots[j].arrived) continue;
 
       let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
@@ -596,7 +510,6 @@ function applyRepulsion() {
         dots[i].pos.add(dir);
         dots[j].pos.sub(dir);
 
-        // pallini entro i limiti dopo repulsione
         dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
         dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
       }
@@ -604,10 +517,8 @@ function applyRepulsion() {
   }
 }
 
+//crea gradualmente i pallini
 function spawnUpToCurrentYear() {
-  if(!years.length || currentYearIndex >= years.length) return;
-
-
   if(!years.length || currentYearIndex >= years.length) {
     return;
   }
@@ -631,6 +542,12 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
+
+  //se showAllDots è true, non fare l'animazione di caduta
+  if(showAllDots && dots.length === 0 && journalists.length > 0) {
+    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
+      showAllDotsImmediately();
+    }
 }
 
 function mousePressed() {
@@ -648,9 +565,16 @@ function mousePressed() {
     activeCard = null;
     closeCard = null;
     cursor(ARROW);
+    hasLoadedPhoto = null;
+  }
+
+  if(cpjButtonHover){
+    window.open(cpjUrl);
+    cpjButtonHover = null;
   }
 }
 
+//disegna card
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
@@ -715,7 +639,7 @@ function drawCard(dot){
 
   //variabili per le dimensioni
   let cardWidth = 700;
-  let cardHeight = 600;
+  let cardHeight = 572;
   let cardX = width/2;
   let cardY = height/2;
   let padding = 30;
@@ -735,16 +659,44 @@ function drawCard(dot){
   rect(cardX, cardY, cardWidth, cardHeight, 20);
 
   //foto
-  let photo = photos[id];
   let photoWidth = 180;
   let photoHeight = 190;
-  imageMode(CORNER);
-  if(photo){
-    image(photo, leftX, topY, photoWidth, photoHeight);
-  }else{
-    rectMode(CORNER);
-    rect(leftX, topY, photoWidth, photoHeight, 10);
+
+  if(!hasLoadedPhoto){
+    photo = loadImage("assets/images/" + (id + 1) + ".jpg");
+    hasLoadedPhoto = true;
   }
+
+  imageMode(CORNER);
+
+  image(defaultPhoto, leftX, topY, photoWidth, photoHeight);
+
+  drawingContext.save(); // salva lo stato del canvas
+
+  // crea un rettangolo arrotondato come maschera per le foto
+  let radius = 5;
+  drawingContext.beginPath();
+  drawingContext.moveTo(leftX + radius, topY);
+  drawingContext.lineTo(leftX + photoWidth - radius, topY);
+  drawingContext.quadraticCurveTo(leftX + photoWidth, topY, leftX + photoWidth, topY + radius);
+  drawingContext.lineTo(leftX + photoWidth, topY + photoHeight - radius);
+  drawingContext.quadraticCurveTo(leftX + photoWidth, topY + photoHeight, leftX + photoWidth - radius, topY + photoHeight);
+  drawingContext.lineTo(leftX + radius, topY + photoHeight);
+  drawingContext.quadraticCurveTo(leftX, topY + photoHeight, leftX, topY + photoHeight - radius);
+  drawingContext.lineTo(leftX, topY + radius);
+  drawingContext.quadraticCurveTo(leftX, topY, leftX + radius, topY);
+  drawingContext.closePath();
+  drawingContext.clip();
+
+  // disegna l'immagine nel rettangolo
+  if (photo) {
+    image(photo, leftX, topY, photoHeight * (photo.width/photo.height), photoHeight);
+  } else {
+    rect(leftX, topY, photoWidth, photoHeight, radius);
+  }
+  
+  drawingContext.restore(); // rimuove il clipping
+
 
   // X per chiudere la card
   noFill();
@@ -782,7 +734,35 @@ function drawCard(dot){
   line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
   line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
   rectMode(CORNERS);
-  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3);
+  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3); //per il violation status
+  line(leftX, topY + photoHeight + 6*padding + 54, width/2 + verticalOffset, topY + photoHeight + 6*padding + 54);
+  line(leftX, topY + photoHeight + 7*padding + 54 + 14, width/2 + verticalOffset, topY + photoHeight + 7*padding + 54 + 14);
+  line(leftX + 200, topY + photoHeight + 5*padding + 40, leftX + 200, bottomY);
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54, rightX, topY + photoHeight + 6*padding + 54); //impunity
+  fill(red_translucent);
+  stroke(red);
+  strokeWeight(2);
+  rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
+
+  //Etichette
+  fill(red);
+  noStroke();
+  textAlign(LEFT, TOP);
+  textSize(11);
+  text("Name", leftX + photoWidth + padding, topY + 83);
+  text("Date of death", leftX + photoWidth + padding, topY + 132);
+  text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
+  text("Organization", leftX + padding, topY + photoHeight + 2*padding + 25);
+  text("Job", leftX + padding, topY + photoHeight + 3*padding + 40);
+  text("Work-related", width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 23);
+  text("Type of death", width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 40);
+  text("Murderer's impunity", width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 56);
+
+  textSize(14);
+  textAlign(LEFT, BOTTOM);
+  text("Threatened", leftX + padding, topY + photoHeight + 5.5*padding + 54);
+  text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
+  text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
   //testi
   textAlign(LEFT, BOTTOM);
@@ -798,72 +778,111 @@ function drawCard(dot){
   text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
   text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
   text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+  text(impunity, width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54);
 
   textSize(14);
   text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
   text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
   text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
+  text(threatened, leftX + padding + 200, topY + photoHeight + 5.5*padding + 54);
+  text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
+  text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
+
+  textAlign(CENTER);
+  text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
+
+  imageMode(CENTER);
+  image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 37, 37);
+
+  if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
+    cpjButtonHover = true;
+    cpjUrl = url;
+    cursor(HAND);
+  }else{
+    cpjButtonHover = null;
+  }
 
 }
 
-function drawYAxis() {
-  stroke(white);
-  strokeWeight(0.5);
-  let yAxisOffset = 15;
-  let yStartOffset = 20;
-  let xAxisY = height - padding - xLabelHeight;
+//disegna griglia
+function drawGridWithSteps() {
+  drawingContext.globalAlpha = 1.0;
 
-  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
-
-  // Etichette Y
-  for(let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-    
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(RIGHT, CENTER);
-    textSize(12);
-    let yLabelOffset = 20;
-    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
-  }
-}
-
-function drawXAxis() {
-  // Tacche anni
-  for(let i = 0; i <= (2025 - 1992); i++) {
-    stroke(255);
-    strokeWeight(0.5);
-    let x = initialX + i * yearWidth;
-    let topY = height - padding - xLabelHeight;
-    let bottomY = height - padding - 40;
-    line(x, topY, x, bottomY);
-  }
-  
-  // Etichette anni ogni 5
-  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-    let label = 1992 + i * 5;
-    let x = initialX + (label - 1992) * yearWidth;
-
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(CENTER, TOP);
-    textSize(12);
-    text(label, x, height - padding - 32);
-  }
-}
-
-//disegna linee categorie
-function drawCategoryLines() {
-  for(let i = 0; i < categories.length; i++) {
-    let y = padding + i * rowHeight + rowHeight / 2;
-
-    noFill();
+  //asse y
+  if(showYAxis) {
     stroke(white);
     strokeWeight(0.5);
-    line(padding + yLabelWidth, y, mainWidth - padding, y);
+    let yAxisOffset = 15;
+    let yStartOffset = 20;
+    let xAxisY = height - padding - xLabelHeight;
+    line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
+
+    // Etichette Y
+    for(let i = 0; i < categories.length; i++) {
+      let y = padding + i * rowHeight + rowHeight / 2;
+      fill(white);
+      noStroke();
+      textFont(font);
+      textAlign(RIGHT, CENTER);
+      textSize(12);
+      let yLabelOffset = 12;
+      text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
+    }
   }
+
+  // 2. ASSE X E PALLINI GLOW (step 1)
+  if (showXAxis) {
+    // Tacche anni
+    for(let i = 0; i <= (2025 - 1992); i++) {
+      stroke(white);
+      strokeWeight(0.5);
+      let x = initialX + i * yearWidth;
+      let topY = height - padding - xLabelHeight;
+      let bottomY = height - padding - 40;
+      line(x, topY, x, bottomY);
+    }
+    
+    // Etichette anni ogni 5 con pallini
+    for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+      let label = 1992 + i * 5;
+      let x = initialX + (label - 1992) * yearWidth;
+
+    fill(white);
+      noStroke();
+      textFont(font);
+      textAlign(CENTER, TOP);
+      textSize(12);
+      text(label, x, height - padding - 32);
+      
+      // Pallini glow
+      let yPallino = height - padding - 45;
+      let radius = 8;
+      let glowWidth = 6;
+      let maxAlpha = 120;
+
+      for (let j = glowWidth; j > 0; j--) {
+        fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
+        noStroke();
+        circle(x, yPallino, radius + j);
+      }
+      fill(255);
+      noStroke();
+      circle(x, yPallino, radius);
+    }
+  }
+
+  // 3. LINEE CATEGORIE (step 2)
+  if (showGridLines) {
+    for(let i = 0; i < categories.length; i++) {
+      let y = padding + i * rowHeight + rowHeight / 2;
+      noFill();
+      stroke(white);
+      strokeWeight(0.5);
+      line(padding + yLabelWidth, y, mainWidth - padding, y);
+    }
+  }
+  
+  drawingContext.globalAlpha = 1.0;
 }
 
 //aggiorna la schermata
@@ -901,6 +920,10 @@ function updateVisualization() {
       showGridLines = true;
       animationStarted = true;
       inVisualizationArea = true;
+
+      dots = [];
+      spawnedIds.clear();
+      currentYearIndex = 0;
       break;
     case 4: //caso maguindanao
       showYAxis = true;
@@ -965,5 +988,10 @@ function updateVisualization() {
       animationStarted = true;
       inVisualizationArea = true;
       break;
+  }
+
+  //se showalldots è true, mostra tutti i pallini
+  if(showAllDots && (currentStep === 3 || currentStep === 4)) {
+    showAllDotsImmediately();
   }
 }

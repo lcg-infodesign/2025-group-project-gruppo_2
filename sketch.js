@@ -33,6 +33,11 @@ function setup() {
     let scrollTarget = window.scrollY + rect.top - window.innerHeight / 2 + rect.height / 2;
 
     window.scrollTo({ top: scrollTarget, behavior: "smooth" });
+
+    // mostra l'header
+  const header = document.getElementById("main-header");
+  header.style.opacity = "1";
+  header.style.pointerEvents = "auto";
   });
 }
 
