@@ -147,6 +147,9 @@ function closeSearch() {
   document.getElementById("deathCounterContainer").style.display = "none";
 }
 
+
+
+
 // filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
@@ -294,9 +297,20 @@ function setup() {
   });
   //bottone SHOW ALL
   document.getElementById('showAllBtn').addEventListener('click', function() {
-    showAllDotsImmediately();
-    this.style.display = 'none';
-  })
+  showAllDots = true;
+  showAllDotsImmediately();
+  this.style.display = 'none';
+
+  // dopo il click facciamo avanzare lo step (se ci troviamo nello step 3)
+  // così viene mostrata la UI di navigazione (frecce) prevista per gli step successivi
+  if (currentStep === 3) {
+    currentStep = 4;
+  }
+
+  // aggiorniamo visuale e UI dei controlli
+  updateVisualization();
+  updateNavigationUI();
+});
 
   updateVisualization();
   updateNavigationUI();
@@ -310,6 +324,9 @@ addImpunityButton();
 
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
+
+  
+  
 
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
@@ -370,27 +387,33 @@ function drawGrid() {
     line(xStart, topY, xStart, bottomY);
   }
 
- // etichette ogni 5 anni con pallino 
-for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-  let label = 1992 + i * 5;
-  let x = initialX + (label - 1992) * yearWidth;
+  // etichette ogni 5 anni con pallino glow
+  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+    let label = 1992 + i * 5;
+    let x = initialX + (label - 1992) * yearWidth;
 
-  // Testo anno
-  fill(white);
-  noStroke();
-  textFont(font);
-  textAlign(CENTER, TOP);
-  textSize(12);
-  text(label, x, height - padding - 32);
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(label, x, height - padding - 32);
 
-  // Pallino semplice (senza glow)
-  let yPallino = height - padding - 45;
-  let radius = 8;
+    // glow
+    let yPallino = height - padding - 45;
+    let radius = 8;
+    let glowWidth = 6;
+    let maxAlpha = 120;
 
-  fill(255);
-  noStroke();
-  circle(x, yPallino, radius);
-}
+    for (let j = glowWidth; j > 0; j--) {
+      fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
+      noStroke();
+      circle(x, yPallino, radius + j);
+    }
+    fill(255);
+    noStroke();
+    circle(x, yPallino, radius);
+  }
 
   // asse y
   stroke(white);
@@ -404,7 +427,7 @@ for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
 function draw() {
   background(25);
 
-  if (showYAxis) {
+    if (showYAxis) {
     drawYAxis();
   }
   
@@ -600,6 +623,8 @@ class Dot {
   this.draw();
 }
 
+
+
   draw() {
     // mostra solo i pallini del paese selezionato
     if (selectedCountry && this.country !== selectedCountry) return;
@@ -679,6 +704,7 @@ class Dot {
   let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
   return d < this.r;
   }
+
 }
 
 function applyForceTo(dot, force) {
@@ -717,7 +743,6 @@ function applyRepulsion() {
 }
 
 function spawnUpToCurrentYear() {
-  if(!years.length || currentYearIndex >= years.length) return;
   //se showAllDots è true, non fare l'animazione di caduta
   if(showAllDots) {
     // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
@@ -1005,21 +1030,24 @@ function goToPreviousStep() {
 
 //mostrare i pallini immediatamente
 function showAllDotsImmediately() {
-  showAllDots = true;
-  spawnedIds.clear();
+  // Resetta tutto
   dots = [];
-  currentYearIndex = years.length - 1; //vai all'ultimo anno
-
+  spawnedIds.clear();
+  currentYearIndex = years.length - 1;
+  
+  // Crea tutti i pallini subito
   for(let j of journalists) {
     let dot = new Dot(j.id, j.year, j.category);
-    // IMPOSTA IL PALLINO COME ARRIVATO SUBITO
+    // Posiziona il pallino direttamente nella posizione finale
     dot.pos.x = dot.finalX;
     dot.pos.y = dot.finalY;
     dot.arrived = true;
-
     dots.push(dot);
     spawnedIds.add(j.id);
   }
+  
+  // Forza il ridisegno
+  redraw();
 }
 
 //aggiorna la schermata
@@ -1162,9 +1190,7 @@ function updateNavigationUI() {
         showAllBtnElement.style.display = 'block';
     }
     navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'block';
-    viewDataBtn.textContent = "→";
-    viewDataBtn.classList.add('arrow-mode');
+    viewDataBtn.style.display = 'none';
   } else if(currentStep >= 4 && currentStep <= 8) {
     //mostra frecce di navigazione x i casi
     navigationArrows.style.display = 'flex';
