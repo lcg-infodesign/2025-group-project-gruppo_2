@@ -245,6 +245,16 @@ function setup() {
 
   inVisualizationArea = true;
 
+  //cliccando su source of fire va alla pagina con i pallini disposti
+  const urlParams = new URLSearchParams(window.location.search);
+  const isDirectMode = urlParams.get('direct') === 'true';
+
+  if(isDirectMode) {
+    currentStep = 10;
+    showAllDots = true;
+    showAllDotsImmediately();
+  }
+
   function addImpunityButton() {
   const sidebar = document.getElementById("sidebar");
 
