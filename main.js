@@ -353,7 +353,7 @@ function drawGrid() {
     textFont(font);
     textAlign(RIGHT, CENTER);
     textSize(12);
-    let yLabelOffset = 20; //quanto spostare a sx le etichette
+    let yLabelOffset = 12; //quanto spostare a sx le etichette
     text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
 
     noFill();
