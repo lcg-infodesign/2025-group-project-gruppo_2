@@ -409,6 +409,8 @@ function drawGrid() {
   // Pallino semplice (senza glow)
   let yPallino = height - padding - 45;
   let radius = 10;
+  let glowWidth = 6;
+  let maxAlpha = 120;
   
 
     for (let j = glowWidth; j > 0; j--) {
@@ -618,6 +620,7 @@ class Dot {
   }
 
   draw() {
+    //cambiare raggio in base alla selezione
     if (selectedCountry && this.country !== selectedCountry) return;
 
     let dotColor = color(255);
@@ -689,15 +692,6 @@ function applyRepulsion() {
 
 
 function spawnUpToCurrentYear() {
-  //se showAllDots è true, non fare l'animazione di caduta
-  if(showAllDots) {
-    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
-    if(dots.length === 0 && journalists.length > 0) {
-      showAllDotsImmediately();
-    }
-    return;
-  }
-
   if(!years.length || currentYearIndex >= years.length) {
     return;
   }
@@ -721,6 +715,12 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
+
+  //se showAllDots è true, non fare l'animazione di caduta
+  if(showAllDots && dots.length === 0 && journalists.length > 0) {
+    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
+      showAllDotsImmediately();
+    }
 }
 
 function mousePressed() {
@@ -1093,6 +1093,10 @@ function updateVisualization() {
       showGridLines = true;
       animationStarted = true;
       inVisualizationArea = true;
+
+      dots = [];
+      spawnedIds.clear();
+      currentYearIndex = 0;
       break;
     case 4: //caso maguindanao
       showYAxis = true;
@@ -1160,7 +1164,7 @@ function updateVisualization() {
   }
 
   //se showalldots è true, mostra tutti i pallini
-  if(showAllDots) {
+  if(showAllDots && (currentStep === 3 || currentStep === 4)) {
     showAllDotsImmediately();
   }
 }
