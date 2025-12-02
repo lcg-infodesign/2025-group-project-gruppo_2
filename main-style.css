@@ -73,6 +73,7 @@ html, body {
   text-decoration: none;
   display: block;
   font-size: 0.85rem;
+  
 }
 
 .dropdown-content a:hover {
@@ -305,7 +306,6 @@ html, body {
   white-space: nowrap;
 }
 
-
 /* bottone in fondo alla sidebar */
 #sidebar .impunity-btn {
   position: absolute;
@@ -428,4 +428,29 @@ html, body {
   background-color: #a00000;
   border-color: #ff3333;
 
+}
+
+/* Bottone SHOW ALL */
+.show-all-btn {
+  width: calc(100% - 40px);
+  margin: 10px 20px;
+  padding: 12px 28px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.show-all-btn:hover {
+  background-color: #cc0000;
 }
