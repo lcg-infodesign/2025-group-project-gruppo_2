@@ -416,7 +416,23 @@ function drawGrid() {
 function draw() {
   background(25);
 
-  drawGrid();
+  if (showYAxis) {
+    drawYAxis();
+  }
+  
+  if (showXAxis) {
+    drawXAxis();
+  }
+  
+  if (showGridLines) {
+    drawCategoryLines();
+  }
+
+  // Se animationStarted è true, disegna la griglia completa
+  if (animationStarted && showGridLines) {
+    drawGrid(); // Questa disegna la griglia completa con etichette, assi, ecc.
+  }
+
 
   if(inVisualizationArea) {
     spawnUpToCurrentYear();
@@ -430,10 +446,6 @@ function draw() {
 
   for (let d of dots) d.update();
 
-
-  
-
-  drawGrid();
 
   if (activeCard) {
     drawCard(activeCard);
