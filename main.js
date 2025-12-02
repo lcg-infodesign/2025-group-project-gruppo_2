@@ -376,33 +376,27 @@ function drawGrid() {
     line(xStart, topY, xStart, bottomY);
   }
 
-  // etichette ogni 5 anni con pallino glow
-  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-    let label = 1992 + i * 5;
-    let x = initialX + (label - 1992) * yearWidth;
+ // etichette ogni 5 anni con pallino 
+for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+  let label = 1992 + i * 5;
+  let x = initialX + (label - 1992) * yearWidth;
 
-    fill(white);
-    noStroke();
-    textFont(font);
-    textAlign(CENTER, TOP);
-    textSize(12);
-    text(label, x, height - padding - 32);
+  // Testo anno
+  fill(white);
+  noStroke();
+  textFont(font);
+  textAlign(CENTER, TOP);
+  textSize(12);
+  text(label, x, height - padding - 32);
 
-    // glow
-    let yPallino = height - padding - 45;
-    let radius = 8;
-    let glowWidth = 6;
-    let maxAlpha = 120;
+  // Pallino semplice (senza glow)
+  let yPallino = height - padding - 45;
+  let radius = 8;
 
-    for (let j = glowWidth; j > 0; j--) {
-      fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
-      noStroke();
-      circle(x, yPallino, radius + j);
-    }
-    fill(255);
-    noStroke();
-    circle(x, yPallino, radius);
-  }
+  fill(255);
+  noStroke();
+  circle(x, yPallino, radius);
+}
 
   // asse y
   stroke(white);
