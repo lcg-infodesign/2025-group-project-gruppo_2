@@ -50,10 +50,11 @@ let categories = [
 
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
-let photos = []; //conterrà le foto per le card
 let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
 let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
 let cpjUrl;
+let photo;
+let hasLoadedPhoto = null;
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -167,13 +168,6 @@ function filterCountries(value) {
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
   cpjLogo = loadImage("assets/cpj_logo.svg");
-
-  console.log("Row count: " + data.getRowCount());
-  // carica tutte le foto dei giornalisti
-  for (let i = 0; i < data.getRowCount(); i++) {
-    photos[i] = loadImage("assets/images/" + i + ".jpg");
-  }
-  console.log("photos " + photos);
 }
 
 function setup() {
@@ -744,6 +738,7 @@ function mousePressed() {
     activeCard = null;
     closeCard = null;
     cursor(ARROW);
+    hasLoadedPhoto = null;
   }
 
   if(cpjButtonHover){
@@ -836,9 +831,14 @@ function drawCard(dot){
   rect(cardX, cardY, cardWidth, cardHeight, 20);
 
   //foto
-  let photo = photos[id];
   let photoWidth = 180;
   let photoHeight = 190;
+
+  if(!hasLoadedPhoto){
+    photo = loadImage("assets/images/" + id + ".jpg") || loadImage("assets/default_photo.jpg");
+    hasLoadedPhoto = true;
+  }
+
   imageMode(CORNER);
   if(photo){
     image(photo, leftX, topY, photoWidth, photoHeight);
