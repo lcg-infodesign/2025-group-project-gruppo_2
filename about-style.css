@@ -3,7 +3,8 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%; 
-  overflow: hidden; 
+  overflow-x: hidden; 
+  overflow-y: auto; 
 }
 
 canvas {
@@ -20,16 +21,12 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
+/* HEADER */
 :root {
-  --spacing-small: 20px;
-  --spacing-large: 40px; 
   --header-height: 80px; 
 }
 
-.red {
-  color: red;
-}
-
+/* HEADER */
 #main-header {
   position: fixed;
   top: 0;
@@ -45,6 +42,7 @@ body {
   background-color: #191919;
 }
 
+/* HEADER */
 .logo {
   color: rgb(255, 245, 233);
   font-size: 1.2rem;
@@ -52,11 +50,13 @@ body {
   letter-spacing: -1px;
 }
 
+/* HEADER */
 .nav-menu {
   display: flex;
   align-items: center;
 }
 
+/* HEADER */
 .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
@@ -65,20 +65,24 @@ body {
   transition: color 0.2s ease-in-out;
 }
 
+/* HEADER */
 .nav-menu > .nav-link, 
 .dropdown {
   margin-left: 40px;
 }
 
+/* HEADER */
 .nav-link:hover {
   text-decoration: underline;
 }
 
+/* HEADER */
 .dropdown {
   position: relative;
   display: inline-block;
 }
 
+/* HEADER */
 .dropdown-content {
   display: none; 
   position: absolute;
@@ -90,6 +94,7 @@ body {
   padding-top: 10px;
 }
 
+/* HEADER */
 .dropdown-content a {
   color: rgb(255, 245, 233);
   padding: 15px 16px;
@@ -98,71 +103,84 @@ body {
   font-size: 0.85rem;
 }
 
+/* HEADER */
 .dropdown-content a:hover {
   text-decoration: underline;
 }
 
+/* HEADER */
 .dropdown:hover .dropdown-content {
   display: block;
 }
 
-#container {
+/* ACCORDION BLOCCO */
+#accordion-wrapper {
+  width: 70%;
+  max-width: 900px;
+  margin: 0 auto; /* orizzontale */
+  min-height: 100vh; /* Alto quanto lo schermo */
+  display: flex;  
+  flex-direction: column; /* Elementi in colonna */
+  justify-content: center; /* Spinge il contenuto al centro verticale */
+  padding-top: 80px; /* Spazio sotto l'header */
+  padding-bottom: 40px; 
+  box-sizing: border-box; /* Padding non sballa l'altezza */
+}
+
+/* SEPARATORI BIANCHI */
+.accordion-section {
+  width: 100%;
+  /* La linea bianca sottile separatrice */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* TITOLI ROSSI */
+.accordion-header {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: red;
+  margin: 0;
+  padding: 30px 0;
+  cursor: pointer;
+  transition: opacity 0.3s;
   display: flex;
-  width: 100vw;
-  height: calc(100vh - 60px);
-  padding-top: 60px;
-  box-sizing: border-box;
-  overflow: hidden;
-  background-color: #191919;
-}
-
-
-#sketch-container {
-  flex: 1;
-  position: relative;   
-}
-
-#sketch-container canvas {
-    top: 80px !important;
-}
-
-.about-section {
-  width: 100vw;
-  height: 100vh; 
-  text-align: center;
-  position: absolute; 
-  top: 0;
-  left: 0;
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end; 
+  justify-content: space-between;
   align-items: center;
-  
-  padding: 5%; 
-  padding-bottom: 10vh; 
-  box-sizing: border-box;
-  background: transparent; 
-  z-index: 1; 
-  padding-top: var(--header-height);
 }
 
-.about-section h2 {
-    font-size: 2.4rem;
-    font-weight: 400;
-    color: red;
-    margin-bottom: var(--spacing-small); 
+/* FRECCETTA A LATO */
+.accordion-header::after {
+  content: '\2335';
+  color: rgb(255, 245, 233);
+  font-family: "JetBrains Mono", monospace; 
+  font-size: 1.8rem; 
+  font-weight: bold; 
+  transition: transform 0.3s ease;
+  display: inline-block;
+  margin-left: 15px;
+  vertical-align: middle; 
 }
 
+/* FRECCETTA A LATO GIRATA */
+.accordion-section.active .accordion-header::after {
+  transform: rotate(180deg); 
+}
+
+/* CONTENITORE TESTO CHIUSO DI DEFAULT */
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-out;
+}
+
+/* TESTO INTERNO BIANCO */
 .about-text {
-  white-space: pre-line; 
-  width: 60%;
-  max-width: 700px; 
-  margin: 0 auto;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   line-height: 1.6;
   font-weight: 200;
-  text-align: center;
-  opacity: 0; 
-  min-height: 12em; 
+  color: rgb(255, 245, 233);
+  padding-bottom: 30px;
+  white-space: pre-line;
+  margin: 0;
+  text-align: left;
 }
