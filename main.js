@@ -51,6 +51,9 @@ let categories = [
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
 let photos = []; //conterrà le foto per le card
+let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
+let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
+let cpjUrl;
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -147,6 +150,9 @@ function closeSearch() {
   document.getElementById("deathCounterContainer").style.display = "none";
 }
 
+
+
+
 // filtra i paesi in base al testo
 function filterCountries(value) {
   const panel = document.getElementById("filterPanel");
@@ -160,6 +166,7 @@ function filterCountries(value) {
 
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
+  cpjLogo = loadImage("assets/cpj_logo.svg");
 
   console.log("Row count: " + data.getRowCount());
   // carica tutte le foto dei giornalisti
@@ -294,9 +301,20 @@ function setup() {
   });
   //bottone SHOW ALL
   document.getElementById('showAllBtn').addEventListener('click', function() {
-    showAllDotsImmediately();
-    this.style.display = 'none';
-  })
+  showAllDots = true;
+  showAllDotsImmediately();
+  this.style.display = 'none';
+
+  // dopo il click facciamo avanzare lo step (se ci troviamo nello step 3)
+  // così viene mostrata la UI di navigazione (frecce) prevista per gli step successivi
+  if (currentStep === 3) {
+    currentStep = 4;
+  }
+
+  // aggiorniamo visuale e UI dei controlli
+  updateVisualization();
+  updateNavigationUI();
+});
 
   updateVisualization();
   updateNavigationUI();
@@ -306,10 +324,12 @@ function setup() {
 // chiama la funzione dopo il setup
 addImpunityButton();
 
-}
 
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
+}
+  
+  
 
 function updateDeathCounter(country) {
   const counter = document.getElementById("deathCounter");
@@ -370,28 +390,32 @@ function drawGrid() {
     line(xStart, topY, xStart, bottomY);
   }
 
- // etichette ogni 5 anni con pallino 
-for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
-  let label = 1992 + i * 5;
-  let x = initialX + (label - 1992) * yearWidth;
+  // etichette ogni 5 anni con pallino glow
+  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+    let label = 1992 + i * 5;
+    let x = initialX + (label - 1992) * yearWidth;
 
-  // Testo anno
-  fill(white);
-  noStroke();
-  textFont(font);
-  textAlign(CENTER, TOP);
-  textSize(12);
-  text(label, x, height - padding - 32);
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(label, x, height - padding - 32);
 
   // Pallino semplice (senza glow)
   let yPallino = height - padding - 45;
   let radius = 10;
   
 
-  fill(255);
-  noStroke();
-  circle(x, yPallino, radius);
-}
+    for (let j = glowWidth; j > 0; j--) {
+      fill(255, 255, 255, map(j, glowWidth, 0, 0, maxAlpha));
+      noStroke();
+      circle(x, yPallino, radius + j);
+    }
+    fill(255);
+    noStroke();
+    circle(x, yPallino, radius);
+  }
 
   // asse y
   stroke(white);
@@ -405,7 +429,7 @@ for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
 function draw() {
   background(25);
 
-  if (showYAxis) {
+    if (showYAxis) {
     drawYAxis();
   }
   
@@ -529,158 +553,103 @@ class Dot {
     this.id = id;
     this.year = year;
     this.category = category;
-    this.country = journalists[id].country;
+    this.country = journalists[id] ? journalists[id].country : "";
 
-    // griglia per determinare la posizione
     let centerX = yearToX(year);
     let jitterX = (yearWidth * 0.4) * randomGaussian(); 
     let baseY = categoryToY(category);
 
-    // posizione finale
+    let minX_local = yearToX(1992);
+    let maxX_local = yearToX(2025);
 
-    // limiti orizzontali del grafico (1992–2025)
-    let minX = yearToX(1992);
-    let maxX = yearToX(2025);
-    this.finalX = constrain(centerX + jitterX, minX, maxX);
-
+    this.finalX = constrain(centerX + jitterX, minX_local, maxX_local);
     this.finalY = baseY + random(-10, 10);
 
-    let randomOffset = random(-30, 30);
-    this.pos = createVector(this.finalX + randomOffset, -20);
-    this.speed = random(2, 4);
-    this.arrived = false;
-    this.r = diam;
-
     let startOffset = random(-40, 40);
-    let startX = constrain(centerX + startOffset, minX, maxX);
+    let startX = constrain(centerX + startOffset, minX_local, maxX_local);
+
     this.pos = createVector(startX, -20);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
+    this.speed = random(2, 4);
+    this.arrived = false;
     this.mass = 1;
-
     this.r = diam;
   }
 
   update() {
-  // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
-    if(showAllDots && !this.arrived) {
+
+    // animazione veloce quando si mostra tutto
+    if (showAllDots && !this.arrived) {
       this.pos.x = this.finalX;
       this.pos.y = this.finalY;
       this.arrived = true;
     }
 
-    if(this.arrived) {
+    if (this.arrived) {
       this.draw();
       return;
     }
 
-  // movimento verso la posizione finale
-  let dx = this.finalX - this.pos.x;
-  let dy = this.finalY - this.pos.y;
-  let distance = sqrt(dx * dx + dy * dy);
+    let dx = this.finalX - this.pos.x;
+    let dy = this.finalY - this.pos.y;
+    let distance = sqrt(dx * dx + dy * dy);
 
-  if(distance < this.speed) {
-    this.pos.x = this.finalX;
-    this.pos.y = this.finalY;
-    this.arrived = true;
-  } else {
-    this.pos.x += (dx/distance) * this.speed;
-    this.pos.y += (dy/distance) * this.speed;
-  }
+    if (distance < this.speed) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    } else {
+      this.pos.x += (dx / distance) * this.speed;
+      this.pos.y += (dy / distance) * this.speed;
+    }
 
-  if (!this.arrived) {
     let floorY = height - padding - xLabelHeight - 10;
-
     if (this.pos.y > floorY) {
       this.pos.y = floorY;
       this.vel.y = 0;
     }
-      }
-  
 
-  this.draw();
-}
+    this.draw();
+  }
 
   draw() {
-    // mostra solo i pallini del paese selezionato
     if (selectedCountry && this.country !== selectedCountry) return;
 
     let dotColor = color(255);
 
-    //caso 4 maguindanao
-    if(highlightMaguindanao && this.year === 2009 && this.category === "Government Officials") {
+    if (highlightMaguindanao && this.year === 2009 && this.category === "Government Officials")
       dotColor = color(255, 0, 0);
-    }
 
-    //caso 5 palestina
-    if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
+    if (highlightPalestina && this.year === 2023 && this.category === "Military Officials")
       dotColor = color(255, 0, 0);
-    }
 
-    //caso 6 iraq
-    if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
+    if (highlightIraq && this.year === 2006 && this.category === "Political Group")
       dotColor = color(255, 0, 0);
-    }
 
-    //caso 7 uncertain e unknownù
-    if(currentStep === 7) {
-      if(this.category === "Uncertain" || this.category === "Unknown") {
-        dotColor = color(255);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 7)
+      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
 
-    //caso 8 uncertain
-    if(currentStep === 8) {
-      if(this.category === "Uncertain") {
-        dotColor = color(255, 0, 0);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 8)
+      dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
 
-    //caso 9 tutti opachi 0.5 tranne uncertain e unknown
-    if(currentStep === 9) {
-      if(this.category === "Unknown") {
-        dotColor = color(255, 0, 0);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 9)
+      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
 
-    //caso 10 tutti i pallini grigi
-    if(currentStep === 10) {
+    if (currentStep === 10)
       dotColor = color(150);
-    }
-
-    //caso 11 tutti i pallini bianchi
 
     fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
-     
-   // controlla se il pallino deve essere visibile
-  let visible = !selectedCountry || this.country === selectedCountry;
-  if (!visible) return;
-
-  // colore
-  if (selectedCountry) {
-    fill(255, 0, 0); // rosso se c'è filtro
-  } else {
-    fill(255); // bianco se worldwide
   }
 
-  noStroke();
-  ellipse(this.pos.x, this.pos.y, this.r * 2);
-  }
-
-  //funzione che restituisce true se il mouse è sul pallino
   isHovered() {
-  let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
-  return d < this.r;
+    return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
   }
 }
+
+// --- NON C’È PIÙ CODICE DENTRO LA CLASSE O DOPO DI ESSA ---
 
 function applyForceTo(dot, force) {
   let f = p5.Vector.div(force, dot.mass);
@@ -688,15 +657,13 @@ function applyForceTo(dot, force) {
 }
 
 function applyRepulsion() {
-  let minDist = diam * 3;      // distanza tra i punti
-  let strength = 6.0;          // costante elastica
+  let minDist = diam * 3;
+  let strength = 6.0;
 
   for (let i = 0; i < dots.length; i++) {
-
     if (!dots[i].arrived) continue;
 
     for (let j = i + 1; j < dots.length; j++) {
-
       if (!dots[j].arrived) continue;
 
       let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
@@ -709,7 +676,6 @@ function applyRepulsion() {
         dots[i].pos.add(dir);
         dots[j].pos.sub(dir);
 
-        // pallini entro i limiti dopo repulsione
         dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
         dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
       }
@@ -717,8 +683,8 @@ function applyRepulsion() {
   }
 }
 
+
 function spawnUpToCurrentYear() {
-  if(!years.length || currentYearIndex >= years.length) return;
   //se showAllDots è true, non fare l'animazione di caduta
   if(showAllDots) {
     // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
@@ -768,6 +734,11 @@ function mousePressed() {
     activeCard = null;
     closeCard = null;
     cursor(ARROW);
+  }
+
+  if(cpjButtonHover){
+    window.open(cpjUrl);
+    cpjButtonHover = null;
   }
 }
 
@@ -835,7 +806,7 @@ function drawCard(dot){
 
   //variabili per le dimensioni
   let cardWidth = 700;
-  let cardHeight = 600;
+  let cardHeight = 572;
   let cardX = width/2;
   let cardY = height/2;
   let padding = 30;
@@ -902,7 +873,35 @@ function drawCard(dot){
   line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
   line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
   rectMode(CORNERS);
-  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3);
+  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3); //per il violation status
+  line(leftX, topY + photoHeight + 6*padding + 54, width/2 + verticalOffset, topY + photoHeight + 6*padding + 54);
+  line(leftX, topY + photoHeight + 7*padding + 54 + 14, width/2 + verticalOffset, topY + photoHeight + 7*padding + 54 + 14);
+  line(leftX + 200, topY + photoHeight + 5*padding + 40, leftX + 200, bottomY);
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54, rightX, topY + photoHeight + 6*padding + 54); //impunity
+  fill(red_translucent);
+  stroke(red);
+  strokeWeight(2);
+  rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
+
+  //Etichette
+  fill(red);
+  noStroke();
+  textAlign(LEFT, TOP);
+  textSize(11);
+  text("Name", leftX + photoWidth + padding, topY + 83);
+  text("Date of death", leftX + photoWidth + padding, topY + 132);
+  text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
+  text("Organization", leftX + padding, topY + photoHeight + 2*padding + 25);
+  text("Job", leftX + padding, topY + photoHeight + 3*padding + 40);
+  text("Work-related", width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 23);
+  text("Type of death", width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 40);
+  text("Murderer's impunity", width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 56);
+
+  textSize(14);
+  textAlign(LEFT, BOTTOM);
+  text("Threatened", leftX + padding, topY + photoHeight + 5.5*padding + 54);
+  text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
+  text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
   //testi
   textAlign(LEFT, BOTTOM);
@@ -918,11 +917,29 @@ function drawCard(dot){
   text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
   text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
   text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+  text(impunity, width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54);
 
   textSize(14);
   text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
   text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
   text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
+  text(threatened, leftX + padding + 200, topY + photoHeight + 5.5*padding + 54);
+  text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
+  text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
+
+  textAlign(CENTER);
+  text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
+
+  imageMode(CENTER);
+  image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 37, 37);
+
+  if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
+    cpjButtonHover = true;
+    cpjUrl = url;
+    cursor(HAND);
+  }else{
+    cpjButtonHover = null;
+  }
 
 }
 
@@ -944,7 +961,7 @@ function drawYAxis() {
     textFont(font);
     textAlign(RIGHT, CENTER);
     textSize(12);
-    let yLabelOffset = 20;
+    let yLabelOffset = 12;
     text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
   }
 }
@@ -1006,21 +1023,24 @@ function goToPreviousStep() {
 
 //mostrare i pallini immediatamente
 function showAllDotsImmediately() {
-  showAllDots = true;
-  spawnedIds.clear();
+  // Resetta tutto
   dots = [];
-  currentYearIndex = years.length - 1; //vai all'ultimo anno
-
+  spawnedIds.clear();
+  currentYearIndex = years.length - 1;
+  
+  // Crea tutti i pallini subito
   for(let j of journalists) {
     let dot = new Dot(j.id, j.year, j.category);
-    // IMPOSTA IL PALLINO COME ARRIVATO SUBITO
+    // Posiziona il pallino direttamente nella posizione finale
     dot.pos.x = dot.finalX;
     dot.pos.y = dot.finalY;
     dot.arrived = true;
-
     dots.push(dot);
     spawnedIds.add(j.id);
   }
+  
+  // Forza il ridisegno
+  redraw();
 }
 
 //aggiorna la schermata
@@ -1163,9 +1183,7 @@ function updateNavigationUI() {
         showAllBtnElement.style.display = 'block';
     }
     navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'block';
-    viewDataBtn.textContent = "→";
-    viewDataBtn.classList.add('arrow-mode');
+    viewDataBtn.style.display = 'none';
   } else if(currentStep >= 4 && currentStep <= 8) {
     //mostra frecce di navigazione x i casi
     navigationArrows.style.display = 'flex';
