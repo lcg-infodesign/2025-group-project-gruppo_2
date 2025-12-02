@@ -385,7 +385,8 @@ for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
 
   // Pallino semplice (senza glow)
   let yPallino = height - padding - 45;
-  let radius = 8;
+  let radius = 10;
+  
 
   fill(255);
   noStroke();
