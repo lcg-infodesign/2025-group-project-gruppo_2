@@ -7,6 +7,20 @@ html, body {
   background-color: #191919;
 }
 
+a {
+  text-decoration: none;
+}
+
+.red {
+  color: red;
+  font-weight: bold;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+/* HEADER */
 #main-header {
   position: fixed;
   top: 0;
@@ -84,6 +98,7 @@ html, body {
   display: block;
 }
 
+/* CONTAINER E SIDEBAR */
 #container {
   display: flex;
   width: 100vw;
@@ -117,6 +132,68 @@ html, body {
   position: relative;
 }
 
+/* WRAPPER E FRECCE NAVIGAZIONE */
+
+.section-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  height: 100%;
+  text-align: center;
+  padding: 20px;
+  color: rgb(255, 245, 233);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.explanation-wrapper, .conflicts-wrapper, 
+.without-perpetrators-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.section-body {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+#closure-body {
+  font-weight: bold;
+}
+
+.navigation-arrows {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  justify-content: center;
+}
+
+.arrow {
+  padding: 5px 17px;
+  border: 2px solid rgb(255, 245, 233);
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 2px;
+  width: 30px;
+  font-size: 15pt;
+  font-family: "JetBrains Mono", monospace;
+  color: rgb(255, 245, 233);
+  cursor: pointer;
+  display: inline-flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+/* BOTTONE FILTRO*/
 .filter-dropdown {
   margin-bottom: 20px;
   margin-top: 10px;
@@ -131,7 +208,8 @@ html, body {
   align-items: center;           
   justify-content: center;       
   width: 100%;                   
-  margin: 5px 0;
+  margin-top: 5px;
+  margin-left: 8px;;
   padding: 12px 28px;
   background-color: #191919;
   color: white;
@@ -141,6 +219,7 @@ html, body {
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
+  vertical-align: middle;
   position: relative;
   transition: transform 0.2s ease, background-color 0.2s ease;
   z-index: 100;
@@ -150,37 +229,21 @@ html, body {
   border-color: darkred;
 }
 
-.filter-btn .arrow {
-  margin-left: 8px;              
-  font-size: 14px;               
-  vertical-align: middle;        
-  transition: transform 0.3s ease;
+#dropdown-arrow {
+  font-size: 16pt;
 }
 
-.filter-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1px;
-  background-color: #191919;
-  color: white;
-  border: 1px solid red;
-  border-radius: 60px;
-  outline: none;             
-  box-sizing: border-box;
-}
-
-.filter-input:focus {
+.filter-input:focus { /* questa classe non esiste, va gestita in js */
   outline: none;              
   border: 1px solid red;      
   box-shadow: 0 0 0 1px red; 
 }
 
-.filter-input::placeholder {
+.filter-input::placeholder { /* questa classe non esiste, va gestita in js */
   color: rgba(80, 79, 79, 0.3);
 }
 
-/*tendina dei filtri*/
-.filter-panel {
+#filter-panel { /*tendina dei filtri*/
   display: none;                 
   max-height: 250px;             
   overflow-y: auto;              
@@ -196,88 +259,18 @@ html, body {
   z-index: 10;                   
 }
 
-.filter-panel div {
-  padding: 8px 12px;             
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.filter-panel div:hover {
-  background-color: darkred;
-  color: white;
-}
-
-#countrySearch {
-  width: 100%;
-  padding: 6px 10px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  border: 1px solid red;
-  background-color: #191919;
-  color: white;
-  box-sizing: border-box;
-  margin-bottom: 5px;
-  outline: none;
-}
-
-/*barra di ricerca*/
-.filter-btn.search-mode {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 40px;
-  padding: 0 12px;              
-  background-color: #191919;
-  border: 1px solid red;
-  border-radius: 60px;
-  box-sizing: border-box;
-  transition: border-color 0.2s ease;
-}
-
-.filter-btn.search-mode:hover {
-  border-color: darkred;
-}
-
-.filter-btn.search-mode input {
-  width: 100%;
-  padding: 0 30px;             
-  background: transparent;
-  border: none;
-  outline: none;
-  color: white;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  text-align: center;
-  height: 100%;
-}
-
-.filter-btn.search-mode input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
-  opacity: 1;
-}
-
-.search-icon, .close-icon {
+#death-counter-container {
+  display: none;
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0 8px;
-  user-select: none;
+  top: 55%;               
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  white-space: nowrap;
 }
 
-.search-icon {
-  right: 15px;  
-}
-
-.close-icon {
-  left: 10px;   
-}
-
-.death-counter-title {
+#death-counter-title {
    display: inline;          
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;          
@@ -286,8 +279,7 @@ html, body {
   vertical-align: middle;
 }
 
-
-.death-counter {
+#death-counter {
  display: inline;           
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;           
@@ -300,19 +292,8 @@ html, body {
   height: auto;
 }
 
-#deathCounterContainer {
-  display: none;
-  position: absolute;
-  top: 55%;               
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 5;
-  white-space: nowrap;
-}
-
-/* bottone in fondo alla sidebar */
-#sidebar .impunity-btn {
+/* BOTTONE IMPUNITY */
+.other-visualization-button {
   position: absolute;
   bottom: 5px;
   left: 20px;
@@ -330,12 +311,11 @@ html, body {
   transition: all 0.2s ease;
 }
 
-#sidebar .impunity-btn:hover {
+.other-visualization-button:hover {
   background-color: #cc0000;
 }
 
-/* scritta bianca indicativa sotto il bottone IMPUNITY STATUS */
-#sidebar .impunity-hint {
+.other-visualization-body{
   position: absolute;
   bottom: 70px; 
   left: 20px;
@@ -346,130 +326,3 @@ html, body {
   text-align: center;
   line-height: 1.2;
 }
-
-.navigation-arrows {
-  display: inline-flex;
-  gap: 8px;
-  margin-bottom: 20px;
-  margin-left: 20px;
-  margin-right: 20px;
-  justify-content: center;
-}
-
-.arrow-btn {
-  padding: 4px 8px;
-  background-color: #191919;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  height: 48px;
-  width: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  flex: none;
-}
-
-.arrow-btn:hover:not(:disabled) {
-  background-color: #252525;
-  border-color: rgba(255, 255, 255, 0.8);
-}
-
-.arrow-btn:disabled {
-  background-color: #191919;
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: not-allowed;
-}
-
-/* bottone freccia dopo VIEW THE DATA*/
-.view-data-btn.arrow-mode {
-  width: 48px !important;
-  height: 48px;
-  margin-bottom: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #191919;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  flex: none;
-}
-
-.view-data-btn.arrow-mode:hover {
-  background-color: #252525;
-  border-color: rgba(255, 255, 255, 0.8);
-}
-
-/*bottoni testo rossi*/
-.view-data-btn:not(.arrow-mode),
-.next-final-btn.red-button {
-  width: calc(100% - 40px);
-  max-width: 260px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 20px;
-  margin-top: 15px;
-  padding: 12px 28px;
-  background-color: #8B0000;
-  color: white;
-  border-radius: 60px;
-  border: 1px solid #ff0000;
-  cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  margin-bottom: 20px;
-  transition: all 0.2s ease;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.view-data-btn:not(.arrow-mode):hover,
-.next-final-btn:hover {
-  background-color: #cc0000;
-}
-
-/* Bottone SHOW ALL */
-.show-all-btn {
-  width: calc(100% - 40px);
- max-width: 260px;
-  margin-left: 20px;
-  margin-right: 20px;
-  margin-bottom: 20px;
-  margin-top: 15px;
-  padding: 12px 28px;
-  background-color:#a00000;
-  color: white;
-  border: none;
-  border-radius: 60px;
-  border: 1px solid #ff0000;
-  cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  text-align: center;
-  transition: all 0.2s ease;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.show-all-btn:hover {
-  background-color: #cc0000;
-}
-
-
-
-

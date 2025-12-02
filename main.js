@@ -51,6 +51,7 @@ let categories = [
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
 let photos = []; //conterrà le foto per le card
+
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -59,7 +60,6 @@ let showXAxis = false;
 let showGridLines = false;
 let animationStarted = false;
 let animationCompleted = false;
-let showAllDots = false;
 
 //evidenzia pallini
 let highlightMaguindanao = false;
@@ -69,94 +69,9 @@ let highlightUncertain = false;
 let highlightUnknown = false;
 let highlightNone = false;
 
-// toggle barra di ricerca
-function toggleSearch() {
-  let btn = document.getElementById("worldwideBtn");
-  let panel = document.getElementById("filterPanel");
 
-  if (btn.classList.contains("search-mode")) return;
 
-  btn.classList.add("search-mode");
-  panel.style.display = "block";
-
-  // crea input e icone
-  if (!document.getElementById("countrySearchInput")) {
-
-    const searchWrapper = document.createElement("div");
-    searchWrapper.className = "search-wrapper";
-    searchWrapper.style.display = "flex";
-    searchWrapper.style.alignItems = "center";
-    searchWrapper.style.gap = "5px";
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.id = "countrySearchInput";
-    input.style.fontSize = "15px";
-    input.placeholder = "Select country...";
-    input.style.flex = "1";
-
-    const searchIcon = document.createElement("span");
-    searchIcon.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="11" cy="11" r="8"></circle>
-      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>`;
-    searchIcon.style.display = "inline-flex";
-
-    const closeIcon = document.createElement("span");
-    closeIcon.className = "close-icon";
-    closeIcon.textContent = "✕";
-    closeIcon.style.cursor = "pointer";
-
-    searchWrapper.appendChild(input);
-    searchWrapper.appendChild(searchIcon);
-    searchWrapper.appendChild(closeIcon);
-
-    btn.innerHTML = "";
-    btn.appendChild(searchWrapper);
-
-    input.focus();
-
-    // filtra i paesi mentre si digita
-    input.addEventListener("input", function () {
-      filterCountries(this.value);
-    });
-
-    // chiudere con la x
-    closeIcon.addEventListener("click", function(e) {
-      e.stopPropagation();
-      closeSearch();
-    });
-  }
-}
-
-function closeSearch() {
-  const btn = document.getElementById("worldwideBtn");
-  const panel = document.getElementById("filterPanel");
-
-  btn.classList.remove("search-mode");
-  panel.style.display = "none";
-
-  const input = document.getElementById("countrySearchInput");
-  if (input) input.value = "";
-
-  selectedCountry = null;
-
-  btn.textContent = "WORLDWIDE ▼";
-
-  document.getElementById("deathCounterContainer").style.display = "none";
-}
-
-// filtra i paesi in base al testo
-function filterCountries(value) {
-  const panel = document.getElementById("filterPanel");
-  const countryDivs = panel.querySelectorAll("div");
-  const query = value.toLowerCase();
-
-  countryDivs.forEach(div => {
-    div.style.display = div.textContent.toLowerCase().includes(query) ? "block" : "none";
-  });
-}
+// funzione barra di ricerca tutta da fare
 
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
@@ -168,6 +83,63 @@ function preload() {
   }
   console.log("photos " + photos);
 }
+
+/* 1. PRESENTAZIONE GRAFICO
+
+    1.1 FUNZIONE CHE FA COMPARIRE I TESTI DI GRAPH-EXPLAINED
+
+    1.2 FUNZIONE CHE FA APPARIRE IL GRAFICO UNO STEP ALLA VOLTA
+
+      le due funzioni vanno combinate insieme in modo che siano coordinate in
+      questo ordine:
+        - categorie (sono già presenti) + id="explanation-categories"
+        - timeline + id="explanation-timeline"
+        - inzia l'animazione della cascata + id="explanation-dot"
+        - la cascata continua (non viene toccata) + id="explanation-closure" 
+        
+      dopo il click su next-arrow-closure, sparisce tutto graph-explained */
+
+
+/* 2. SPIEGAZIONE DEI PICCHI
+
+    2.1 FUNZIONE CHE FA COMPARIRE I TESTI DI CONFLICTS
+
+    2.2 FUNZIONE CHE EVIDENZIA I PALLINI RELATIVI AL CONFLITTO
+
+      le due funzioni vanno combinate insieme in modo che siano coordinate in
+      questo ordine:
+        - id="intro-first-paragraph"
+        - id="intro-second paragraph"
+        - let highlightMaguindanao = true + id="conflicts-philippines" (al click su next-arrow-philippines let highlightMaguindanao torna false)
+        - let highlightPalestina = true + id="conflicts-palestine" (al click su next-arrow-palestine let highlightPalestina torna false)
+        - let highlightIraq = true + id="conflicts-iraq" (al click su next-arrow-iraq let highlightIraq torna false)
+        - let highlightUncertain = true + let highlightUnknown = true + id="without-perpetrators-intro" (al click su next-arrow-without-perpetrators let highlightUnknown torna false)
+        - let highlightUncertain = true (lo era già) + id="section-uncertain" (al click su next-arrow-uncertain let highlightUncertain torna false)
+        - let highlightUnknown = true + id="section-unknown" (al click su next-arrow-unknown tutte le variabili highlight tornano false)*/
+
+
+/* 3. FILTRO X PAESE
+
+    3.1 FUNZIONE CHE FA COMPARIRE I TESTI DI COUNTRY-INTRO
+
+    3.2 FUNZIONE CHE FA APPARIRE FILTER-CONTAINER, ACCORDION E OTHER-VISUALIZATION WRAPPER QUANDO SI CLICCA NEXT-ARROW-COUNTRY-INTRO
+
+    3.3 FUNZIONE CHE FA FUNZIONARE IL FILTRO*/
+
+
+/* FUNZIONI IMPORTANTI DA TENERE A MENTE X IL MERGE:
+  - drawXAxis + drawYAxis
+  - drawCategoryLines
+  - drawGrid
+  - buildJournalistsFromTable
+  - yearToX + categoryToY
+  - spawnUpToCurrentYear
+  - applyForceTo + applyRepulsion
+  - updateVisualization
+  - updateDeathCounter
+  - drawCard
+  - mousePressed
+*/
 
 function setup() {
   sidebarWidth = 300;
@@ -210,58 +182,12 @@ function setup() {
     if (country && !countries.includes(country)) {countries.push(country)};
   }
 
-  // ordina alfabeticamente
+  // ordina i paesi alfabeticamente
   countries.sort((a, b) => a.localeCompare(b));
 
-  let panel = document.getElementById("filterPanel");
-  countries.forEach(country => {
-  let div = document.createElement("div");
-  div.textContent = country;
-   
-    div.onclick = () => {
-      selectedCountry = country;
-      updateDeathCounter(country);         // aggiorna contatore vittime
-      document.getElementById("deathCounterContainer").style.display = "block";
-      panel.style.display = "none";
-      const btn = document.getElementById("worldwideBtn");
-      btn.classList.remove("search-mode");
-      btn.textContent = country + " ▼";
-       // Nascondi pannello filtri
-      panel.style.display = "none";
-
-  // aggiornamento numero vittime
-  updateDeathCounter(country);
-  document.getElementById("deathCounterContainer").style.display = "block";
-    };
-    panel.appendChild(div);
-  });
 
   inVisualizationArea = true;
 
-  function addImpunityButton() {
-  const sidebar = document.getElementById("sidebar");
-
-  // bottone
-  const impunityBtn = document.createElement("button");
-  impunityBtn.className = "filter-btn impunity-btn"; 
-  impunityBtn.textContent = "IMPUNITY STATUS";
-
-  // click porta a second.html
-  impunityBtn.addEventListener("click", () => {
-    window.location.href = "second.html";
-  });
-
-  sidebar.appendChild(impunityBtn);
-
-  // scritta indicativa sotto il bottone
-  const hintText = document.createElement("div");
-  hintText.className = "impunity-hint";
-  hintText.textContent = "Click the IMPUNITY STATUS button to switch to another visualization";
-
-  sidebar.appendChild(hintText);
-
-  
-}
 
   //gestione frecce navigazione
   document.getElementById('prevBtn').addEventListener('click', goToPreviousStep);
@@ -280,41 +206,14 @@ function setup() {
       updateNavigationUI();
     }
   });
-  //bottone COUNTRY
-  document.getElementById('nextBtnFinal').addEventListener('click', function() {
-    if(currentStep === 9) {
-      currentStep = 10;
-      updateVisualization();
-      updateNavigationUI();
-
-      //nascondi COUNTRY e mostra frecce
-      document.getElementById('nextBtnFinal').style.display = 'none';
-      document.getElementById('navigationArrows').style.display = 'flex';
-    }
-  });
-  //bottone SHOW ALL
-  document.getElementById('showAllBtn').addEventListener('click', function() {
-    showAllDotsImmediately();
-    this.style.display = 'none';
-  })
 
   updateVisualization();
-  updateNavigationUI();
-
-
-
-// chiama la funzione dopo il setup
-addImpunityButton();
-
 }
 
-  // apertura ricerca
-  document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
-
+// conteggio vittime
 function updateDeathCounter(country) {
-  const counter = document.getElementById("deathCounter");
+  const counter = document.getElementById("death-counter");
   
-  // conteggio vittime x paese
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
     if (data.get(i, "country") === country) {
@@ -561,17 +460,6 @@ class Dot {
   }
 
   update() {
-  // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
-    if(showAllDots && !this.arrived) {
-      this.pos.x = this.finalX;
-      this.pos.y = this.finalY;
-      this.arrived = true;
-    }
-
-    if(this.arrived) {
-      this.draw();
-      return;
-    }
 
   // movimento verso la posizione finale
   let dx = this.finalX - this.pos.x;
@@ -606,22 +494,22 @@ class Dot {
 
     let dotColor = color(255);
 
-    //caso 4 maguindanao
+    // PHILIPPINES
     if(highlightMaguindanao && this.year === 2009 && this.category === "Government Officials") {
       dotColor = color(255, 0, 0);
     }
 
-    //caso 5 palestina
+    // PALESTINE
     if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
       dotColor = color(255, 0, 0);
     }
 
-    //caso 6 iraq
+    // IRAQ
     if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
       dotColor = color(255, 0, 0);
     }
 
-    //caso 7 uncertain e unknownù
+    // WITHOUT PERPETRATORS (UNCERTAIN + UNKNOWN)
     if(currentStep === 7) {
       if(this.category === "Uncertain" || this.category === "Unknown") {
         dotColor = color(255);
@@ -630,7 +518,7 @@ class Dot {
       }
     }
 
-    //caso 8 uncertain
+    // UNCERTAIN
     if(currentStep === 8) {
       if(this.category === "Uncertain") {
         dotColor = color(255, 0, 0);
@@ -639,7 +527,7 @@ class Dot {
       }
     }
 
-    //caso 9 tutti opachi 0.5 tranne uncertain e unknown
+    // UNKNOWN
     if(currentStep === 9) {
       if(this.category === "Unknown") {
         dotColor = color(255, 0, 0);
@@ -648,12 +536,12 @@ class Dot {
       }
     }
 
-    //caso 10 tutti i pallini grigi
+    // NESSUNO SELEZIONATO
     if(currentStep === 10) {
       dotColor = color(150);
     }
 
-    //caso 11 tutti i pallini bianchi
+    // TUTTI SELEZIONATI
 
     fill(dotColor);
     noStroke();
@@ -663,7 +551,7 @@ class Dot {
   let visible = !selectedCountry || this.country === selectedCountry;
   if (!visible) return;
 
-  // colore
+  // colore in base al filtro
   if (selectedCountry) {
     fill(255, 0, 0); // rosso se c'è filtro
   } else {
@@ -718,14 +606,7 @@ function applyRepulsion() {
 
 function spawnUpToCurrentYear() {
   if(!years.length || currentYearIndex >= years.length) return;
-  //se showAllDots è true, non fare l'animazione di caduta
-  if(showAllDots) {
-    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
-    if(dots.length === 0 && journalists.length > 0) {
-      showAllDotsImmediately();
-    }
-    return;
-  }
+
 
   if(!years.length || currentYearIndex >= years.length) {
     return;
@@ -985,43 +866,6 @@ function drawCategoryLines() {
   }
 }
 
-//navigazione andare avanti
-function goToNextStep() {
-  if(currentStep < totalSteps - 1) {
-    currentStep++;
-    updateVisualization();
-    updateNavigationUI();
-  }
-}
-
-//navigazione tornare indietro
-function goToPreviousStep() {
-  if(currentStep > 0) {
-    currentStep--;
-    updateVisualization();
-    updateNavigationUI();
-  }
-}
-
-//mostrare i pallini immediatamente
-function showAllDotsImmediately() {
-  showAllDots = true;
-  spawnedIds.clear();
-  dots = [];
-  currentYearIndex = years.length - 1; //vai all'ultimo anno
-
-  for(let j of journalists) {
-    let dot = new Dot(j.id, j.year, j.category);
-    // IMPOSTA IL PALLINO COME ARRIVATO SUBITO
-    dot.pos.x = dot.finalX;
-    dot.pos.y = dot.finalY;
-    dot.arrived = true;
-
-    dots.push(dot);
-    spawnedIds.add(j.id);
-  }
-}
-
 //aggiorna la schermata
 function updateVisualization() {
   //reset tutto
@@ -1036,11 +880,6 @@ function updateVisualization() {
   highlightUncertain = false;
   highlightUnknown = false;
   highlightNone = false;
-
-  // Resetta showAllDots solo se non siamo nello step 3 (dove è attivo il bottone SHOW ALL)
-  if(currentStep !== 3) {
-    showAllDots = false;
-  }
 
   //attiva in base allo step corrente
   switch(currentStep) {
@@ -1127,78 +966,4 @@ function updateVisualization() {
       inVisualizationArea = true;
       break;
   }
-
-  //se showalldots è true, mostra tutti i pallini
-  if(showAllDots) {
-    showAllDotsImmediately();
-  }
-}
-
-//abilita o disabilita i bottoni
-function updateNavigationUI() {
-  const navigationArrows = document.getElementById('navigationArrows');
-  const viewDataBtn = document.getElementById('viewDataBtn');
-  const nextBtnFinal = document.getElementById('nextBtnFinal');
-  const worldwideBtnContainer = document.querySelector('.filter-dropdown');
-  const showAllBtnElement = document.getElementById('showAllBtn');
-
-  nextBtnFinal.style.display = 'none';
-  nextBtnFinal.classList.remove('red-button');
-  viewDataBtn.classList.remove('arrow-mode');
-  viewDataBtn.style.width = '100%';
-
-  worldwideBtnContainer.style.display = 'none';
-
-  if(currentStep === 2) {
-    //mostra frecce e nascondi bottone finale
-    navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'block';
-    viewDataBtn.textContent = 'VIEW THE DATA';
-    viewDataBtn.classList.remove('arrow-mode');
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-  } else if(currentStep === 3) {
-    //dopo animazione, mostra bottone x continuare
-    if (showAllBtnElement) {
-        showAllBtnElement.style.display = 'block';
-    }
-    navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'block';
-    viewDataBtn.textContent = "→";
-    viewDataBtn.classList.add('arrow-mode');
-  } else if(currentStep >= 4 && currentStep <= 8) {
-    //mostra frecce di navigazione x i casi
-    navigationArrows.style.display = 'flex';
-    viewDataBtn.style.display = 'none';
-    nextBtnFinal.style.display = 'none';
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-  } else if(currentStep === 9) {
-    // nascondi tutto, mostra COUNTRY
-    navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'none';
-    nextBtnFinal.style.display = 'block';
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-    nextBtnFinal.textContent = "COUNTRY";
-    nextBtnFinal.classList.add('red-button');
-  } else if(currentStep === 10) {
-    navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'none';
-    nextBtnFinal.style.display = 'none';
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-    worldwideBtnContainer.style.display = 'block';
-  } else if(currentStep === 11) {
-    navigationArrows.style.display = 'none';
-    viewDataBtn.style.display = 'none';
-    nextBtnFinal.style.display = 'none';
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-    worldwideBtnContainer.style.display = 'block';
-  } else {
-    // normale navigazione
-    navigationArrows.style.display = 'flex';
-    viewDataBtn.style.display = 'none';
-    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
-  }
-
-  //disabilita frecce quando necessario
-  document.getElementById('prevBtn').disabled = (currentStep === 0);
-  document.getElementById('nextBtn').disabled = (currentStep >= 11);
 }

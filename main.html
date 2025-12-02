@@ -18,68 +18,306 @@
 
   <body>
     <header id="main-header">
-    <div class="logo">STOLEN VOICES</div>
-     
-    <nav class="nav-menu">
-        <a href="index.html" class="nav-link">HOME</a>
-        
-        <div class="dropdown">
-            <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
-            <div class="dropdown-content">
-                <a href="main.html">SOURCE OF FIRE</a>
-                <a href="second.html">IMPUNITY</a>
-            </div>
-        </div>
 
-        <a href="about.html" class="nav-link">ABOUT</a>
-        <a href="team.html" class="nav-link">TEAM</a>
-    </nav>
+      <div class="logo">STOLEN VOICES</div>
+      
+      <nav class="nav-menu">
+          <a href="index.html" class="nav-link">HOME</a>
+          
+          <div class="dropdown">
+              <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
+              <div class="dropdown-content">
+                  <a href="main.html">SOURCE OF FIRE</a>
+                  <a href="second.html">IMPUNITY</a>
+              </div>
+          </div>
+
+          <a href="about.html" class="nav-link">ABOUT</a>
+          <a href="team.html" class="nav-link">TEAM</a>
+      </nav>
+
     </header>
 
 
-    <div id="container">
-      <div id="sketch-container"></div>
+    <main>
 
-      <div id="sidebar">
-    
-      <div class="filter-dropdown">
-        <button class="filter-btn" id="worldwideBtn">WORLDWIDE<span class="arrow">▼</span></button>
-        <div class="filter-panel" id="filterPanel"></div>
+      <div id="container">
+
+        <div id="sketch-container"></div>
+
+        <div id="sidebar">
+
+          <!--TESTI INTRODUZIONE-->
+          <div class="section-wrapper" id="graph-explained">
+
+            <div class="explanation-wrapper" id="explanation-categories">
+
+              <div class="section-body" id="categories-body">
+                These 9 categories identify the <span class="red">source of fire</span> and who is responsible for the killings. This
+                allows us to understand which groups or individuals have targeted journalists over the years.
+              </div>
+
+              <div class="navigation-arrows" id="navigation-arrows-categories">
+                <button class="arrow" id="next-arrow-categories">→</button>
+              </div>
+
+            </div>
+
+            <div class="explanation-wrapper" id="explanation-timeline">
+
+              <div class="section-body" id="timeline-body">
+                The timeline, <span class="red"> from 1992 to 2025</span>, shows the year each killing occurred, making it
+                possible to observe how incidents are distributed over time and to identify any peaks or trends.
+              </div>
+
+              <div class="navigation-arrows" id="navigation-arrows-timeline">
+                <button class="arrow" id="prev-arrow-timeline">←</button>
+                <button class="arrow" id="next-arrow-timeline">→</button>
+              </div>
+              
+            </div>
+
+            <!--QUA PARTE L'ANIMAZIONE DELLA CASCATA-->
+
+            <div class="explanation-wrapper" id="explanation-dot">
+
+              <div class="section-body" id="dot-body">
+                Each <span class="red">dot</span> on the chart represents <span class="red">1 journalist</span>. At any moment, 
+                you can pause to explore a story by clicking on it.
+              </div>
+
+              <div class="navigation-arrows" id="navigation-arrows-dot">
+                <button class="arrow" id="prev-arrow-dot">←</button>
+                <button class="arrow" id="next-arrow-dot">→</button>
+              </div>
+
+            </div>
+
+            <div class="explanation-wrapper" id="explanation-closure">
+
+              <div class="section-body" id="closure-body">
+                The silence will not have the last word.
+              </div>
+
+              <div class="navigation-arrows" id="navigation-arrows-closure">
+                <button class="arrow" id="prev-arrow-closure">←</button>
+                <button class="arrow" id="next-arrow-closure">→</button>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!--TESTI SPIEGAZIONE PICCHI-->
+          <div class="accordion" id="main-accordion">
+            <!--Testi dei conflitti-->
+            <div class="section-wrapper" id="conflicts">
+
+              <div class="conflicts-wrapper" id="intro-first-paragraph">
+
+                <div class="section-body" id="intro-first-paragraph-body">
+                  In the recent decades, the number of journalists killed worldwide has become an alarming indicator of 
+                  <span class="red">press freedom</span>. CPJ data show that reporters and media workers continue to lose 
+                  their lives, especially in contexts of conflict, political instability, or organized crime.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-intro-first-paragraph">
+                  <button class="arrow" id="next-arrow-intro-first-paragraph">→</button>
+                </div>
+
+              </div>
+
+              <div class="conflicts-wrapper" id="intro-second-paragraph">
+
+                <div class="section-body" id="intro-second-paragraph-body">
+                  Analyzing <span class="red">peaks</span> of these violent events helps to better understand the dynamics
+                  threatening freedom of information and to identify the most affected periods and regions.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-intro-second-paragraph">
+                  <button class="arrow" id="prev-arrow-intro-second-paragraph">←</button>
+                  <button class="arrow" id="next-arrow-intro-second-paragraph">→</button>
+                </div>
+
+              </div>
+
+              <div class="conflicts-wrapper" id="conflicts-philippines">
+
+                <div class="section-title" id="philippines-title">Maguindanao Massacre (Philippines)</div>
+
+                <div class="section-subtitle" id="philippines-subtitle">
+                  Period: <span class="red">2009</span><br>
+                  Total recorded victims: <span class="red">32</span>
+                </div>
+
+                <div class="section-body" id="philippines-body">
+                  A single event illustrates the danger posed by political clans. A convoy of journalists 
+                  was attacked, and <span class="red">32 media workers</span> were brutally executed by men 
+                  connected to government officials, marking one of the deadliest attacks on the press in history.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-philippines">
+                  <button class="arrow" id="prev-arrow-philippines">←</button>
+                  <button class="arrow" id="next-arrow-philippines">→</button>
+                </div>
+
+              </div>
+
+              <div class="conflicts-wrapper" id="conflicts-palestine">
+
+                <div class="section-title" id="palestine-title">Palestinian Occupation</div>
+
+                <div class="section-subtitle" id="palestine-subtitle">
+                  Period: <span class="red">1948-2025</span><br>
+                  Total recorded victims: <span class="red">216</span>
+                </div>
+
+                <div class="section-body" id="palestine-body">
+                  Journalists investigating corruption and trafficking are systematically silenced. Violence among 
+                  cartels peaked at <span class="red">75 murders</span> in 2023 due to operations and attacks carried 
+                  out by military forces.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-palestine">
+                  <button class="arrow" id="prev-arrow-palestine">←</button>
+                  <button class="arrow" id="next-arrow-palestine">→</button>
+                </div>
+
+              </div>
+
+              <div class="conflicts-wrapper" id="conflicts-iraq">
+
+                <div class="section-title" id="iraq-title">Iraq War</div>
+
+                <div class="section-subtitle" id="iraq-subtitle">
+                  Period: <span class="red">2003-2011</span><br>
+                  Total recorded victims: <span class="red">286</span>
+                </div>
+
+                <div class="section-body" id="iraq-body">
+                  Post-invasion instability turned the country into a deadly trap among government forces, militias, 
+                  and jihadist groups. Violence peaked in 2006 with <span class="red">55 killings</span>, mostly 
+                  perpetrated by armed political groups.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-iraq">
+                  <button class="arrow" id="prev-arrow-iraq">←</button>
+                  <button class="arrow" id="next-arrow-iraq">→</button>
+                </div>
+
+              </div>
+
+              <div class="without-perpetrators-wrapper" id="without-perpetrators-intro">
+
+                <div class="section-title" id="without-perpetrators-title">The Massacre Without Perpetrators</div>
+
+                <div class="section-body" id="without-perpetrators-body">
+                  The most dramatic data does not concern a single conflict, but a set of cases united by one key
+                  element: the <span class="bold">absence of identified responsibility.</span>
+                  <br><br>
+                  In total, there are <span class="red">188 victims</span>. Different stories, same outcome: no 
+                  confirmed perpetrator. Not always due to lack of information, but often because the available 
+                  details are insufficient to provide a definitive answer.
+                </div>
+
+                <div class="navigation-arrows" id="navigation-arrows-without-perpetrators">
+                  <button class="arrow" id="prev-arrow-without-perpetrators">←</button>
+                  <button class="arrow" id="next-arrow-without-perpetrators">→</button>
+                </div>
+                
+                <div id="section-uncertain">
+
+                  <div class="section-title" id="uncertain-title">Uncertain</div>
+
+                  <div class="section-body" id="uncertain-body">
+                    Here the truth is suspended in <span class="red">doubt</span>. Responsibility could lie 
+                    with different actors without it being possible to identify one for certain. Too many 
+                    versions, no official truth. And when the truth is “uncertain,” so is justice.
+                  </div>
+
+                  <div class="navigation-arrows" id="navigation-arrows-uncertain">
+                    <button class="arrow" id="prev-arrow-uncertain">←</button>
+                    <button class="arrow" id="next-arrow-uncertain">→</button>
+                  </div>
+
+                </div>
+
+                <div id="section-unknown">
+                  <div class="section-title" id="unknown-title">Unknown</div>
+
+                  <div class="section-body" id="unknown-body">
+                    Here the situation is even clearer: the perpetrator has not been identified. Each 
+                    dot represents a victim with no known perpetrator. The data counts the cases but 
+                    also highlights a gap: <span class="red">a crime without an official culprit</span>.
+                  </div>
+
+                  <div class="navigation-arrows" id="navigation-arrows-unknown">
+                    <button class="arrow" id="prev-arrow-unknwon">←</button>
+                    <button class="arrow" id="next-arrow-unknown">→</button>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+           
+          </div>
+
+          <!--INTRODUZIONE AL FILTRO X PAESE-->
+          <div class="section-wrapper" id="country-intro">
+
+            <div class="section-title" id="country-intro-title">
+              Explore the Data by Country
+            </div>
+
+            <div class="section-body" id="country-intro-body">
+              The overall view shows major trends but hides key differences. Observing the data country by 
+              country allows us to understand how violence changes depending on context: <span class="bold">where 
+              it rises, where it falls, who is most involved, and the number of victims in each country</span>.<br>
+              This perspective helps move from aggregate data to individual realities, highlighting responsibilities 
+              and dynamics that would otherwise remain indistinct.
+            </div>
+
+            <div class="navigation-arrows" id="navigation-arrow-country-intro">
+              <button class="arrow" id="prev-arrow-country-intro">←</button>
+              <button class="arrow" id="next-arrow-country-intro">→</button>
+            </div>
+
+          </div>
+
+          <div id="filter-container">
+
+            <div class="filter-dropdown">
+              <button class="filter-btn" id="worldwide-btn">WORLDWIDE <span id="dropdown-arrow"> ⌵ </span></button>
+              <div id="filter-panel"></div>
+            </div>
+
+            <div id="death-counter-container">
+              <div id="death-counter-title">Number of victims</div>
+              <div id="death-counter">0</div>
+            </div>
+
+          </div>
+
+          <div class="other-visualization-wrapper" id="impunity-status-wrapper">
+
+            <div class="other-visualization-body" id="impunity-status-body">
+              Click the button to explore another visualization
+            </div>
+
+            <a class="other-visualization-button" id="impunity-status-button" href="second.html">
+              IMPUNITY STATUS
+            </a>
+
+          </div>
+
+        </div>
+
       </div>
-
-      <div id="deathCounterContainer" style="display: none;">
-        <div class="death-counter-title">Number of victims</div>
-        <div id="deathCounter" class="death-counter">0</div>
-      </div>
-
-      <!--bottone MOSTRA TUTTO-->
-      <button id="showAllBtn" class="show-all-btn" style="display: none;">
-      SHOW ALL
-      </button>
-
-    <!--bottoni di navigazione-->
-    <div class="navigation-arrows" id="navigationArrows">
-      <button class="arrow-btn" id="prevBtn">←</button>
-      <button class="arrow-btn" id="nextBtn">→</button>
-    </div>
-
-    <!--bottone per continuare dopo l'animazione)-->
-    <button class="view-data-btn" id="viewDataBtn" style="display: none;">
-    VIEW THE DATA
-    </button>
-
-    <!--bottone COUNTRY-->
-    <button class="next-final-btn" id="nextBtnFinal" style="display: none;">
-    NEXT
-    </button>
-
-    <div id="deathCounterContainer" style="display: none;">
-      <div class="death-counter-title">Number of victims</div>
-      <div id="deathCounter" class="death-counter">0</div>
-    </div>
-
     
-    </div>
+    </main>
+
     <script src="main.js"></script>
   </body>
 

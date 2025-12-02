@@ -183,17 +183,3 @@ body {
   display: block;
 }
 
-#navigation-help {
-  position: fixed;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: underline;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: none;
-}
-
