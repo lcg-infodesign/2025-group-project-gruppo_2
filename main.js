@@ -135,6 +135,7 @@ function toggleSearch() {
   }
 }
 
+//chiudi search
 function closeSearch() {
   const btn = document.getElementById("worldwideBtn");
   const panel = document.getElementById("filterPanel");
@@ -439,6 +440,7 @@ function buildJournalistsFromTable() {
   console.log("Sample journalist:", journalists[0]);
 }
 
+//calcola le dimensioni dell'area del grafico
 function drawLayout() {
   graphWidth = mainWidth - 2 * padding - yLabelWidth;
   graphHeight = height - 2 * padding - xLabelHeight;
@@ -446,6 +448,7 @@ function drawLayout() {
   yAxisStart = height - padding - xLabelHeight;
 }
 
+//converti un anno in una coordinata x sullo schermo
 function yearToX(year) {
   if (years.length === 0) return width / 2;
   let minYear = min(years);
@@ -453,12 +456,14 @@ function yearToX(year) {
   return map(year, minYear, maxYear, xAxisStart, xAxisStart + graphWidth);
 }
 
+//converti una categoria in una coordinata Y
 function categoryToY(category) {
   let index = categories.indexOf(category);
   if(index === -1) index = categories.indexOf("Unknown");
   return padding + index * rowHeight + rowHeight / 2;
 }
 
+//crea pallini
 class Dot {
   constructor(id, year, category) {
     this.id = id;
@@ -561,12 +566,13 @@ class Dot {
   }
 }
 
-
+//applica campo di forze
 function applyForceTo(dot, force) {
   let f = p5.Vector.div(force, dot.mass);
   dot.acc.add(f);
 }
 
+//applica campo di forze
 function applyRepulsion() {
   let minDist = diam * 3;
   let strength = 6.0;
@@ -594,7 +600,7 @@ function applyRepulsion() {
   }
 }
 
-
+//crea gradualmente i pallini
 function spawnUpToCurrentYear() {
   if(!years.length || currentYearIndex >= years.length) {
     return;
@@ -651,6 +657,7 @@ function mousePressed() {
   }
 }
 
+//disegna card
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
@@ -880,6 +887,7 @@ function drawCard(dot){
 
 }
 
+//disegna griglia
 function drawGridWithSteps() {
   drawingContext.globalAlpha = 1.0;
 
