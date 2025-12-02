@@ -433,12 +433,16 @@ html, body {
 /* Bottone SHOW ALL */
 .show-all-btn {
   width: calc(100% - 40px);
-  margin: 10px 20px;
+ max-width: 260px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
   padding: 12px 28px;
-  background-color: #ff0000;
+  background-color:#a00000;
   color: white;
   border: none;
   border-radius: 12px;
+  border: 1px solid #ff0000;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
@@ -452,5 +456,6 @@ html, body {
 }
 
 .show-all-btn:hover {
-  background-color: #cc0000;
+  background-color: #a00000;
+  border-color: #ff3333;
 }
