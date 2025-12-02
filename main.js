@@ -55,6 +55,7 @@ let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone
 let cpjUrl;
 let photo;
 let hasLoadedPhoto = null;
+let maskGraphics;
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -168,6 +169,7 @@ function filterCountries(value) {
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
   cpjLogo = loadImage("assets/cpj_logo.svg");
+  defaultPhoto = loadImage("assets/default_photo.jpg");
 }
 
 function setup() {
@@ -835,17 +837,40 @@ function drawCard(dot){
   let photoHeight = 190;
 
   if(!hasLoadedPhoto){
-    photo = loadImage("assets/images/" + id + ".jpg") || loadImage("assets/default_photo.jpg");
+    photo = loadImage("assets/images/" + (id + 1) + ".jpg");
     hasLoadedPhoto = true;
   }
 
   imageMode(CORNER);
-  if(photo){
-    image(photo, leftX, topY, photoWidth, photoHeight);
-  }else{
-    rectMode(CORNER);
-    rect(leftX, topY, photoWidth, photoHeight, 10);
+
+  image(defaultPhoto, leftX, topY, photoWidth, photoHeight);
+
+  drawingContext.save(); // salva lo stato del canvas
+
+  // crea un rettangolo arrotondato come maschera per le foto
+  let radius = 5;
+  drawingContext.beginPath();
+  drawingContext.moveTo(leftX + radius, topY);
+  drawingContext.lineTo(leftX + photoWidth - radius, topY);
+  drawingContext.quadraticCurveTo(leftX + photoWidth, topY, leftX + photoWidth, topY + radius);
+  drawingContext.lineTo(leftX + photoWidth, topY + photoHeight - radius);
+  drawingContext.quadraticCurveTo(leftX + photoWidth, topY + photoHeight, leftX + photoWidth - radius, topY + photoHeight);
+  drawingContext.lineTo(leftX + radius, topY + photoHeight);
+  drawingContext.quadraticCurveTo(leftX, topY + photoHeight, leftX, topY + photoHeight - radius);
+  drawingContext.lineTo(leftX, topY + radius);
+  drawingContext.quadraticCurveTo(leftX, topY, leftX + radius, topY);
+  drawingContext.closePath();
+  drawingContext.clip();
+
+  // disegna l'immagine nel rettangolo
+  if (photo) {
+    image(photo, leftX, topY, photoHeight * (photo.width/photo.height), photoHeight);
+  } else {
+    rect(leftX, topY, photoWidth, photoHeight, radius);
   }
+  
+  drawingContext.restore(); // rimuove il clipping
+
 
   // X per chiudere la card
   noFill();
