@@ -126,6 +126,7 @@ html, body {
 
 }
 
+
 .filter-btn {
   display: flex;                
   align-items: center;           
@@ -136,7 +137,7 @@ html, body {
   background-color: #191919;
   color: white;
   border: 2px solid red;
-  border-radius: 12px;
+  border-radius: 60px;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
@@ -160,7 +161,7 @@ html, body {
   background-color: #191919;
   color: white;
   border: 1px solid red;
-  border-radius: 12px;
+  border-radius: 60px;
   outline: none;             
   box-sizing: border-box;
 }
@@ -175,6 +176,7 @@ html, body {
   color: rgba(80, 79, 79, 0.3);
 }
 
+/*tendina dei filtri*/
 .filter-panel {
   display: none;                 
   max-height: 250px;             
@@ -215,6 +217,7 @@ html, body {
   outline: none;
 }
 
+/*barra di ricerca*/
 .filter-btn.search-mode {
   position: relative;
   display: flex;
@@ -225,7 +228,7 @@ html, body {
   padding: 0 12px;              
   background-color: #191919;
   border: 1px solid red;
-  border-radius: 12px;
+  border-radius: 60px;
   box-sizing: border-box;
   transition: border-color 0.2s ease;
 }
@@ -318,7 +321,7 @@ html, body {
   background-color: red;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 60px;
   padding: 12px 28px;
   cursor: pointer;
   transition: transform 0.2s ease, background-color 0.2s ease;
@@ -327,7 +330,7 @@ html, body {
 /* scritta bianca indicativa sotto il bottone IMPUNITY STATUS */
 #sidebar .impunity-hint {
   position: absolute;
-  bottom: 70px;  /* regola la distanza dal bottone */
+  bottom: 70px; 
   left: 20px;
   width: calc(100% - 40px);
   font-family: 'JetBrains Mono', monospace;
@@ -409,7 +412,7 @@ html, body {
   padding: 12px 28px;
   background-color: #8B0000;
   color: white;
-  border-radius: 12px;
+  border-radius: 60px;
   border: 1px solid #ff0000;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
@@ -438,7 +441,7 @@ html, body {
   background-color: #ff0000;
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 60px;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
@@ -454,3 +457,6 @@ html, body {
 .show-all-btn:hover {
   background-color: #cc0000;
 }
+
+
+
