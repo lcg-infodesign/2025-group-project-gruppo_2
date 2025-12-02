@@ -177,12 +177,7 @@ function draw() {
         b.show();
     }
 
-    // linea verticale sfumata
-    let blurWidth = 10, maxAlpha = 200;
-    for (let i = 0; i < blurWidth; i++) {
-        stroke(128, 128, 128, map(i, 0, blurWidth - 1, maxAlpha, 0));
-        line(width - i, 0, width - i, height);
-    }
+  
 }
 
 function buildBubbles() {
