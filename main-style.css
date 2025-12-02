@@ -336,3 +336,124 @@ html, body {
   text-align: center;
   line-height: 1.2;
 }
+<<<<<<< HEAD
+=======
+.navigation-arrows {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  justify-content: center;
+}
+
+.arrow-btn {
+  padding: 4px 8px;
+  background-color: #191919;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  height: 48px;
+  width: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: none;
+}
+
+.arrow-btn:hover:not(:disabled) {
+  background-color: #252525;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+.arrow-btn:disabled {
+  background-color: #191919;
+  border-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+}
+
+/* bottone freccia dopo VIEW THE DATA*/
+.view-data-btn.arrow-mode {
+  width: 48px !important;
+  height: 48px;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #191919;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  flex: none;
+}
+
+.view-data-btn.arrow-mode:hover {
+  background-color: #252525;
+  border-color: rgba(255, 255, 255, 0.8);
+}
+
+/*bottoni testo rossi*/
+.view-data-btn:not(.arrow-mode),
+.next-final-btn.red-button {
+  width: calc(100% - 40px);
+  max-width: 260px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  padding: 12px 28px;
+  background-color: #8B0000;
+  color: white;
+  border-radius: 12px;
+  border: 1px solid #ff0000;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  margin-bottom: 20px;
+  transition: all 0.2s ease;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.view-data-btn:not(.arrow-mode):hover,
+.next-final-btn:hover {
+  background-color: #a00000;
+  border-color: #ff3333;
+
+}
+
+/* Bottone SHOW ALL */
+.show-all-btn {
+  width: calc(100% - 40px);
+  margin: 10px 20px;
+  padding: 12px 28px;
+  background-color: #ff0000;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.2s ease;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.show-all-btn:hover {
+  background-color: #cc0000;
+}
+>>>>>>> 35629a8f5346408042ea88a0dc0ae9059c2fcdf1

@@ -48,6 +48,26 @@ let categories = [
   "Unknown"
 ];
 
+let activeCard = null; //variabile che stabilisce se/quale card mostrare
+let closeCard = null;
+let photos = []; //conterrà le foto per le card
+//variabili per la navigazione
+let currentStep = 0;
+const totalSteps = 12;
+let showYAxis = false;
+let showXAxis = false;
+let showGridLines = false;
+let animationStarted = false;
+let animationCompleted = false;
+let showAllDots = false;
+
+//evidenzia pallini
+let highlightMaguindanao = false;
+let highlightPalestina = false;
+let highlightIraq = false;
+let highlightUncertain = false;
+let highlightUnknown = false;
+let highlightNone = false;
 
 // toggle barra di ricerca
 function toggleSearch() {
@@ -143,6 +163,13 @@ function filterCountries(value) {
 
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
+
+  console.log("Row count: " + data.getRowCount());
+  // carica tutte le foto dei giornalisti
+  for (let i = 0; i < data.getRowCount(); i++) {
+    photos[i] = loadImage("assets/images/" + i + ".jpg");
+  }
+  console.log("photos " + photos);
 }
 
 function setup() {
@@ -238,6 +265,45 @@ function setup() {
 
   
 }
+
+  //gestione frecce navigazione
+  document.getElementById('prevBtn').addEventListener('click', goToPreviousStep);
+  document.getElementById('nextBtn').addEventListener('click', goToNextStep);
+  //bottone VIEW THE DATA  che avvia l'animazione
+  document.getElementById('viewDataBtn').addEventListener('click', function() {
+    if(currentStep === 2) {
+      //attiva l'animazione - step3
+      currentStep = 3;
+      updateVisualization();
+      updateNavigationUI();
+    } else if (currentStep === 3) {
+      //vai al caso maguindanao
+      currentStep = 4;
+      updateVisualization();
+      updateNavigationUI();
+    }
+  });
+  //bottone COUNTRY
+  document.getElementById('nextBtnFinal').addEventListener('click', function() {
+    if(currentStep === 9) {
+      currentStep = 10;
+      updateVisualization();
+      updateNavigationUI();
+
+      //nascondi COUNTRY e mostra frecce
+      document.getElementById('nextBtnFinal').style.display = 'none';
+      document.getElementById('navigationArrows').style.display = 'flex';
+    }
+  });
+  //bottone SHOW ALL
+  document.getElementById('showAllBtn').addEventListener('click', function() {
+    showAllDotsImmediately();
+    this.style.display = 'none';
+  })
+
+  updateVisualization();
+  updateNavigationUI();
+
 
 
 // chiama la funzione dopo il setup
@@ -377,6 +443,11 @@ function draw() {
   }
 
   drawGrid();
+
+  if (activeCard) {
+    drawCard(activeCard);
+  }
+
 }
 
 //caricamento dati
@@ -397,20 +468,39 @@ function buildJournalistsFromTable() {
       }
     }
 
+    let workRelated = "Unknown";
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Confirmed"){
+      workRelated = "Confirmed";
+    }
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Unconfirmed"){
+      workRelated = "Unconfirmed";
+    }
+    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Media Worker"){
+      workRelated = "Media Worker";
+    }
+
     let journalist = {
       id: j,
       year: year,
+      date: row.get("entry_date"),
+      ambiguousEntryDate: row.get("ambiguous_entry_date"),
       category: row.get("source_of_fire") || "Unknown",
       name: row.get("journalist/media worker_name") || "",
       country: row.get("country") || "",
       motive: row.get("motive") || "",
       role: row.get("role") || "",
       city: row.get("city") || "",
+      typeOfDeath: row.get("type_of_death"),
       impunity: row.get("impunity") || "",
+      organization: row.get("organization"),
       medium: row.get("mediums") || "",
       beats: row.get("beats_covered") || "",
       job: row.get("job") || "",
-      url: row.get("cpj.org_url") || ""
+      url: row.get("cpj.org_url") || "",
+      workRelated: workRelated,
+      threatened: row.get("threatened") || "Unknown",
+      tortured: row.get("tortured") || "Unknown",
+      heldCaptive: row.get("held_captive") || "Unknown"
     };
 
     journalists.push(journalist);
@@ -480,10 +570,17 @@ class Dot {
   }
 
   update() {
-  if(this.arrived) {
-    this.draw();
-    return;
-  }
+  // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
+    if(showAllDots && !this.arrived) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    }
+
+    if(this.arrived) {
+      this.draw();
+      return;
+    }
 
   // movimento verso la posizione finale
   let dx = this.finalX - this.pos.x;
@@ -506,7 +603,8 @@ class Dot {
       this.pos.y = floorY;
       this.vel.y = 0;
     }
-  }
+      }
+  
 
   this.draw();
 }
@@ -514,6 +612,63 @@ class Dot {
 
 
   draw() {
+    // mostra solo i pallini del paese selezionato
+    if (selectedCountry && this.country !== selectedCountry) return;
+
+    let dotColor = color(255);
+
+    //caso 4 maguindanao
+    if(highlightMaguindanao && this.year === 2009 && this.category === "Government Officials") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 5 palestina
+    if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 6 iraq
+    if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
+      dotColor = color(255, 0, 0);
+    }
+
+    //caso 7 uncertain e unknownù
+    if(currentStep === 7) {
+      if(this.category === "Uncertain" || this.category === "Unknown") {
+        dotColor = color(255);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    //caso 8 uncertain
+    if(currentStep === 8) {
+      if(this.category === "Uncertain") {
+        dotColor = color(255, 0, 0);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    //caso 9 tutti opachi 0.5 tranne uncertain e unknown
+    if(currentStep === 9) {
+      if(this.category === "Unknown") {
+        dotColor = color(255, 0, 0);
+      } else {
+        dotColor = color(150);
+      }
+    }
+
+    //caso 10 tutti i pallini grigi
+    if(currentStep === 10) {
+      dotColor = color(150);
+    }
+
+    //caso 11 tutti i pallini bianchi
+
+    fill(dotColor);
+    noStroke();
+    ellipse(this.pos.x, this.pos.y, this.r * 2);
      
    // controlla se il pallino deve essere visibile
   let visible = !selectedCountry || this.country === selectedCountry;
@@ -529,6 +684,13 @@ class Dot {
   noStroke();
   ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
+
+  //funzione che restituisce true se il mouse è sul pallino
+  isHovered() {
+  let d = dist(mouseX, mouseY, this.pos.x, this.pos.y);
+  return d < this.r;
+  }
+
 }
 
 function applyForceTo(dot, force) {
@@ -568,6 +730,18 @@ function applyRepulsion() {
 
 function spawnUpToCurrentYear() {
   if(!years.length || currentYearIndex >= years.length) return;
+  //se showAllDots è true, non fare l'animazione di caduta
+  if(showAllDots) {
+    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
+    if(dots.length === 0 && journalists.length > 0) {
+      showAllDotsImmediately();
+    }
+    return;
+  }
+
+  if(!years.length || currentYearIndex >= years.length) {
+    return;
+  }
 
 
   const yearLimit = years[currentYearIndex];
@@ -588,4 +762,455 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
+}
+
+function mousePressed() {
+  for (let d of dots) {
+
+    // se c'è un filtro per paese, ignora i pallini nascosti:
+    if (selectedCountry && d.country !== selectedCountry) continue;
+
+    if (d.isHovered()) {
+      activeCard = d;
+    }
+  }
+
+  if(closeCard){
+    activeCard = null;
+    closeCard = null;
+    cursor(ARROW);
+  }
+}
+
+function drawCard(dot){
+  let journalist = journalists[dot.id];
+
+  //Imposto tutte le variabili con le informazioni per la card
+  let id = journalist.id;
+  let name = journalist.name;
+  let date = journalist.date;
+  let ambiguous, dateIcon; //Queste variabili servono per mettere un'icona e un tooltip che spiega se la data è certa o meno
+  if(!journalist.ambiguousEntryDate){
+    dateIcon = "tick";
+    ambiguous = "The date is confirmed";
+  }else{
+    dateIcon = "?";
+    ambiguous = "The date is ambiguous. Plausible dates: " + journalist.ambiguousEntryDate;
+  }
+  let place = journalist.city + ", " + journalist.country;
+  let org;
+  if(journalist.organization !== ""){
+    org = journalist.organization;
+  }else{
+    org = "Unknown";
+  }
+  let job = journalist.job;
+  if(journalist.job !== ""){
+    job = journalist.job;
+  }else{
+    job = "Unknown";
+  }
+  let workRelated = journalist.workRelated;
+  let typeOfDeath;
+  if(journalist.typeOfDeath !== ""){
+    typeOfDeath = journalist.typeOfDeath;
+  }else{
+    typeOfDeath = "Unknown";
+  }
+  let threatened, tortured, heldCaptive;
+  if(journalist.threatened !== ""){
+    threatened = journalist.threatened;
+  }else{
+    threatened = "Unknown";
+  }
+  if(journalist.tortured !== ""){
+    tortured = journalist.tortured;
+  }else{
+    tortured = "Unknown";
+  }
+  if(journalist.heldCaptive !== ""){
+    heldCaptive = journalist.heldCaptive;
+  }else{
+    heldCaptive = "Unknown";
+  }
+  let impunity = journalist.impunity;
+  let url = journalist.url;
+
+  //fondo nero trasparente
+  noStroke();
+  fill(0,0,0,175);
+  rectMode(CORNER);
+  rect(0,0, width, height);
+
+  // DISEGNO LA CARD
+
+  //variabili per le dimensioni
+  let cardWidth = 700;
+  let cardHeight = 600;
+  let cardX = width/2;
+  let cardY = height/2;
+  let padding = 30;
+  let leftX = cardX - cardWidth/2 + padding;
+  let topY = cardY - cardHeight/2 + padding;
+  let rightX = cardX + cardWidth/2 - padding;
+  let bottomY = cardY + cardHeight/2 - padding;
+
+  let bg = color(19,19,19);
+  let grey = color(38,38,38);
+
+  //rettangolo di base
+  stroke(grey);
+  strokeWeight(2);
+  fill(bg);
+  rectMode(CENTER);
+  rect(cardX, cardY, cardWidth, cardHeight, 20);
+
+  //foto
+  let photo = photos[id];
+  let photoWidth = 180;
+  let photoHeight = 190;
+  imageMode(CORNER);
+  if(photo){
+    image(photo, leftX, topY, photoWidth, photoHeight);
+  }else{
+    rectMode(CORNER);
+    rect(leftX, topY, photoWidth, photoHeight, 10);
+  }
+
+  // X per chiudere la card
+  noFill();
+  stroke(red);
+  let crossWidth = 16;
+  line(rightX - crossWidth, topY, rightX, topY + crossWidth);
+  line(rightX, topY, rightX - crossWidth, topY + crossWidth);
+  let crossCenterX = rightX - crossWidth/2;
+  let crossCenterY = topY + crossWidth/2;
+  let d = dist(mouseX, mouseY, crossCenterX, crossCenterY);
+  if(d <= crossWidth){
+    closeCard = true;
+    cursor(HAND);
+  }else{
+    closeCard = null;
+    cursor(ARROW);
+  }
+
+  //grafica della card
+
+  let verticalOffset = 40;
+  noFill();
+  stroke(red);
+  strokeWeight(0.5);
+  line(leftX + photoWidth + padding, topY + 80, leftX + cardWidth - 2*padding, topY + 80); //nome
+  line(leftX + photoWidth + padding, topY + 80 + 50, leftX + cardWidth - 2*padding, topY + 80 + 50); //data
+  line(leftX + photoWidth + padding, topY + 80 + 97, leftX + cardWidth - 2*padding, topY + 80 + 97); //luogo
+  rectMode(CORNER);
+  fill(grey);
+  rect(leftX, topY + photoHeight + padding, cardWidth - 2*padding, 3*padding + 40, 3);
+  noFill();
+  line(width/2 + verticalOffset, topY + photoHeight + padding, width/2 + verticalOffset, topY + photoHeight + padding + 3*padding + 40); //divisore verticale
+  line(leftX + padding, topY + photoHeight + 2*padding + 20, width/2 + verticalOffset - padding, topY + photoHeight + 2*padding + 20); //org
+  line(leftX + padding, topY + photoHeight + 3*padding + 37, width/2 + verticalOffset - padding, topY + photoHeight + 3*padding + 37); //job
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
+  rectMode(CORNERS);
+  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3);
+
+  //testi
+  textAlign(LEFT, BOTTOM);
+  textFont(font);
+  textWrap(WORD);
+  fill(white);
+  noStroke();
+
+  textSize(35);
+  text(name, leftX + photoWidth + padding, topY + 80, cardWidth - 3*padding - photoWidth);
+
+  textSize(20);
+  text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
+  text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
+  text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+
+  textSize(14);
+  text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
+  text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
+  text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
+
+}
+
+function drawYAxis() {
+  stroke(white);
+  strokeWeight(0.5);
+  let yAxisOffset = 15;
+  let yStartOffset = 20;
+  let xAxisY = height - padding - xLabelHeight;
+
+  line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
+
+  // Etichette Y
+  for(let i = 0; i < categories.length; i++) {
+    let y = padding + i * rowHeight + rowHeight / 2;
+    
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(RIGHT, CENTER);
+    textSize(12);
+    let yLabelOffset = 20;
+    text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
+  }
+}
+
+function drawXAxis() {
+  // Tacche anni
+  for(let i = 0; i <= (2025 - 1992); i++) {
+    stroke(255);
+    strokeWeight(0.5);
+    let x = initialX + i * yearWidth;
+    let topY = height - padding - xLabelHeight;
+    let bottomY = height - padding - 40;
+    line(x, topY, x, bottomY);
+  }
+  
+  // Etichette anni ogni 5
+  for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
+    let label = 1992 + i * 5;
+    let x = initialX + (label - 1992) * yearWidth;
+
+    fill(white);
+    noStroke();
+    textFont(font);
+    textAlign(CENTER, TOP);
+    textSize(12);
+    text(label, x, height - padding - 32);
+  }
+}
+
+//disegna linee categorie
+function drawCategoryLines() {
+  for(let i = 0; i < categories.length; i++) {
+    let y = padding + i * rowHeight + rowHeight / 2;
+
+    noFill();
+    stroke(white);
+    strokeWeight(0.5);
+    line(padding + yLabelWidth, y, mainWidth - padding, y);
+  }
+}
+
+//navigazione andare avanti
+function goToNextStep() {
+  if(currentStep < totalSteps - 1) {
+    currentStep++;
+    updateVisualization();
+    updateNavigationUI();
+  }
+}
+
+//navigazione tornare indietro
+function goToPreviousStep() {
+  if(currentStep > 0) {
+    currentStep--;
+    updateVisualization();
+    updateNavigationUI();
+  }
+}
+
+//mostrare i pallini immediatamente
+function showAllDotsImmediately() {
+  showAllDots = true;
+  spawnedIds.clear();
+  dots = [];
+  currentYearIndex = years.length - 1; //vai all'ultimo anno
+
+  for(let j of journalists) {
+    let dot = new Dot(j.id, j.year, j.category);
+    // IMPOSTA IL PALLINO COME ARRIVATO SUBITO
+    dot.pos.x = dot.finalX;
+    dot.pos.y = dot.finalY;
+    dot.arrived = true;
+
+    dots.push(dot);
+    spawnedIds.add(j.id);
+  }
+}
+
+//aggiorna la schermata
+function updateVisualization() {
+  //reset tutto
+  showXAxis = false;
+  showYAxis = false;
+  showGridLines = false;
+  animationStarted = false;
+  inVisualizationArea = false;
+  highlightMaguindanao = false;
+  highlightPalestina = false;
+  highlightIraq = false;
+  highlightUncertain = false;
+  highlightUnknown = false;
+  highlightNone = false;
+
+  // Resetta showAllDots solo se non siamo nello step 3 (dove è attivo il bottone SHOW ALL)
+  if(currentStep !== 3) {
+    showAllDots = false;
+  }
+
+  //attiva in base allo step corrente
+  switch(currentStep) {
+    case 0: //solo asse y
+      showYAxis = true;
+      break;
+    case 1: //assi x e y
+      showYAxis = true;
+      showXAxis = true;
+      break;
+    case 2: //linee categorie
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      break;
+    case 3: //animaizone completa
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+    case 4: //caso maguindanao
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightMaguindanao = true;
+      break;
+    case 5: //caso palestina
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightPalestina = true;
+      break;
+    case 6: //caso iraq
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightIraq = true;
+      break;
+    case 7: //caso uncertain e unknown
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUncertain = true;
+      highlightUnknown = true;
+      break;
+    case 8: //caso uncertain
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUncertain = true;
+      break;
+    case 9: //caso unknown
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      highlightUnknown = true;
+      break;
+    case 10: //mostra filtro paese
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+    case 11: //tutti i pallini bianchi
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+      break;
+  }
+
+  //se showalldots è true, mostra tutti i pallini
+  if(showAllDots) {
+    showAllDotsImmediately();
+  }
+}
+
+//abilita o disabilita i bottoni
+function updateNavigationUI() {
+  const navigationArrows = document.getElementById('navigationArrows');
+  const viewDataBtn = document.getElementById('viewDataBtn');
+  const nextBtnFinal = document.getElementById('nextBtnFinal');
+  const worldwideBtnContainer = document.querySelector('.filter-dropdown');
+  const showAllBtnElement = document.getElementById('showAllBtn');
+
+  nextBtnFinal.style.display = 'none';
+  nextBtnFinal.classList.remove('red-button');
+  viewDataBtn.classList.remove('arrow-mode');
+  viewDataBtn.style.width = '100%';
+
+  worldwideBtnContainer.style.display = 'none';
+
+  if(currentStep === 2) {
+    //mostra frecce e nascondi bottone finale
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'block';
+    viewDataBtn.textContent = 'VIEW THE DATA';
+    viewDataBtn.classList.remove('arrow-mode');
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+  } else if(currentStep === 3) {
+    //dopo animazione, mostra bottone x continuare
+    if (showAllBtnElement) {
+        showAllBtnElement.style.display = 'block';
+    }
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'block';
+    viewDataBtn.textContent = "→";
+    viewDataBtn.classList.add('arrow-mode');
+  } else if(currentStep >= 4 && currentStep <= 8) {
+    //mostra frecce di navigazione x i casi
+    navigationArrows.style.display = 'flex';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+  } else if(currentStep === 9) {
+    // nascondi tutto, mostra COUNTRY
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'block';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+    nextBtnFinal.textContent = "COUNTRY";
+    nextBtnFinal.classList.add('red-button');
+  } else if(currentStep === 10) {
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+    worldwideBtnContainer.style.display = 'block';
+  } else if(currentStep === 11) {
+    navigationArrows.style.display = 'none';
+    viewDataBtn.style.display = 'none';
+    nextBtnFinal.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+    worldwideBtnContainer.style.display = 'block';
+  } else {
+    // normale navigazione
+    navigationArrows.style.display = 'flex';
+    viewDataBtn.style.display = 'none';
+    if (showAllBtnElement) showAllBtnElement.style.display = 'none';
+  }
+
+  //disabilita frecce quando necessario
+  document.getElementById('prevBtn').disabled = (currentStep === 0);
+  document.getElementById('nextBtn').disabled = (currentStep >= 11);
 }
