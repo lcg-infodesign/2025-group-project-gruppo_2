@@ -7,6 +7,7 @@ html, body {
   background-color: #191919;
 }
 
+/* HEADER */
 #main-header {
   position: fixed;
   top: 0;
@@ -22,6 +23,7 @@ html, body {
   background-color: #191919;
 }
 
+/* HEADER */
 .logo {
   color: rgb(255, 245, 233);
   font-size: 1.2rem;
@@ -29,11 +31,13 @@ html, body {
   letter-spacing: -1px;
 }
 
+/* HEADER */
 .nav-menu {
   display: flex;
   align-items: center;
 }
 
+/* HEADER */
 .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
@@ -42,20 +46,24 @@ html, body {
   transition: color 0.2s ease-in-out;
 }
 
+/* HEADER */
 .nav-menu > .nav-link, 
 .dropdown {
   margin-left: 40px;
 }
 
+/* HEADER */
 .nav-link:hover {
   text-decoration: underline;
 }
 
+/* HEADER */
 .dropdown {
   position: relative;
   display: inline-block;
 }
 
+/* HEADER */
 .dropdown-content {
   display: none; 
   position: absolute;
@@ -67,6 +75,7 @@ html, body {
   padding-top: 10px;
 }
 
+/* HEADER */
 .dropdown-content a {
   color: rgb(255, 245, 233);
   padding: 15px 16px;
@@ -76,14 +85,17 @@ html, body {
   
 }
 
+/* HEADER */
 .dropdown-content a:hover {
   text-decoration: underline;
 }
 
+/* HEADER */
 .dropdown:hover .dropdown-content {
   display: block;
 }
 
+/* CONTAINER E SIDEBAR */
 #container {
   display: flex;
   width: 100vw;
@@ -94,15 +106,18 @@ html, body {
   background-color: #191919;
 }
 
+/* CONTAINER E SIDEBAR */
 #sketch-container {
   flex: 1;
   position: relative;   
 }
 
+/* CONTAINER E SIDEBAR */
 #sketch-container canvas {
     top: 80px !important;
 }
 
+/* CONTAINER E SIDEBAR */
 #sidebar {
   width: 300px;
   background-color: #191919;
@@ -117,6 +132,8 @@ html, body {
   position: relative;
 }
 
+
+/* BOTTONE FILTRO*/
 .filter-dropdown {
   margin-bottom: 20px;
   margin-top: 10px;
@@ -125,6 +142,7 @@ html, body {
 
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn {
   max-width: 260px;
   display: flex;                
@@ -146,10 +164,12 @@ html, body {
   z-index: 100;
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn:hover {
   border-color: darkred;
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn .arrow {
   margin-left: 8px;              
   font-size: 14px;               
@@ -157,6 +177,7 @@ html, body {
   transition: transform 0.3s ease;
 }
 
+/* BOTTONE FILTRO*/
 .filter-input {
   width: 100%;
   padding: 10px;
@@ -169,16 +190,19 @@ html, body {
   box-sizing: border-box;
 }
 
+/* BOTTONE FILTRO*/
 .filter-input:focus {
   outline: none;              
   border: 1px solid red;      
   box-shadow: 0 0 0 1px red; 
 }
 
+/* BOTTONE FILTRO*/
 .filter-input::placeholder {
   color: rgba(80, 79, 79, 0.3);
 }
 
+/* BOTTONE FILTRO*/
 /*tendina dei filtri*/
 .filter-panel {
   display: none;                 
@@ -196,17 +220,20 @@ html, body {
   z-index: 10;                   
 }
 
+/* BOTTONE FILTRO*/
 .filter-panel div {
   padding: 8px 12px;             
   cursor: pointer;
   transition: background 0.2s;
 }
 
+/* BOTTONE FILTRO*/
 .filter-panel div:hover {
   background-color: darkred;
   color: white;
 }
 
+/* BOTTONE FILTRO*/
 #countrySearch {
   width: 100%;
   padding: 6px 10px;
@@ -220,6 +247,7 @@ html, body {
   outline: none;
 }
 
+/* BOTTONE FILTRO*/
 /*barra di ricerca*/
 .filter-btn.search-mode {
   position: relative;
@@ -236,10 +264,12 @@ html, body {
   transition: border-color 0.2s ease;
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn.search-mode:hover {
   border-color: darkred;
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn.search-mode input {
   width: 100%;
   padding: 0 30px;             
@@ -253,11 +283,13 @@ html, body {
   height: 100%;
 }
 
+/* BOTTONE FILTRO*/
 .filter-btn.search-mode input::placeholder {
   color: rgba(255, 255, 255, 0.3);
   opacity: 1;
 }
 
+/* BOTTONE FILTRO*/
 .search-icon, .close-icon {
   position: absolute;
   top: 50%;
@@ -269,14 +301,17 @@ html, body {
   user-select: none;
 }
 
+/* BOTTONE FILTRO*/
 .search-icon {
   right: 15px;  
 }
 
+/* BOTTONE FILTRO*/
 .close-icon {
   left: 10px;   
 }
 
+/* BOTTONE FILTRO*/
 .death-counter-title {
    display: inline;          
   font-family: 'JetBrains Mono', monospace;
@@ -286,6 +321,7 @@ html, body {
   vertical-align: middle;
 }
 
+/* BOTTONE FILTRO*/
 .death-counter {
  display: inline;           
   font-family: 'JetBrains Mono', monospace;
@@ -299,6 +335,7 @@ html, body {
   height: auto;
 }
 
+/* BOTTONE FILTRO*/
 #deathCounterContainer {
   display: none;
   position: absolute;
@@ -310,7 +347,7 @@ html, body {
   white-space: nowrap;
 }
 
-/* bottone in fondo alla sidebar */
+/* BOTTONE IMPUNITY */
 #sidebar .impunity-btn {
   position: absolute;
   bottom: 5px;
@@ -329,10 +366,12 @@ html, body {
   transition: all 0.2s ease;
 }
 
+/* BOTTONE IMPUNITY */
 #sidebar .impunity-btn:hover {
   background-color: #cc0000;
 }
 
+/* BOTTONE IMPUNITY */
 /* scritta bianca indicativa sotto il bottone IMPUNITY STATUS */
 #sidebar .impunity-hint {
   position: absolute;
@@ -346,6 +385,7 @@ html, body {
   line-height: 1.2;
 }
 
+/* BOTTONI NAVIGAZIONE */
 .navigation-arrows {
   display: inline-flex;
   gap: 8px;
@@ -355,6 +395,7 @@ html, body {
   justify-content: center;
 }
 
+/* BOTTONI NAVIGAZIONE */
 .arrow-btn {
   padding: 4px 8px;
   background-color: #191919;
@@ -373,11 +414,13 @@ html, body {
   flex: none;
 }
 
+/* BOTTONI NAVIGAZIONE */
 .arrow-btn:hover:not(:disabled) {
   background-color: #252525;
   border-color: rgba(255, 255, 255, 0.8);
 }
 
+/* BOTTONI NAVIGAZIONE */
 .arrow-btn:disabled {
   background-color: #191919;
   border-color: rgba(255, 255, 255, 0.3);
@@ -385,6 +428,7 @@ html, body {
   cursor: not-allowed;
 }
 
+/* BOTTONI NAVIGAZIONE */
 /* bottone freccia dopo VIEW THE DATA*/
 .view-data-btn.arrow-mode {
   width: 48px !important;
@@ -403,12 +447,13 @@ html, body {
   flex: none;
 }
 
+/* BOTTONI NAVIGAZIONE */
 .view-data-btn.arrow-mode:hover {
   background-color: #252525;
   border-color: rgba(255, 255, 255, 0.8);
 }
 
-/*bottoni testo rossi*/
+/* BOTTONI ROSSI (COUNTRY E INIZIALI) */
 .view-data-btn:not(.arrow-mode),
 .next-final-btn.red-button,
 .show-all-btn {
@@ -435,6 +480,7 @@ html, body {
   box-sizing: border-box;
 }
 
+/* BOTTONI ROSSI (COUNTRY E INIZIALI) */
 .view-data-btn:not(.arrow-mode):hover,
 .next-final-btn:hover, 
 .show-all-btn:hover {
