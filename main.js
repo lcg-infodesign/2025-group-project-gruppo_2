@@ -320,11 +320,10 @@ function setup() {
 // chiama la funzione dopo il setup
 addImpunityButton();
 
-}
 
   // apertura ricerca
   document.getElementById("worldwideBtn").addEventListener("click", toggleSearch);
-
+}
   
   
 
@@ -968,7 +967,7 @@ function drawYAxis() {
     textFont(font);
     textAlign(RIGHT, CENTER);
     textSize(12);
-    let yLabelOffset = 20;
+    let yLabelOffset = 12;
     text(categories[i], padding - yLabelOffset, y, yLabelWidth - 10);
   }
 }
