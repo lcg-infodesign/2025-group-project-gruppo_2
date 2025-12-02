@@ -51,6 +51,9 @@ let categories = [
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
 let photos = []; //conterrà le foto per le card
+let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
+let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
+let cpjUrl;
 //variabili per la navigazione
 let currentStep = 0;
 const totalSteps = 12;
@@ -163,6 +166,7 @@ function filterCountries(value) {
 
 function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
+  cpjLogo = loadImage("assets/cpj_logo.svg");
 
   console.log("Row count: " + data.getRowCount());
   // carica tutte le foto dei giornalisti
@@ -594,7 +598,7 @@ class Dot {
   }
 
   update() {
-  // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
+    // Se showAllDots è true e il pallino non è arrivato, impostalo subito come arrivato
     if(showAllDots && !this.arrived) {
       this.pos.x = this.finalX;
       this.pos.y = this.finalY;
@@ -606,31 +610,31 @@ class Dot {
       return;
     }
 
-  // movimento verso la posizione finale
-  let dx = this.finalX - this.pos.x;
-  let dy = this.finalY - this.pos.y;
-  let distance = sqrt(dx * dx + dy * dy);
+    // movimento verso la posizione finale
+    let dx = this.finalX - this.pos.x;
+    let dy = this.finalY - this.pos.y;
+    let distance = sqrt(dx * dx + dy * dy);
 
-  if(distance < this.speed) {
-    this.pos.x = this.finalX;
-    this.pos.y = this.finalY;
-    this.arrived = true;
-  } else {
-    this.pos.x += (dx/distance) * this.speed;
-    this.pos.y += (dy/distance) * this.speed;
+    if(distance < this.speed) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    } else {
+      this.pos.x += (dx/distance) * this.speed;
+      this.pos.y += (dy/distance) * this.speed;
+    }
+
+    if (!this.arrived) {
+      let floorY = height - padding - xLabelHeight - 10;
+
+      if (this.pos.y > floorY) {
+        this.pos.y = floorY;
+        this.vel.y = 0;
+        }
+    }
+
+    this.draw();
   }
-
-  if (!this.arrived) {
-    let floorY = height - padding - xLabelHeight - 10;
-
-    if (this.pos.y > floorY) {
-      this.pos.y = floorY;
-      this.vel.y = 0;
-      }
-  }
-
-  this.draw();
-}
 
   draw() {
     // mostra solo i pallini del paese selezionato
@@ -797,6 +801,11 @@ function mousePressed() {
     closeCard = null;
     cursor(ARROW);
   }
+
+  if(cpjButtonHover){
+    window.open(cpjUrl);
+    cpjButtonHover = null;
+  }
 }
 
 function drawCard(dot){
@@ -863,7 +872,7 @@ function drawCard(dot){
 
   //variabili per le dimensioni
   let cardWidth = 700;
-  let cardHeight = 600;
+  let cardHeight = 572;
   let cardX = width/2;
   let cardY = height/2;
   let padding = 30;
@@ -930,7 +939,35 @@ function drawCard(dot){
   line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
   line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
   rectMode(CORNERS);
-  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3);
+  rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3); //per il violation status
+  line(leftX, topY + photoHeight + 6*padding + 54, width/2 + verticalOffset, topY + photoHeight + 6*padding + 54);
+  line(leftX, topY + photoHeight + 7*padding + 54 + 14, width/2 + verticalOffset, topY + photoHeight + 7*padding + 54 + 14);
+  line(leftX + 200, topY + photoHeight + 5*padding + 40, leftX + 200, bottomY);
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54, rightX, topY + photoHeight + 6*padding + 54); //impunity
+  fill(red_translucent);
+  stroke(red);
+  strokeWeight(2);
+  rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
+
+  //Etichette
+  fill(red);
+  noStroke();
+  textAlign(LEFT, TOP);
+  textSize(11);
+  text("Name", leftX + photoWidth + padding, topY + 83);
+  text("Date of death", leftX + photoWidth + padding, topY + 132);
+  text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
+  text("Organization", leftX + padding, topY + photoHeight + 2*padding + 25);
+  text("Job", leftX + padding, topY + photoHeight + 3*padding + 40);
+  text("Work-related", width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 23);
+  text("Type of death", width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 40);
+  text("Murderer's impunity", width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 56);
+
+  textSize(14);
+  textAlign(LEFT, BOTTOM);
+  text("Threatened", leftX + padding, topY + photoHeight + 5.5*padding + 54);
+  text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
+  text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
   //testi
   textAlign(LEFT, BOTTOM);
@@ -946,11 +983,29 @@ function drawCard(dot){
   text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
   text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
   text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+  text(impunity, width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54);
 
   textSize(14);
   text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
   text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
   text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
+  text(threatened, leftX + padding + 200, topY + photoHeight + 5.5*padding + 54);
+  text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
+  text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
+
+  textAlign(CENTER);
+  text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
+
+  imageMode(CENTER);
+  image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 37, 37);
+
+  if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
+    cpjButtonHover = true;
+    cpjUrl = url;
+    cursor(HAND);
+  }else{
+    cpjButtonHover = null;
+  }
 
 }
 
