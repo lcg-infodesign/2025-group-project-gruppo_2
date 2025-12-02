@@ -18,44 +18,54 @@
 
   <body>
     
+       <!-- HEADER -->
     <header id="main-header">
-    <div class="logo">STOLEN VOICES</div>
-     
-    <nav class="nav-menu">
-        <a href="index.html" class="nav-link">HOME</a>
-        
-        <div class="dropdown">
-            <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
-            <div class="dropdown-content">
-                <a href="main.html">SOURCE OF FIRE</a>
-                <a href="second.html">IMPUNITY</a>
+        <div class="logo">STOLEN VOICES</div>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">HOME</a>
+            <div class="dropdown">
+                <a class="nav-link dropdown-btn">VISUALIZATIONS</a>
+                <div class="dropdown-content">
+                    <a href="main.html">SOURCE OF FIRE</a>
+                    <a href="second.html">IMPUNITY</a>
+                </div>
             </div>
+            <a href="about.html" class="nav-link">ABOUT</a>
+            <a href="team.html" class="nav-link">TEAM</a>
+        </nav>
+    </header>
+
+    <!-- ACCORDION -->
+    <div id="accordion-wrapper">
+        
+        <div id="why-this-project" class="accordion-section">
+          <h2 id="why-this-project-title" class="accordion-header"></h2>
+          <div class="accordion-content">
+            <p class="about-text" id="why-this-project-text"></p>
+          </div>
         </div>
 
-        <a href="about.html" class="nav-link">ABOUT</a>
-        <a href="team.html" class="nav-link">TEAM</a>
-    </nav>
-</header>
+        <div id="why-this-metodology" class="accordion-section">
+          <h2 id="why-this-metodology-title" class="accordion-header"></h2>
+          <div class="accordion-content">
+            <p class="about-text" id="why-this-metodology-text"></p>
+          </div>
+        </div>
 
+        <div id="what-is-cpj" class="accordion-section">
+          <h2 id="what-is-cpj-title" class="accordion-header"></h2>
+          <div class="accordion-content">
+            <p class="about-text" id="what-is-cpj-text"></p>
+          </div>
+        </div>
 
-    <div id="why-this-project" class="about-section" style="display: none;">
-      <h2 id="why-this-project-title"></h2>
-      <p class="about-text" id="why-this-project-text"></p>
-    </div>
+        <div id="how-cpj-collected-this-dataset" class="accordion-section">
+          <h2 id="how-cpj-collected-this-dataset-title" class="accordion-header"></h2>
+          <div class="accordion-content">
+            <p class="about-text" id="how-cpj-collected-this-dataset-text"></p>
+          </div>
+        </div>
 
-    <div id="why-this-metodology" class="about-section" style="display: none;">
-      <h2 id="why-this-metodology-title"></h2>
-      <p class="about-text" id="why-this-metodology-text"></p>
-    </div>
-
-    <div id="what-is-cpj" class="about-section" style="display: none;">
-      <h2 id="what-is-cpj-title"></h2>
-      <p class="about-text" id="what-is-cpj-text"></p>
-    </div>
-
-    <div id="how-cpj-collected-this-dataset" class="about-section" style="display: none;">
-      <h2 id="how-cpj-collected-this-dataset-title"></h2>
-      <p class="about-text" id="how-cpj-collected-this-dataset-text"></p>
     </div>
 
     <script src="about.js"></script>
