@@ -36,7 +36,6 @@ a {
   background-color: #191919;
 }
 
-/* HEADER */
 .logo {
   color: rgb(255, 245, 233);
   font-size: 1.2rem;
@@ -44,13 +43,11 @@ a {
   letter-spacing: -1px;
 }
 
-/* HEADER */
 .nav-menu {
   display: flex;
   align-items: center;
 }
 
-/* HEADER */
 .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
@@ -59,24 +56,20 @@ a {
   transition: color 0.2s ease-in-out;
 }
 
-/* HEADER */
 .nav-menu > .nav-link, 
 .dropdown {
   margin-left: 40px;
 }
 
-/* HEADER */
 .nav-link:hover {
   text-decoration: underline;
 }
 
-/* HEADER */
 .dropdown {
   position: relative;
   display: inline-block;
 }
 
-/* HEADER */
 .dropdown-content {
   display: none; 
   position: absolute;
@@ -88,7 +81,6 @@ a {
   padding-top: 10px;
 }
 
-/* HEADER */
 .dropdown-content a {
   color: rgb(255, 245, 233);
   padding: 15px 16px;
@@ -98,17 +90,16 @@ a {
   
 }
 
-/* HEADER */
 .dropdown-content a:hover {
   text-decoration: underline;
 }
 
-/* HEADER */
+
 .dropdown:hover .dropdown-content {
   display: block;
 }
 
-/* CONTAINER E SIDEBAR */
+
 /* CONTAINER E SIDEBAR */
 #container {
   display: flex;
@@ -120,18 +111,15 @@ a {
   background-color: #191919;
 }
 
-/* CONTAINER E SIDEBAR */
 #sketch-container {
   flex: 1;
   position: relative;   
 }
 
-/* CONTAINER E SIDEBAR */
 #sketch-container canvas {
     top: 80px !important;
 }
 
-/* CONTAINER E SIDEBAR */
 #sidebar {
   width: 300px;
   background-color: #191919;
@@ -147,7 +135,6 @@ a {
 }
 
 /* WRAPPER E FRECCE NAVIGAZIONE */
-
 .section-wrapper {
   display: flex;
   flex-direction: column;
@@ -159,6 +146,14 @@ a {
   padding: 20px;
   color: rgb(255, 245, 233);
   font-family: 'JetBrains Mono', monospace;
+}
+
+#graph-explained {
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  width: 90%;
+  z-index: 10;
 }
 
 .explanation-wrapper, .conflicts-wrapper, 
@@ -216,7 +211,6 @@ a {
 
 }
 
-/* BOTTONE FILTRO*/
 .filter-btn {
   max-width: 260px;
   display: flex;                
@@ -240,7 +234,6 @@ a {
   z-index: 100;
 }
 
-/* BOTTONE FILTRO*/
 .filter-btn:hover {
   border-color: darkred;
 }

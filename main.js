@@ -58,12 +58,15 @@ let hasLoadedPhoto = null;
 let maskGraphics;
 //variabili per la navigazione
 let currentStep = 0;
-const totalSteps = 12;
+let totalSteps = 12;
+let showAllDots = false;
 let showYAxis = false;
 let showXAxis = false;
 let showGridLines = false;
 let animationStarted = false;
 let animationCompleted = false;
+let animationInitialized = false;
+
 
 //evidenzia pallini
 let highlightMaguindanao = false;
@@ -88,7 +91,7 @@ function preload() {
   console.log("photos " + photos);
 }
 
-/* 1. PRESENTAZIONE GRAFICO
+/* 1. PRESENTAZIONE GRAFICO -- FATTO
 
     1.1 FUNZIONE CHE FA COMPARIRE I TESTI DI GRAPH-EXPLAINED
 
@@ -131,23 +134,163 @@ function preload() {
     3.3 FUNZIONE CHE FA FUNZIONARE IL FILTRO*/
 
 
-/* FUNZIONI IMPORTANTI DA TENERE A MENTE X IL MERGE:
-  - drawGridWithSteps OK
-  - buildJournalistsFromTable OK 
-  - drawLayout + yearToX + categoryToY OK 
-  - spawnUpToCurrentYear OK 
-  - applyRepulsion OK
-  - updateVisualization OK
-  - updateDeathCounter OK
-  - drawCard OK
-  - mousePressed OK
-*/
+// animazione typewriter
+function typeWriter(element, speed = 20, callback = null) {
+    let html = element.innerHTML.trim();
+    let output = "", buffer = "";
+    let i = 0, insideTag = false;
+
+    element.innerHTML = "";
+    element.style.visibility = "visible";
+
+    function type() {
+        if (i >= html.length) {
+            if (callback) callback();
+            return;
+        }
+
+        let char = html[i];
+
+        if (char === "<") {
+            insideTag = true;
+            buffer = "<";
+        } else if (char === ">") {
+            insideTag = false;
+            buffer += ">";
+            output += buffer;
+            element.innerHTML = output;
+            buffer = "";
+        } else if (insideTag) {
+            buffer += char;
+        } else {
+            output += char;
+            element.innerHTML = output;
+        }
+
+        i++;
+        setTimeout(type, speed);
+    }
+    type();
+}
+
+// lista sezioni di explanation-wrapper in ordine
+let explanationSections = [
+    "explanation-categories",
+    "explanation-timeline",
+    "explanation-dot",
+    "explanation-closure"
+];
+
+let currentGraphIndex = 0;
+let graphExplainedMode = false;
+let graphExplainedStep = 0; 
+
+
+// attiva una sezione
+function activateGraphExplainedSection(index = 0) {
+    graphExplainedMode = true;
+    graphExplainedStep = 0;
+
+    // nasconde tutte le sezioni
+    explanationSections.forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.style.display = "none";
+    });
+
+    // mostra solo la sezione attiva
+    let active = document.getElementById(explanationSections[index]);
+    if(active){
+        active.style.display = "flex";
+        let bodyEl = active.querySelector(".section-body");
+        if(bodyEl) typeWriter(bodyEl, 20);
+    }
+
+    // aggiorna lo step del grafico
+    gridAnimationStep = index + 1;
+}
+
+// navigazione con le frecce
+function setupGraphExplainedNavigation() {
+
+  function activateSection(index) {
+    if (index < 0 || index >= explanationSections.length) return;
+
+    // nasconde tutte le sezioni
+    explanationSections.forEach(id => {
+      document.getElementById(id).style.display = "none";
+    });
+
+    // mostra quella giusta
+    let wrapper = document.getElementById(explanationSections[index]);
+    wrapper.style.display = "flex";
+
+    // avvia typewriter
+    let bodyEl = wrapper.querySelector(".section-body");
+    typeWriter(bodyEl, 20);
+
+    // aggiorna lo step
+    graphExplainedStep = index;
+
+    // sincronizza con current step -- importantissimo per coordinare
+    currentStep = index;
+
+    // aggiorna il gridAnimationStep
+    if(index === 0) gridAnimationStep = 1; 
+    if(index === 1) gridAnimationStep = 2;
+    if(index === 2) gridAnimationStep = 3;
+    if(index === 3) gridAnimationStep = 4;
+}
+
+
+  // Frecce categories → timeline
+  document.getElementById("next-arrow-categories").addEventListener("click", () => {
+    activateSection(1);
+  });
+
+  // Frecce timeline ←→ dot
+  document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
+    activateSection(0);
+  });
+  document.getElementById("next-arrow-timeline").addEventListener("click", () => {
+    activateSection(2);
+  });
+
+  // Frecce dot ←→ closure
+  document.getElementById("prev-arrow-dot").addEventListener("click", () => {
+    activateSection(1);
+  });
+  document.getElementById("next-arrow-dot").addEventListener("click", () => {
+    activateSection(3);
+  });
+
+  // Frecce closure
+  document.getElementById("prev-arrow-closure").addEventListener("click", () => {
+    activateSection(2);
+  });
+  document.getElementById("next-arrow-closure").addEventListener("click", () => {
+      // sparisce tutto
+      explanationSections.forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.querySelector(".section-body").style.display = "none";
+      });
+      explanationSections.forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.querySelector(".navigation-arrows").style.display = "none";
+      });
+  });
+
+}
+
+window.addEventListener("load", () => {
+    setupGraphExplainedNavigation();
+    activateGraphExplainedSection(0);
+});
 
 //disegna griglia
 function drawGridWithSteps() {
   drawingContext.globalAlpha = 1.0;
 
-  //asse y
+  // asse y -- categorie
   if(showYAxis) {
     stroke(white);
     strokeWeight(0.5);
@@ -156,7 +299,7 @@ function drawGridWithSteps() {
     let xAxisY = height - padding - xLabelHeight;
     line(initialX - yAxisOffset, xAxisY - yStartOffset, initialX - yAxisOffset, padding);
 
-    // Etichette Y
+    // etichette categorie
     for(let i = 0; i < categories.length; i++) {
       let y = padding + i * rowHeight + rowHeight / 2;
       fill(white);
@@ -169,9 +312,9 @@ function drawGridWithSteps() {
     }
   }
 
-  // 2. ASSE X E PALLINI GLOW (step 1)
+  // asse x -- timeline
   if (showXAxis) {
-    // Tacche anni
+    // tacche anni
     for(let i = 0; i <= (2025 - 1992); i++) {
       stroke(white);
       strokeWeight(0.5);
@@ -181,7 +324,7 @@ function drawGridWithSteps() {
       line(x, topY, x, bottomY);
     }
     
-    // Etichette anni ogni 5 con pallini
+    // etichette anni + pallini ogni 5
     for (let i = 0; i <= ceil((2025 - 1992) / 5); i++) {
       let label = 1992 + i * 5;
       let x = initialX + (label - 1992) * yearWidth;
@@ -193,7 +336,7 @@ function drawGridWithSteps() {
       textSize(12);
       text(label, x, height - padding - 32);
       
-      // Pallini glow
+      // pallini
       let yPallino = height - padding - 45;
       let radius = 8;
       let glowWidth = 6;
@@ -210,7 +353,7 @@ function drawGridWithSteps() {
     }
   }
 
-  // 3. LINEE CATEGORIE (step 2)
+  // linee categorie
   if (showGridLines) {
     for(let i = 0; i < categories.length; i++) {
       let y = padding + i * rowHeight + rowHeight / 2;
@@ -223,6 +366,7 @@ function drawGridWithSteps() {
   
   drawingContext.globalAlpha = 1.0;
 }
+
 
 //caricamento dati
 function buildJournalistsFromTable() {
@@ -311,14 +455,15 @@ function categoryToY(category) {
 
 //crea gradualmente i pallini
 function spawnUpToCurrentYear() {
+    if (!graphExplainedMode || graphExplainedStep < 2) return; // la cascata parte allo step 2
+
   if(!years.length || currentYearIndex >= years.length) {
     return;
   }
 
-
-  const yearLimit = years[currentYearIndex];
+  let yearLimit = years[currentYearIndex];
   let spawnedCount = 0;
-  const maxSpawnPerFrame = 3; //controllo velocità
+  let maxSpawnPerFrame = 3; //velocità
 
   for(let j of journalists) {
     if (spawnedCount >= maxSpawnPerFrame) break;
@@ -335,16 +480,18 @@ function spawnUpToCurrentYear() {
     currentYearIndex++;
   }
 
-  //se showAllDots è true, non fare l'animazione di caduta
+  /* FUNZIONE SHOWALLDOTS -- DA UTILIZZARE SOLO QUANDO SI GESTISCE LA NAVIGAZIONE CON HEADER
+  //se showAllDots = true, non fare l'animazione di caduta
   if(showAllDots && dots.length === 0 && journalists.length > 0) {
     // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
       showAllDotsImmediately();
     }
+  */
 }
 
 function applyRepulsion() {
   let minDist = diam * 3;
-  let strength = 0.5;  // più basso = più stabile
+  let strength = 0.5; // più basso = beeswarm più compatto 
 
   for (let i = 0; i < dots.length; i++) {
     let a = dots[i];
@@ -361,7 +508,7 @@ function applyRepulsion() {
         let overlap = (minDist - d) * strength;
         dir.normalize();
 
-        // spinge i due punti in direzioni opposte
+        // spinge punti in direzioni opposte
         a.pos.add(dir.copy().mult(overlap));
         b.pos.sub(dir.copy().mult(overlap));
 
@@ -370,6 +517,17 @@ function applyRepulsion() {
         b.pos.x = constrain(b.pos.x, minX, maxX);
       }
     }
+  }
+}
+
+function showAllDotsImmediately() {
+  dots = [];
+  spawnedIds.clear();
+  for (let j of journalists) {
+    let dot = new Dot(j.id, j.year, j.category);
+    dots.push(dot);
+    spawnedIds.add(j.id);
+    dot.arrived = true; // piazza subito i pallini
   }
 }
 
@@ -388,31 +546,48 @@ function updateVisualization() {
   highlightUnknown = false;
   highlightNone = false;
 
-  //attiva in base allo step corrente
+  // attiva in base allo step corrente
   switch(currentStep) {
     case 0: //solo asse y
       showYAxis = true;
       break;
+
     case 1: //assi x e y
       showYAxis = true;
       showXAxis = true;
       break;
-    case 2: //linee categorie
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      break;
-    case 3: //animaizone completa
+
+    case 2: //linee categorie + cascata
       showYAxis = true;
       showXAxis = true;
       showGridLines = true;
       animationStarted = true;
       inVisualizationArea = true;
 
-      dots = [];
-      spawnedIds.clear();
-      currentYearIndex = 0;
+      if (!animationInitialized) {
+        dots = [];
+        spawnedIds.clear();
+        currentYearIndex = 0;
+        animationInitialized = true;
+      }
       break;
+
+    case 3: //animazione completa
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      animationStarted = true;
+      inVisualizationArea = true;
+
+      // non resetta se l'animazione è già iniziata
+      if(!animationInitialized){
+        dots = [];
+        spawnedIds.clear();
+        currentYearIndex = 0;
+        animationInitialized = true;
+      }
+      break;
+
     case 4: //caso maguindanao
       showYAxis = true;
       showXAxis = true;
@@ -421,6 +596,7 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightMaguindanao = true;
       break;
+
     case 5: //caso palestina
       showYAxis = true;
       showXAxis = true;
@@ -429,6 +605,7 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightPalestina = true;
       break;
+
     case 6: //caso iraq
       showYAxis = true;
       showXAxis = true;
@@ -437,6 +614,7 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightIraq = true;
       break;
+
     case 7: //caso uncertain e unknown
       showYAxis = true;
       showXAxis = true;
@@ -446,6 +624,7 @@ function updateVisualization() {
       highlightUncertain = true;
       highlightUnknown = true;
       break;
+
     case 8: //caso uncertain
       showYAxis = true;
       showXAxis = true;
@@ -454,6 +633,7 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightUncertain = true;
       break;
+
     case 9: //caso unknown
       showYAxis = true;
       showXAxis = true;
@@ -462,6 +642,7 @@ function updateVisualization() {
       inVisualizationArea = true;
       highlightUnknown = true;
       break;
+
     case 10: //mostra filtro paese
       showYAxis = true;
       showXAxis = true;
@@ -469,6 +650,7 @@ function updateVisualization() {
       animationStarted = true;
       inVisualizationArea = true;
       break;
+
     case 11: //tutti i pallini bianchi
       showYAxis = true;
       showXAxis = true;
@@ -486,7 +668,7 @@ function updateVisualization() {
 
 // conteggio vittime
 function updateDeathCounter(country) {
-  const counter = document.getElementById("death-counter");
+  let counter = document.getElementById("death-counter");
   
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
@@ -497,7 +679,6 @@ function updateDeathCounter(country) {
   
   counter.textContent = count;
 }
-
 
 //disegna card
 function drawCard(dot){
@@ -777,8 +958,8 @@ function setup() {
   inVisualizationArea = true;
 
   //cliccando su source of fire va alla pagina con i pallini disposti
-  const urlParams = new URLSearchParams(window.location.search);
-  const isDirectMode = urlParams.get('direct') === 'true';
+  let urlParams = new URLSearchParams(window.location.search);
+  let isDirectMode = urlParams.get('direct') === 'true';
 
   if(isDirectMode) {
     currentStep = 10;
@@ -792,6 +973,7 @@ function draw() {
 
   //disegna sempre la griglia  completa
   //ma controlla cosa rendere visibile in base allo step
+  updateVisualization();
   drawGridWithSteps();
 
   if(inVisualizationArea) {
@@ -842,101 +1024,67 @@ class Dot {
   }
 
   update() {
-    if (!this.arrived) {
-      let dx = this.finalX - this.pos.x;
-      let dy = this.finalY - this.pos.y;
-      let dist = sqrt(dx*dx + dy*dy);
 
-      if (dist < 0.5) {
-        this.pos.x = this.finalX;
-        this.pos.y = this.finalY;
-        this.arrived = true;
-      } else {
-        this.pos.x += dx * 0.1;
-        this.pos.y += dy * 0.1;
-      }
+    if (this.arrived) {
+      this.draw();
+      return;
+    }
+
+    let dx = this.finalX - this.pos.x;
+    let dy = this.finalY - this.pos.y;
+    let distance = sqrt(dx * dx + dy * dy);
+
+    if (distance < this.speed) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    } else {
+      this.pos.x += (dx / distance) * this.speed;
+      this.pos.y += (dy / distance) * this.speed;
+    }
+
+    let floorY = height - padding - xLabelHeight - 10;
+    if (this.pos.y > floorY) {
+      this.pos.y = floorY;
+      this.vel.y = 0;
     }
 
     this.draw();
   }
 
-
   draw() {
-    //cambiare raggio in base alla selezione
+    // raggio maggiore x dots selezionati (country)
     if (selectedCountry && this.country !== selectedCountry) return;
 
     let dotColor = color(255);
 
-    // PHILIPPINES
-    if(highlightMaguindanao && this.year === 2009 && this.category === "Government Officials") {
+    if (highlightMaguindanao && this.year === 2009 && this.category === "Government Officials")
       dotColor = color(255, 0, 0);
-    }
 
-    // PALESTINE
-    if(highlightPalestina && this.year === 2023 && this.category === "Military Officials") {
+    if (highlightPalestina && this.year === 2023 && this.category === "Military Officials")
       dotColor = color(255, 0, 0);
-    }
-    // IRAQ
-    if(highlightIraq && this.year === 2006 && this.category === "Political Group") {
+
+    if (highlightIraq && this.year === 2006 && this.category === "Political Group")
       dotColor = color(255, 0, 0);
-    }
 
-    // WITHOUT PERPETRATORS (UNCERTAIN + UNKNOWN)
-    if(currentStep === 7) {
-      if(this.category === "Uncertain" || this.category === "Unknown") {
-        dotColor = color(255);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 7)
+      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
 
-    // UNCERTAIN
-    if(currentStep === 8) {
-      if(this.category === "Uncertain") {
-        dotColor = color(255, 0, 0);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 8)
+      dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
 
-    // UNKNOWN
-    if(currentStep === 9) {
-      if(this.category === "Unknown") {
-        dotColor = color(255, 0, 0);
-      } else {
-        dotColor = color(150);
-      }
-    }
+    if (currentStep === 9)
+      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
 
-    // NESSUNO SELEZIONATO
-    if(currentStep === 10) {
+    if (currentStep === 10)
       dotColor = color(150);
-    }
-
-    // TUTTI SELEZIONATI
 
     fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
-     
-   // controlla se il pallino deve essere visibile
-    let visible = !selectedCountry || this.country === selectedCountry;
-    if (!visible) return;
+  }
 
-    // cosa cambiare in base al filtro
-    /*
-    if (selectedCountry) {
-      ; paese selezionato
-    } else {
-      ; nessun paese selezionato
-    }*/
-
-    noStroke();
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
-    }
-
-  //funzione che restituisce true se il mouse è sul pallino
-    isHovered() {
+  isHovered() {
     return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
   }
 }
@@ -978,7 +1126,7 @@ function applyRepulsion() {
 function mousePressed() {
   for (let d of dots) {
 
-    // se c'è un filtro per paese, ignora i pallini nascosti:
+    // se c'è un filtro per paese, ignora i pallini nascosti
     if (selectedCountry && d.country !== selectedCountry) continue;
 
     if (d.isHovered()) {
