@@ -56,10 +56,10 @@ let cpjUrl;
 let photo;
 let hasLoadedPhoto = null;
 let maskGraphics;
+
 //variabili per la navigazione
 let currentStep = 0;
 let totalSteps = 12;
-let showAllDots = false;
 let showYAxis = false;
 let showXAxis = false;
 let showGridLines = false;
@@ -188,117 +188,155 @@ let conflictSections = [
   "conflicts-philippines",
   "conflicts-palestine",
   "conflicts-iraq",
-  "without-perpetrators-intro",
-  "section-uncertain",
-  "section-unknown"
+  "conflicts-without-perpetrators",
+  "conflicts-uncertain",
+  "conflicts-unknown"
 ];
 
-let currentGraphIndex = 0;
-let graphExplainedMode = false;
-let graphExplainedStep = 0; 
-let conflictStep = 0;
+// lista globale sezioni
+let globalSteps = [...explanationSections, ...conflictSections];
 
 
-// attiva una sezione di graph-explained
-function activateGraphExplainedSection(index = 0) {
-    graphExplainedMode = true;
-    graphExplainedStep = 0;
+let currentGlobalStep = 0;
 
-    // nasconde tutte le sezioni
-    explanationSections.forEach(id => {
-        let el = document.getElementById(id);
-        if(el) el.style.display = "none";
-    });
 
-    // mostra solo la sezione attiva
-    let active = document.getElementById(explanationSections[index]);
-    if(active){
-        active.style.display = "flex";
-        let bodyEl = active.querySelector(".section-body");
-        if(bodyEl) typeWriter(bodyEl, 20);
+// funzione globale di attivazione sezioni + evento correlato (passaggi 1 e 2)
+function activateGlobalStep(step) {
+    if (step < 0 || step >= globalSteps.length) return;
+    currentGlobalStep = step;
+
+    // mappa i primi 4 step (graph-explained) sugli step del grafico
+    if (step < explanationSections.length) {
+      graphExplainedMode = true;
+      graphExplainedStep = step;
+      currentStep = step; // fondamentale per updateVisualization()
+    } else {
+        graphExplainedMode = false; // esci dalla modalità grafico
     }
 
-    // aggiorna lo step del grafico
-    gridAnimationStep = index + 1;
+    // nasconde tutte le sezioni
+    globalSteps.forEach(id => {
+        let el = document.getElementById(id);
+        if (el) el.style.display = "none";
+    });
+
+    // mostra la sezione corretta
+    let active = document.getElementById(globalSteps[step]);
+    if (active) {
+        active.style.display = "flex";
+
+        let bodyEl = active.querySelector(".section-body");
+        if (bodyEl) typeWriter(bodyEl, 20);
+    }
+
+    // da qui in poi puoi iniettare i tuoi boolean flags del grafico
+    // handleConflictsFlags(step);
 }
+
 
 // navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
 
-  function activateSection(index) {
-    if (index < 0 || index >= explanationSections.length) return;
+    function localActivate(i) {
+        activateGlobalStep(i);
+    }
 
-    // nasconde tutte le sezioni
-    explanationSections.forEach(id => {
-      document.getElementById(id).style.display = "none";
+    document.getElementById("next-arrow-categories").addEventListener("click", () => {
+        localActivate(1);
     });
 
-    // mostra quella giusta
-    let wrapper = document.getElementById(explanationSections[index]);
-    wrapper.style.display = "flex";
+    document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
+        localActivate(0);
+    });
+    document.getElementById("next-arrow-timeline").addEventListener("click", () => {
+        localActivate(2);
+    });
 
-    // avvia typewriter
-    let bodyEl = wrapper.querySelector(".section-body");
-    typeWriter(bodyEl, 20);
+    document.getElementById("prev-arrow-dot").addEventListener("click", () => {
+        localActivate(1);
+    });
+    document.getElementById("next-arrow-dot").addEventListener("click", () => {
+        localActivate(3);
+    });
 
-    // aggiorna lo step
-    graphExplainedStep = index;
+    document.getElementById("prev-arrow-closure").addEventListener("click", () => {
+        localActivate(2);
+    });
 
-    // sincronizza con current step -- importantissimo per coordinare
-    currentStep = index;
-
-    // aggiorna il gridAnimationStep
-    if(index === 0) gridAnimationStep = 1; 
-    if(index === 1) gridAnimationStep = 2;
-    if(index === 2) gridAnimationStep = 3;
-    if(index === 3) gridAnimationStep = 4;
+    // qui avviene il passaggio a conflicts
+    document.getElementById("next-arrow-closure").addEventListener("click", () => {
+        // step 3 → step 4
+        activateGlobalStep(4);
+    });
 }
 
+// navigazione con le frecce di conflicts
+function setupConflictsNavigation() {
 
-  // categories → timeline
-  document.getElementById("next-arrow-categories").addEventListener("click", () => {
-    activateSection(1);
-  });
+    function localActivateConflicts(relativeIndex) {
+        // num. sezioni graph-explained = 4 → offset = 4
+        activateGlobalStep(4 + relativeIndex);
+    }
 
-  // timeline ←→ dot
-  document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
-    activateSection(0);
-  });
-  document.getElementById("next-arrow-timeline").addEventListener("click", () => {
-    activateSection(2);
-  });
+    document.getElementById("next-arrow-intro-first-paragraph").addEventListener("click", () => {
+        localActivateConflicts(1);
+    });
 
-  // dot ←→ closure
-  document.getElementById("prev-arrow-dot").addEventListener("click", () => {
-    activateSection(1);
-  });
-  document.getElementById("next-arrow-dot").addEventListener("click", () => {
-    activateSection(3);
-  });
+    document.getElementById("prev-arrow-intro-second-paragraph").addEventListener("click", () => {
+        localActivateConflicts(0);
+    });
+    document.getElementById("next-arrow-intro-second-paragraph").addEventListener("click", () => {
+        localActivateConflicts(2);
+    });
 
-  // closure
-  document.getElementById("prev-arrow-closure").addEventListener("click", () => {
-    activateSection(2);
-  });
-  document.getElementById("next-arrow-closure").addEventListener("click", () => {
-      // sparisce tutto
-      explanationSections.forEach(id => {
-        let el = document.getElementById(id);
-        if(el) el.querySelector(".section-body").style.display = "none";
-      });
-      explanationSections.forEach(id => {
-        let el = document.getElementById(id);
-        if(el) el.querySelector(".navigation-arrows").style.display = "none";
-      });
-  });
+    document.getElementById("prev-arrow-philippines").addEventListener("click", () => {
+        localActivateConflicts(1);
+    });
+    document.getElementById("next-arrow-philippines").addEventListener("click", () => {
+        localActivateConflicts(3);
+    });
 
+    document.getElementById("prev-arrow-palestine").addEventListener("click", () => {
+        localActivateConflicts(2);
+    });
+    document.getElementById("next-arrow-palestine").addEventListener("click", () => {
+        localActivateConflicts(4);
+    });
+
+    document.getElementById("prev-arrow-iraq").addEventListener("click", () => {
+        localActivateConflicts(3);
+    });
+    document.getElementById("next-arrow-iraq").addEventListener("click", () => {
+        localActivateConflicts(5);
+    });
+
+    document.getElementById("prev-arrow-without-perpetrators").addEventListener("click", () => {
+        localActivateConflicts(4);
+    });
+    document.getElementById("next-arrow-without-perpetrators").addEventListener("click", () => {
+        localActivateConflicts(6);
+    });
+
+    document.getElementById("prev-arrow-uncertain").addEventListener("click", () => {
+        localActivateConflicts(5);
+    });
+    document.getElementById("next-arrow-uncertain").addEventListener("click", () => {
+        localActivateConflicts(7);
+    });
+
+    document.getElementById("prev-arrow-unknown").addEventListener("click", () => {
+        localActivateConflicts(6);
+    });
+    document.getElementById("next-arrow-unknown").addEventListener("click", () => {
+        activateGlobalStep(globalSteps.length - 1);
+    });
 }
-
 
 
 window.addEventListener("load", () => {
     setupGraphExplainedNavigation();
-    activateGraphExplainedSection(0);
+    setupConflictsNavigation();
+    activateGlobalStep(0); // parte da explanation-categories
 });
 
 //disegna griglia
@@ -469,19 +507,16 @@ function categoryToY(category) {
 
 //crea gradualmente i pallini
 function spawnUpToCurrentYear() {
-    if (!graphExplainedMode || graphExplainedStep < 2) return; // la cascata parte allo step 2
+  if (!graphExplainedMode || graphExplainedStep < 2) return; 
 
-  if(!years.length || currentYearIndex >= years.length) {
-    return;
-  }
+  if (!years.length || currentYearIndex >= years.length) return;
 
   let yearLimit = years[currentYearIndex];
   let spawnedCount = 0;
-  let maxSpawnPerFrame = 3; //velocità
+  let maxSpawnPerFrame = 10;
 
-  for(let j of journalists) {
+  for (let j of journalists) {
     if (spawnedCount >= maxSpawnPerFrame) break;
-    
     if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
       dots.push(dot);
@@ -493,15 +528,9 @@ function spawnUpToCurrentYear() {
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
-
-  /* FUNZIONE SHOWALLDOTS -- DA UTILIZZARE SOLO QUANDO SI GESTISCE LA NAVIGAZIONE CON HEADER
-  //se showAllDots = true, non fare l'animazione di caduta
-  if(showAllDots && dots.length === 0 && journalists.length > 0) {
-    // Se showAllDots è true ma dots è vuoto, mostra tutti i pallini immediatamente
-      showAllDotsImmediately();
-    }
-  */
 }
+
+
 
 function applyRepulsion() {
   let minDist = diam * 3.5;
@@ -534,24 +563,13 @@ function applyRepulsion() {
   }
 }
 
-function showAllDotsImmediately() {
-  dots = [];
-  spawnedIds.clear();
-  for (let j of journalists) {
-    let dot = new Dot(j.id, j.year, j.category);
-    dots.push(dot);
-    spawnedIds.add(j.id);
-    dot.arrived = true; // piazza subito i pallini
-  }
-}
-
 //aggiorna la schermata
 function updateVisualization() {
-  //reset tutto
+  // reset parziale degli highlight
   showXAxis = false;
   showYAxis = false;
   showGridLines = false;
-  animationStarted = false;
+
   inVisualizationArea = false;
   highlightMaguindanao = false;
   highlightPalestina = false;
@@ -562,121 +580,210 @@ function updateVisualization() {
 
   // attiva in base allo step corrente
   switch(currentStep) {
-    case 0: //solo asse y
-      showYAxis = true;
-      break;
+    case 0: showYAxis = true; 
+    break;
 
-    case 1: //assi x e y
-      showYAxis = true;
-      showXAxis = true;
-      break;
+    case 1: 
+      showYAxis = true; 
+      showXAxis = true; 
+    break;
 
-    case 2: //linee categorie + cascata
+    case 2: // start cascata
       showYAxis = true;
-      showXAxis = true;
+      showXAxis = true; 
       showGridLines = true;
       animationStarted = true;
       inVisualizationArea = true;
 
       if (!animationInitialized) {
-        dots = [];
-        spawnedIds.clear();
         currentYearIndex = 0;
         animationInitialized = true;
       }
       break;
 
-    case 3: //animazione completa
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-
-      // non resetta se l'animazione è già iniziata
-      if(!animationInitialized){
-        dots = [];
-        spawnedIds.clear();
-        currentYearIndex = 0;
-        animationInitialized = true;
-      }
-      break;
-
-    case 4: //caso maguindanao
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightMaguindanao = true;
-      break;
-
-    case 5: //caso palestina
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightPalestina = true;
-      break;
-
-    case 6: //caso iraq
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightIraq = true;
-      break;
-
-    case 7: //caso uncertain e unknown
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightUncertain = true;
-      highlightUnknown = true;
-      break;
-
-    case 8: //caso uncertain
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightUncertain = true;
-      break;
-
-    case 9: //caso unknown
-      showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      highlightUnknown = true;
-      break;
-
-    case 10: //mostra filtro paese
-      showYAxis = true;
-      showXAxis = true;
+    case 3: // animazione continua
+      showYAxis = true; 
+      showXAxis = true; 
       showGridLines = true;
       animationStarted = true;
       inVisualizationArea = true;
       break;
 
-    case 11: //tutti i pallini bianchi
+    // highlight step
+    case 4: 
       showYAxis = true;
-      showXAxis = true;
-      showGridLines = true;
-      animationStarted = true;
-      inVisualizationArea = true;
-      break;
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightMaguindanao = true; 
+    break;
+
+    case 5: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightPalestina = true; 
+    break;
+
+    case 6: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightIraq = true; 
+    break;
+
+    case 7: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightUncertain = true; 
+      highlightUnknown = true; 
+    break;
+    
+    case 8: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightUncertain = true; 
+    break;
+    
+    case 9: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+      highlightUnknown = true; 
+    break;
+
+    case 10: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+    break;
+    
+    case 11: 
+      showYAxis = true; 
+      showXAxis = true; 
+      showGridLines = true; 
+      inVisualizationArea = true; 
+    break;
   }
 
-  //se showalldots è true, mostra tutti i pallini
-  if(showAllDots && (currentStep === 3 || currentStep === 4)) {
-    showAllDotsImmediately();
+}
+
+
+/*
+function showAllDotsImmediately() {
+  for (let j of journalists) {
+    if (!spawnedIds.has(j.id)) {
+      let dot = new Dot(j.id, j.year, j.category);
+      dots.push(dot);
+      spawnedIds.add(j.id);
+      dot.arrived = true; // piazza subito i pallini mancanti
+    }
+  }
+  animationCompleted = true; // marca l’animazione come completata
+  showAllDots = false;
+} */
+
+//crea pallini
+class Dot {
+  constructor(id, year, category) {
+    this.id = id;
+    this.year = year;
+    this.category = category;
+    this.country = journalists[id] ? journalists[id].country : "";
+
+    let centerX = yearToX(year);
+    let jitterX = (yearWidth * 0.4) * randomGaussian(); 
+    let baseY = categoryToY(category);
+
+    let minX_local = yearToX(1992);
+    let maxX_local = yearToX(2025);
+
+    this.finalX = constrain(centerX + jitterX, minX_local, maxX_local);
+    this.finalY = baseY + random(-10, 10);
+
+    let startOffset = random(-40, 40);
+    let startX = constrain(centerX + startOffset, minX_local, maxX_local);
+
+    this.pos = createVector(startX, -20);
+    this.vel = createVector(0, 0);
+    this.acc = createVector(0, 0);
+    this.speed = random(8, 10);
+    this.arrived = false;
+    this.mass = 1;
+    this.r = diam;
+  }
+
+  update() {
+
+    if (this.arrived) {
+      this.draw();
+      return;
+    }
+
+    let dx = this.finalX - this.pos.x;
+    let dy = this.finalY - this.pos.y;
+    let distance = sqrt(dx * dx + dy * dy);
+
+    if (distance < this.speed) {
+      this.pos.x = this.finalX;
+      this.pos.y = this.finalY;
+      this.arrived = true;
+    } else {
+      this.pos.x += (dx / distance) * this.speed;
+      this.pos.y += (dy / distance) * this.speed;
+    }
+
+    let floorY = height - padding - xLabelHeight - 10;
+    if (this.pos.y > floorY) {
+      this.pos.y = floorY;
+      this.vel.y = 0;
+    }
+
+    this.draw();
+  }
+
+  draw() {
+    // raggio maggiore x dots selezionati (country)
+    if (selectedCountry && this.country !== selectedCountry) return;
+
+    let dotColor = color(255);
+
+    if (highlightMaguindanao && this.year === 2009 && this.category === "Government Officials")
+      dotColor = color(255, 0, 0);
+
+    if (highlightPalestina && this.year === 2023 && this.category === "Military Officials")
+      dotColor = color(255, 0, 0);
+
+    if (highlightIraq && this.year === 2006 && this.category === "Political Group")
+      dotColor = color(255, 0, 0);
+
+    if (currentStep === 7)
+      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
+
+    if (currentStep === 8)
+      dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
+
+    if (currentStep === 9)
+      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
+
+    if (currentStep === 10)
+      dotColor = color(150);
+
+    fill(dotColor);
+    noStroke();
+    ellipse(this.pos.x, this.pos.y, this.r * 2);
+  }
+
+  isHovered() {
+    return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
   }
 }
 
@@ -974,12 +1081,6 @@ function setup() {
   //cliccando su source of fire va alla pagina con i pallini disposti
   let urlParams = new URLSearchParams(window.location.search);
   let isDirectMode = urlParams.get('direct') === 'true';
-
-  if(isDirectMode) {
-    currentStep = 10;
-    showAllDots = true;
-    showAllDotsImmediately();
-  }
 }
 
 function draw() {
@@ -1007,101 +1108,6 @@ function draw() {
 
 }
 
-//crea pallini
-class Dot {
-  constructor(id, year, category) {
-    this.id = id;
-    this.year = year;
-    this.category = category;
-    this.country = journalists[id] ? journalists[id].country : "";
-
-    let centerX = yearToX(year);
-    let jitterX = (yearWidth * 0.4) * randomGaussian(); 
-    let baseY = categoryToY(category);
-
-    let minX_local = yearToX(1992);
-    let maxX_local = yearToX(2025);
-
-    this.finalX = constrain(centerX + jitterX, minX_local, maxX_local);
-    this.finalY = baseY + random(-10, 10);
-
-    let startOffset = random(-40, 40);
-    let startX = constrain(centerX + startOffset, minX_local, maxX_local);
-
-    this.pos = createVector(startX, -20);
-    this.vel = createVector(0, 0);
-    this.acc = createVector(0, 0);
-    this.speed = random(2, 4);
-    this.arrived = false;
-    this.mass = 1;
-    this.r = diam;
-  }
-
-  update() {
-
-    if (this.arrived) {
-      this.draw();
-      return;
-    }
-
-    let dx = this.finalX - this.pos.x;
-    let dy = this.finalY - this.pos.y;
-    let distance = sqrt(dx * dx + dy * dy);
-
-    if (distance < this.speed) {
-      this.pos.x = this.finalX;
-      this.pos.y = this.finalY;
-      this.arrived = true;
-    } else {
-      this.pos.x += (dx / distance) * this.speed;
-      this.pos.y += (dy / distance) * this.speed;
-    }
-
-    let floorY = height - padding - xLabelHeight - 10;
-    if (this.pos.y > floorY) {
-      this.pos.y = floorY;
-      this.vel.y = 0;
-    }
-
-    this.draw();
-  }
-
-  draw() {
-    // raggio maggiore x dots selezionati (country)
-    if (selectedCountry && this.country !== selectedCountry) return;
-
-    let dotColor = color(255);
-
-    if (highlightMaguindanao && this.year === 2009 && this.category === "Government Officials")
-      dotColor = color(255, 0, 0);
-
-    if (highlightPalestina && this.year === 2023 && this.category === "Military Officials")
-      dotColor = color(255, 0, 0);
-
-    if (highlightIraq && this.year === 2006 && this.category === "Political Group")
-      dotColor = color(255, 0, 0);
-
-    if (currentStep === 7)
-      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
-
-    if (currentStep === 8)
-      dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
-
-    if (currentStep === 9)
-      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
-
-    if (currentStep === 10)
-      dotColor = color(150);
-
-    fill(dotColor);
-    noStroke();
-    ellipse(this.pos.x, this.pos.y, this.r * 2);
-  }
-
-  isHovered() {
-    return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
-  }
-}
 
 /*//applica campo di forze
 function applyForceTo(dot, force) {
