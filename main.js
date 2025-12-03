@@ -173,7 +173,7 @@ function typeWriter(element, speed = 20, callback = null) {
     type();
 }
 
-// lista sezioni di explanation-wrapper in ordine
+// lista sezioni di graph-explained in ordine
 let explanationSections = [
     "explanation-categories",
     "explanation-timeline",
@@ -181,12 +181,25 @@ let explanationSections = [
     "explanation-closure"
 ];
 
+// lista sezioni di conflicts in ordine
+let conflictSections = [
+  "intro-first-paragraph",
+  "intro-second-paragraph",
+  "conflicts-philippines",
+  "conflicts-palestine",
+  "conflicts-iraq",
+  "without-perpetrators-intro",
+  "section-uncertain",
+  "section-unknown"
+];
+
 let currentGraphIndex = 0;
 let graphExplainedMode = false;
 let graphExplainedStep = 0; 
+let conflictStep = 0;
 
 
-// attiva una sezione
+// attiva una sezione di graph-explained
 function activateGraphExplainedSection(index = 0) {
     graphExplainedMode = true;
     graphExplainedStep = 0;
@@ -209,7 +222,7 @@ function activateGraphExplainedSection(index = 0) {
     gridAnimationStep = index + 1;
 }
 
-// navigazione con le frecce
+// navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
 
   function activateSection(index) {
@@ -242,12 +255,12 @@ function setupGraphExplainedNavigation() {
 }
 
 
-  // Frecce categories → timeline
+  // categories → timeline
   document.getElementById("next-arrow-categories").addEventListener("click", () => {
     activateSection(1);
   });
 
-  // Frecce timeline ←→ dot
+  // timeline ←→ dot
   document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
     activateSection(0);
   });
@@ -255,7 +268,7 @@ function setupGraphExplainedNavigation() {
     activateSection(2);
   });
 
-  // Frecce dot ←→ closure
+  // dot ←→ closure
   document.getElementById("prev-arrow-dot").addEventListener("click", () => {
     activateSection(1);
   });
@@ -263,7 +276,7 @@ function setupGraphExplainedNavigation() {
     activateSection(3);
   });
 
-  // Frecce closure
+  // closure
   document.getElementById("prev-arrow-closure").addEventListener("click", () => {
     activateSection(2);
   });
@@ -280,6 +293,8 @@ function setupGraphExplainedNavigation() {
   });
 
 }
+
+
 
 window.addEventListener("load", () => {
     setupGraphExplainedNavigation();
@@ -366,7 +381,6 @@ function drawGridWithSteps() {
   
   drawingContext.globalAlpha = 1.0;
 }
-
 
 //caricamento dati
 function buildJournalistsFromTable() {
@@ -490,7 +504,7 @@ function spawnUpToCurrentYear() {
 }
 
 function applyRepulsion() {
-  let minDist = diam * 3;
+  let minDist = diam * 3.5;
   let strength = 0.5; // più basso = beeswarm più compatto 
 
   for (let i = 0; i < dots.length; i++) {

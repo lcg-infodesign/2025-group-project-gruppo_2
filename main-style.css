@@ -163,6 +163,10 @@ a {
   gap: 40px;
 }
 
+#conflicts {
+  display: none;
+}
+
 .section-title {
   font-size: 22px;
   font-weight: bold;
