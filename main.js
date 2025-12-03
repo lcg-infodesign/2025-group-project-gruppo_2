@@ -48,6 +48,7 @@ let categories = [
   "Unknown"
 ];
 
+// variabili per le card
 let activeCard = null; //variabile che stabilisce se/quale card mostrare
 let closeCard = null;
 let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
@@ -56,6 +57,8 @@ let cpjUrl;
 let photo;
 let hasLoadedPhoto = null;
 let maskGraphics;
+let tickIcon;
+
 //variabili per la navigazione
 let currentStep = 0;
 let totalSteps = 12;
@@ -81,7 +84,7 @@ function preload() {
   data = loadTable("assets/data.csv", "csv", "header");
   cpjLogo = loadImage("assets/cpj_logo.svg");
   defaultPhoto = loadImage("assets/default_photo.jpg");
-
+  tickIcon = loadImage("assets/tickIcon.svg");
 
   console.log("Row count: " + data.getRowCount());
   // carica tutte le foto dei giornalisti
@@ -694,18 +697,23 @@ function updateDeathCounter(country) {
   counter.textContent = count;
 }
 
-//disegna card
+
+//funzione che disegna la card, per farla funzionare ci sono:
+// - delle variabili globali dichiarate all'inizio
+// - dei cicli if() nella funzione mousePressed()
+// - un richiamo della funzione dentro draw()
+
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
-  //Imposto tutte le variabili con le informazioni per la card
+  //Imposto tutte le variabili con le informazioni sul giornalista per la card
   let id = journalist.id;
   let name = journalist.name;
   let date = journalist.date;
   let ambiguous, dateIcon; //Queste variabili servono per mettere un'icona e un tooltip che spiega se la data è certa o meno
   if(!journalist.ambiguousEntryDate){
     dateIcon = "tick";
-    ambiguous = "The date is confirmed";
+    ambiguous = "The date\nis confirmed";
   }else{
     dateIcon = "?";
     ambiguous = "The date is ambiguous. Plausible dates: " + journalist.ambiguousEntryDate;
@@ -749,7 +757,7 @@ function drawCard(dot){
   let impunity = journalist.impunity;
   let url = journalist.url;
 
-  //fondo nero trasparente
+  //fondo nero trasparente che oscura il grafico
   noStroke();
   fill(0,0,0,175);
   rectMode(CORNER);
@@ -778,10 +786,12 @@ function drawCard(dot){
   rectMode(CENTER);
   rect(cardX, cardY, cardWidth, cardHeight, 20);
 
-  //foto
+  //--------------------------- FOTO ---------------------------
+
   let photoWidth = 180;
   let photoHeight = 190;
 
+  //Serve memorizzare se la foto è stata caricata e fare un ciclo if in modo che la foto viene caricata una volta sola
   if(!hasLoadedPhoto){
     photo = loadImage("assets/images/" + (id + 1) + ".jpg");
     hasLoadedPhoto = true;
@@ -789,8 +799,14 @@ function drawCard(dot){
 
   imageMode(CORNER);
 
+  //Disegno la foto di default in modo che
+  // - se esiste la foto del giornalista viene disegnata sopra e copre quella di default
+  // - se non esiste la foto del giornalista non viene disegnato nulla sopra quella di default e si vede quella
   image(defaultPhoto, leftX, topY, photoWidth, photoHeight);
 
+  //tutte ste righe servono per fare una maschera rettangolare con gli angoli arrotondati in modo che:
+  // - se la foto non ha il formato giusto non serve deformarla perchè tanto l'eccesso viene mascherato
+  // - ci sono gli angoli arrotondati :)
   drawingContext.save(); // salva lo stato del canvas
 
   // crea un rettangolo arrotondato come maschera per le foto
@@ -818,7 +834,7 @@ function drawCard(dot){
   drawingContext.restore(); // rimuove il clipping
 
 
-  // X per chiudere la card
+  //--------------------------- X PER CHIUDERE LA CARD ---------------------------
   noFill();
   stroke(red);
   let crossWidth = 16;
@@ -835,14 +851,15 @@ function drawCard(dot){
     cursor(ARROW);
   }
 
-  //grafica della card
+  //--------------------------- GRAFICA DELLA CARD ---------------------------
 
-  let verticalOffset = 40;
+  let verticalOffset = 40; // quanto la linea verticale che divide il rettangolo centrale è spostata rispetto al centro della card
+
   noFill();
   stroke(red);
   strokeWeight(0.5);
   line(leftX + photoWidth + padding, topY + 80, leftX + cardWidth - 2*padding, topY + 80); //nome
-  line(leftX + photoWidth + padding, topY + 80 + 50, leftX + cardWidth - 2*padding, topY + 80 + 50); //data
+  line(leftX + photoWidth + padding, topY + 80 + 50, rightX - 40 - 20, topY + 80 + 50); //data
   line(leftX + photoWidth + padding, topY + 80 + 97, leftX + cardWidth - 2*padding, topY + 80 + 97); //luogo
   rectMode(CORNER);
   fill(grey);
@@ -864,6 +881,34 @@ function drawCard(dot){
   strokeWeight(2);
   rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
 
+  //icona e tooltip per la data
+  noStroke();
+  circle(rightX - 20, topY + 80 + 40, 40);
+  if(dateIcon == "tick"){
+    imageMode(CENTER);
+    image(tickIcon, rightX - 20, topY + 80 + 40, 40, 40);
+  }else{
+    noStroke();
+    fill(red);
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    text("?", rightX - 20, topY + 80 + 43);
+  }
+
+  //tooltip
+  let dDate = dist(mouseX, mouseY, rightX - 20, topY + 80 + 40);
+  if(dDate <= 20){
+    fill(bg);
+    rectMode(CORNER);
+    let rectHeight = 120;
+    let rectWidth = 160;
+    rect(rightX + 2*padding, topY + 80 + 40 - rectHeight/2, rectWidth, rectHeight, 10);
+    fill(white);
+    textAlign(LEFT, CENTER);
+    textSize(14);
+    text(ambiguous, rightX + 2*padding + padding/2, topY + 80 + 40, rectWidth - padding/2);
+  }
+
   //Etichette
   fill(red);
   noStroke();
@@ -884,7 +929,8 @@ function drawCard(dot){
   text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
   text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //testi
+  //--------------------------- TESTI DELLA CARD ---------------------------
+  
   textAlign(LEFT, BOTTOM);
   textFont(font);
   textWrap(WORD);
@@ -908,12 +954,15 @@ function drawCard(dot){
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
   text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
 
+  //Bottone Discover more
   textAlign(CENTER);
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
   image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 37, 37);
 
+  //Praticamente quando l'utente fa hover cpjButtonHover diventa true e in mousePressed() c'è una condizione:
+  //Se cpjButtonHover è vera e l'utente clicca si apre la pagina di CPJ
   if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
     cpjButtonHover = true;
     cpjUrl = url;
@@ -1000,7 +1049,7 @@ function draw() {
   
   applyRepulsion();
 
-
+  //Disegna la card se activeCard è vero (cioè quando si preme su un pallino)
   if (activeCard) {
     drawCard(activeCard);
   }
@@ -1148,6 +1197,7 @@ function mousePressed() {
     }
   }
 
+  //Condizione per chiudere la card quando si preme sulla croce
   if(closeCard){
     activeCard = null;
     closeCard = null;
@@ -1155,6 +1205,7 @@ function mousePressed() {
     hasLoadedPhoto = null;
   }
 
+  //Condizione per aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
   if(cpjButtonHover){
     window.open(cpjUrl);
     cpjButtonHover = null;
