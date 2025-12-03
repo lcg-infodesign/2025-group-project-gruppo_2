@@ -153,7 +153,6 @@ a {
 
 
 #graph-explained, #main-accordion, #conflicts {
-  top: 30px;
   width: 100%;
   right: 15px;
   justify-content: center;
@@ -274,6 +273,7 @@ a {
   z-index: 10;                   
 }
 
+/*
 #death-counter-container {
   display: none;
   position: absolute;
@@ -305,10 +305,10 @@ a {
   border: none;              
   width: auto;
   height: auto;
-}
+}*/
 
 /* BOTTONE IMPUNITY */
-.other-visualization-button {
+/*.other-visualization-button {
   position: absolute;
   bottom: 5px;
   left: 20px;
@@ -340,4 +340,4 @@ a {
   color: white;
   text-align: center;
   line-height: 1.2;
-}
+}*/
