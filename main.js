@@ -109,7 +109,7 @@ function preload() {
       dopo il click su next-arrow-closure, sparisce tutto graph-explained */
 
 
-/* 2. SPIEGAZIONE DEI PICCHI
+/* 2. SPIEGAZIONE DEI PICCHI -- FATTO
 
     2.1 FUNZIONE CHE FA COMPARIRE I TESTI DI CONFLICTS
 
@@ -125,6 +125,45 @@ function preload() {
         - let highlightUncertain = true + let highlightUnknown = true + id="without-perpetrators-intro" (al click su next-arrow-without-perpetrators let highlightUnknown torna false)
         - let highlightUncertain = true (lo era già) + id="section-uncertain" (al click su next-arrow-uncertain let highlightUncertain torna false)
         - let highlightUnknown = true + id="section-unknown" (al click su next-arrow-unknown tutte le variabili highlight tornano false)*/
+
+function handleConflictsFlags(step) {
+
+    // reset di tutti gli highlight
+    highlightMaguindanao = false;
+    highlightPalestina = false;
+    highlightIraq = false;
+    highlightUncertain = false;
+    highlightUnknown = false;
+
+    // mappa degli step globali → highlight
+    switch(step) {
+
+        case 6: // conflicts-philippines
+            highlightMaguindanao = true;
+            break;
+
+        case 7: // conflicts-palestine
+            highlightPalestina = true;
+            break;
+
+        case 8: // conflicts-iraq
+            highlightIraq = true;
+            break;
+
+        case 9: // without-perpetrators-intro
+            highlightUncertain = true;
+            highlightUnknown = true;
+            break;
+
+        case 10: // section-uncertain
+            highlightUncertain = true;
+            break;
+
+        case 11: // section-unknown
+            highlightUnknown = true;
+            break;
+    }
+}
 
 
 /* 3. FILTRO X PAESE
@@ -232,7 +271,7 @@ function activateGlobalStep(step) {
     }
 
     // da qui in poi puoi iniettare i tuoi boolean flags del grafico
-    // handleConflictsFlags(step);
+    handleConflictsFlags(step);
 }
 
 
@@ -573,12 +612,6 @@ function updateVisualization() {
   showGridLines = false;
 
   inVisualizationArea = false;
-  highlightMaguindanao = false;
-  highlightPalestina = false;
-  highlightIraq = false;
-  highlightUncertain = false;
-  highlightUnknown = false;
-  highlightNone = false;
 
   // attiva in base allo step corrente
   switch(currentStep) {
@@ -608,7 +641,6 @@ function updateVisualization() {
       showXAxis = true; 
       showGridLines = true;
       animationStarted = true;
-      inVisualizationArea = true;
       break;
 
     // highlight step
@@ -767,13 +799,13 @@ class Dot {
     if (highlightIraq && this.year === 2006 && this.category === "Political Group")
       dotColor = color(255, 0, 0);
 
-    if (currentStep === 7)
+    if (highlightUncertain && highlightUnknown)
       dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
 
-    if (currentStep === 8)
+    else if (highlightUncertain)
       dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
 
-    if (currentStep === 9)
+    else if (highlightUnknown)
       dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
 
     if (currentStep === 10)
