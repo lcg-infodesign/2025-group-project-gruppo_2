@@ -172,7 +172,7 @@ function handleConflictsFlags(step) {
 
 /* 3. FILTRO X PAESE
 
-    3.1 FUNZIONE CHE FA COMPARIRE I TESTI DI COUNTRY-INTRO
+    3.1 FUNZIONE CHE FA COMPARIRE I TESTI DI COUNTRY-INTRO -- FATTO
 
     3.2 FUNZIONE CHE FA APPARIRE FILTER-CONTAINER, ACCORDION E OTHER-VISUALIZATION WRAPPER QUANDO SI CLICCA NEXT-ARROW-COUNTRY-INTRO
 
@@ -240,7 +240,9 @@ let conflictSections = [
 
 // lista sezioni di country in ordine
 let countrySections = [
-  "country-intro"
+  "country-intro",
+  "filter-container",
+  "impunity-status-wrapper"
 ];
 
 // lista globale sezioni
@@ -378,9 +380,28 @@ function setupConflictsNavigation() {
         localActivateConflicts(6);
     });
     document.getElementById("next-arrow-unknown").addEventListener("click", () => {
-        const index = globalSteps.indexOf("country-intro");
+        let index = globalSteps.indexOf("country-intro");
         activateGlobalStep(index);
     });
+
+    document.getElementById("next-arrow-country-intro").addEventListener("click", () => {
+
+        // 1. Nasconde country-intro
+        const countryIntro = document.getElementById("country-intro");
+        countryIntro.style.display = "none";
+
+        // 2. Mostra filter-container
+        const filterContainer = document.getElementById("filter-container");
+        filterContainer.style.display = "flex";
+        filterContainer.style.opacity = "1";
+
+        // 3. Mostra impunity-status-wrapper
+        const impunityWrapper = document.getElementById("impunity-status-wrapper");
+        impunityWrapper.style.display = "flex";
+        impunityWrapper.style.opacity = "1";
+    });
+
+
 
 }
 

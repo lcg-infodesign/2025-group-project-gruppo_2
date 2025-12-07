@@ -207,6 +207,7 @@ a {
   justify-content: center;
 }
 
+
 /* BOTTONE FILTRO*/
 .filter-dropdown {
   margin-bottom: 20px;
@@ -273,7 +274,7 @@ a {
   z-index: 10;                   
 }
 
-/*
+
 #death-counter-container {
   display: none;
   position: absolute;
@@ -305,10 +306,10 @@ a {
   border: none;              
   width: auto;
   height: auto;
-}*/
+}
 
 /* BOTTONE IMPUNITY */
-/*.other-visualization-button {
+.other-visualization-button {
   position: absolute;
   bottom: 5px;
   left: 20px;
@@ -340,4 +341,4 @@ a {
   color: white;
   text-align: center;
   line-height: 1.2;
-}*/
+}
