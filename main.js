@@ -162,6 +162,10 @@ function handleConflictsFlags(step) {
         case 11: // section-unknown
             highlightUnknown = true;
             break;
+        
+        default:
+          // tutti gli highlight si resettano
+          break;
     }
 }
 
@@ -234,8 +238,13 @@ let conflictSections = [
   "conflicts-unknown"
 ];
 
+// lista sezioni di country in ordine
+let countrySections = [
+  "country-intro"
+];
+
 // lista globale sezioni
-let globalSteps = [...explanationSections, ...conflictSections];
+let globalSteps = [...explanationSections, ...conflictSections, ...countrySections];
 
 
 let currentGlobalStep = 0;
@@ -369,8 +378,10 @@ function setupConflictsNavigation() {
         localActivateConflicts(6);
     });
     document.getElementById("next-arrow-unknown").addEventListener("click", () => {
-        activateGlobalStep(globalSteps.length - 1);
+        const index = globalSteps.indexOf("country-intro");
+        activateGlobalStep(index);
     });
+
 }
 
 
