@@ -34,6 +34,10 @@ let inVisualizationArea = false;
 // filtri
 let countries = [];
 let selectedCountry = null;
+let selectedState = null;
+
+
+
 
 // categorie source_of_fire
 let categories = [
@@ -497,30 +501,31 @@ function drawGridWithSteps() {
 function buildJournalistsFromTable() {
   journalists = [];
 
-  for(let j = 0; j < data.getRowCount(); j++) {
+  for (let j = 0; j < data.getRowCount(); j++) {
     let row = data.getRow(j);
-    let dateStr = row.get("entry_date");
+    let dateStr = row.get("entry_date") || "";
     let parts = dateStr.split("/");
-    let year = Number(parts[2]);
+    let year = Number(parts[2]) || 0;
 
-    if(year < 100) {
-      if(year >= 90) {
+    if (year < 100) {
+      if (year >= 90) {
         year += 1900;
       } else {
         year += 2000;
       }
     }
 
+    // workRelated
     let workRelated = "Unknown";
-    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Confirmed"){
-      workRelated = "Confirmed";
-    }
-    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Journalist - Unconfirmed"){
-      workRelated = "Unconfirmed";
-    }
-    if(row.get("confirmed work related or unconfirmed (may be work related)") == "Media Worker"){
-      workRelated = "Media Worker";
-    }
+    const wr = row.get("confirmed work related or unconfirmed (may be work related)");
+    if (wr === "Journalist - Confirmed") workRelated = "Confirmed";
+    if (wr === "Journalist - Unconfirmed") workRelated = "Unconfirmed";
+    if (wr === "Media Worker") workRelated = "Media Worker";
+
+    // country: normalizziamo qui
+    let rawCountry = (row.get("country") || "");
+    let country = rawCountry.trim(); // per mostrare nella UI
+    let countryNorm = country.toLowerCase(); // per confronti (no spazi esterni)
 
     let journalist = {
       id: j,
@@ -529,13 +534,14 @@ function buildJournalistsFromTable() {
       ambiguousEntryDate: row.get("ambiguous_entry_date"),
       category: row.get("source_of_fire") || "Unknown",
       name: row.get("journalist/media worker_name") || "",
-      country: row.get("country") || "",
+      country: country,
+      countryNorm: countryNorm,
       motive: row.get("motive") || "",
       role: row.get("role") || "",
       city: row.get("city") || "",
-      typeOfDeath: row.get("type_of_death"),
+      typeOfDeath: row.get("type_of_death") || "",
       impunity: row.get("impunity") || "",
-      organization: row.get("organization"),
+      organization: row.get("organization") || "",
       medium: row.get("mediums") || "",
       beats: row.get("beats_covered") || "",
       job: row.get("job") || "",
@@ -554,6 +560,7 @@ function buildJournalistsFromTable() {
   console.log("Years available:", years);
   console.log("Sample journalist:", journalists[0]);
 }
+
 
 //calcola le dimensioni dell'area del grafico
 function drawLayout() {
@@ -589,19 +596,57 @@ function spawnUpToCurrentYear() {
   let maxSpawnPerFrame = 10;
 
   for (let j of journalists) {
-    if (spawnedCount >= maxSpawnPerFrame) break;
-    if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
-      let dot = new Dot(j.id, j.year, j.category);
-      dots.push(dot);
-      spawnedIds.add(j.id);
-      spawnedCount++;
+  if (spawnedCount >= maxSpawnPerFrame) break;
+  if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
+
+    // FILTRO PAESE
+
+
+          let dot = new Dot(j.id, j.year, j.category); 
+    // imposta la visibilità al momento della creazione
+    if (!selectedCountry) {
+      dot.visible = true;
+      dot.dimmed = false;
+    } else {
+      dot.visible = (dot.country && dot.country === selectedCountry.trim().toLowerCase());
+       dot.dimmed = false;
     }
+    dots.push(dot);
+    spawnedIds.add(j.id);
+    spawnedCount++;
+
+
   }
+}
+
 
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
 }
+
+
+// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry (che deve essere normalized)
+function updateDotsVisibility() {
+  if (!dots) return;
+
+  if (!selectedCountry) {
+    // Nessun filtro: tutti visibili
+    dots.forEach(d => {
+      d.visible = true;
+    });
+  } else {
+    const sel = selectedCountry.trim().toLowerCase();
+    dots.forEach(d => {
+      // Mostra solo i dots del paese selezionato
+      d.visible = d.country && d.country === sel;
+    });
+  }
+
+  console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
+}
+
+
 
 
 
@@ -763,7 +808,8 @@ class Dot {
     this.id = id;
     this.year = year;
     this.category = category;
-    this.country = journalists[id] ? journalists[id].country : "";
+    this.country = (journalists[id] && journalists[id].countryNorm) ? journalists[id].countryNorm : "";
+
 
     let centerX = yearToX(year);
     let jitterX = (yearWidth * 0.4) * randomGaussian(); 
@@ -785,6 +831,8 @@ class Dot {
     this.arrived = false;
     this.mass = 1;
     this.r = diam;
+
+    this.visible = true;
   }
 
   update() {
@@ -818,7 +866,6 @@ class Dot {
 
   draw() {
     // raggio maggiore x dots selezionati (country)
-    if (selectedCountry && this.country !== selectedCountry) return;
 
     let dotColor = color(255);
 
@@ -843,10 +890,19 @@ class Dot {
     if (currentStep === 10)
       dotColor = color(150);
 
-    fill(dotColor);
+    // determina alpha in base al filtro: se non c'è filtro alpha=255, altrimenti alpha ridotto se dimmed
+    let alphaValue = 255;
+    if (selectedCountry) {
+      alphaValue = this.dimmed ? 60 : 255; // regola qui il 60 per più/meno trasparenza
+    }
+
+    // p5.Color oggetto: estrai i livelli RGB e riapplica alpha
+    let levels = dotColor.levels || [255,255,255,255];
+    fill(levels[0], levels[1], levels[2], alphaValue);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
+
 
   isHovered() {
     return dist(mouseX, mouseY, this.pos.x, this.pos.y) < this.r;
@@ -859,9 +915,9 @@ function updateDeathCounter(country) {
   
   let count = 0;
   for (let i = 0; i < data.getRowCount(); i++) {
-    if (data.get(i, "country") === country) {
-      count++;
-    }
+    if ((data.get(i, "country") || "").trim().toLowerCase() === (country || "").trim().toLowerCase()) {
+  count++;
+  }
   }
   
   counter.textContent = count;
@@ -1151,7 +1207,6 @@ function setup() {
   let canvas = createCanvas(mainWidth, windowHeight);
   canvas.position(0, 30);
 
-
   yLabelWidth = padding + 60;
   xLabelHeight = 50;
   rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
@@ -1172,28 +1227,110 @@ function setup() {
   minX = yearToX(1992)-13;
   maxX = yearToX(2025)+15;
 
-
   dots = [];
   countries = [];
 
   let nRows = data.getRowCount();
 
-  // carica i dati in dots e crea lista paesi unici
+  // crea lista paesi unici
   for (let i = 0; i < nRows; i++) {
-    let country = data.get(i, "country");
+    let country = (data.get(i, "country") || "").trim();
     if (country && !countries.includes(country)) {countries.push(country)};
   }
-
-  // ordina i paesi alfabeticamente
   countries.sort((a, b) => a.localeCompare(b));
 
+  // Popola pannello paesi
+  populateCountryPanel();
+
+  // Bottone worldwide → reset filtro + input di ricerca
+  const worldwideBtn = document.getElementById("worldwide-btn");
+  worldwideBtn.addEventListener("click", () => {
+    
+    selectedCountry = null; // reset filtro
+    updateDeathCounter(""); // reset contatore
+    updateDotsVisibility();  // mostra tutti i pallini attraverso la funzione centrale
+
+
+    const panel = document.getElementById("filter-panel");
+
+    // crea input di ricerca
+    const input = document.createElement("input");
+    input.type = "text";
+    input.id = "search-input";
+    input.placeholder = "Search country...";
+
+    // copia stile bottone
+    input.style.cssText = worldwideBtn.style.cssText;
+    input.style.width = worldwideBtn.offsetWidth + "px";
+    input.style.height = worldwideBtn.offsetHeight + "px";
+
+    // sostituisci bottone con input
+    worldwideBtn.replaceWith(input);
+
+    // mostra pannello
+    panel.style.display = "flex";
+
+    // filtro live
+    input.addEventListener("input", () => {
+      const query = input.value.toLowerCase();
+      const options = panel.querySelectorAll(".country-option");
+      options.forEach(opt => {
+        opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
+      });
+    });
+
+    input.focus();
+
+    // torna bottone se si perde focus
+    input.addEventListener("blur", () => {
+      panel.style.display = "none";
+      input.replaceWith(worldwideBtn);
+    });
+  });
 
   inVisualizationArea = true;
 
-  //cliccando su source of fire va alla pagina con i pallini disposti
-  let urlParams = new URLSearchParams(window.location.search);
-  let isDirectMode = urlParams.get('direct') === 'true';
+
+
 }
+
+// --- POPOLAMENTO PANNELLO COUNTRY ---
+function populateCountryPanel() {
+  const panel = document.getElementById("filter-panel");
+  panel.innerHTML = "";
+  panel.style.display = "none";
+
+  countries.forEach(country => {
+    const div = document.createElement("div");
+    div.classList.add("country-option");
+    div.textContent = country;
+    div.style.cursor = "pointer";
+
+        div.addEventListener("click", () => {
+      // normalizziamo selectedCountry per i confronti
+      selectedCountry = country.trim().toLowerCase();
+
+      // Aggiorna contatore vittime (ok anche se gli passi lowercase)
+      updateDeathCounter(selectedCountry);
+
+      // Aggiorna visibilità pallini (usa la funzione centrale)
+      updateDotsVisibility();
+
+      // Chiudi pannello e reset input ricerca
+      panel.style.display = "none";
+      const searchInput = document.getElementById("search-input");
+      if (searchInput) searchInput.value = "";
+    });
+
+
+    panel.appendChild(div);
+  });
+}
+
+
+
+
+
 
 function draw() {
   background(25);
@@ -1207,9 +1344,12 @@ function draw() {
     spawnUpToCurrentYear();
   }
 
-  for (let d of dots) {
+ for (let d of dots) {
+  if (d.visible) {   // <--- Mostra solo i pallini visibili
     d.update();
   }
+  }
+
   
   applyRepulsion();
 
@@ -1256,15 +1396,16 @@ function applyRepulsion() {
 }*/
 
 function mousePressed() {
-  for (let d of dots) {
+   for (let d of dots) {
 
-    // se c'è un filtro per paese, ignora i pallini nascosti
-    if (selectedCountry && d.country !== selectedCountry) continue;
+    // se è dimmed (cioè non è del paese selezionato), ignoralo per l'interazione
+    if (d.dimmed) continue;
 
     if (d.isHovered()) {
       activeCard = d;
     }
-  }
+    }
+
 
   //Condizione per chiudere la card quando si preme sulla croce
   if(closeCard){

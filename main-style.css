@@ -210,35 +210,34 @@ a {
 
 /* BOTTONE FILTRO*/
 .filter-dropdown {
-  margin-bottom: 20px;
-  margin-top: 10px;
-  margin-left: 20px;
-  margin-right: 20px;
+  position: absolute; /* rispetto al contenitore padre */
+  top: 20px;          /* distanza dal bordo superiore */
+  left: 20px;
+  width: calc(100% - 40px);
 
 }
 
 .filter-btn {
-  max-width: 260px;
-  display: flex;                
-  align-items: center;           
-  justify-content: center;       
-  width: 100%;                   
-  margin-top: 5px;
-  margin-left: 8px;;
-  padding: 12px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 40px); /* stessa larghezza dell'IMPUNITY */
+  padding: 12px 28px;       /* stesso padding */
   background-color: #191919;
   color: white;
   border: 2px solid red;
-  border-radius: 60px;
+  border-radius: 60px;       /* stesso border-radius */
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
-  vertical-align: middle;
   position: relative;
+  box-sizing: border-box;    /* come l'IMPUNITY */
   transition: transform 0.2s ease, background-color 0.2s ease;
   z-index: 100;
+  margin-left: 8px;          /* puoi regolare se vuoi margini diversi */
 }
+
 
 .filter-btn:hover {
   border-color: darkred;
@@ -246,6 +245,7 @@ a {
 
 #dropdown-arrow {
   font-size: 16pt;
+  margin-bottom: 10px;
 }
 
 .filter-input:focus { /* questa classe non esiste, va gestita in js */
@@ -258,21 +258,7 @@ a {
   color: rgba(80, 79, 79, 0.3);
 }
 
-#filter-panel { /*tendina dei filtri*/
-  display: none;                 
-  max-height: 250px;             
-  overflow-y: auto;              
-  background-color: #191919;        
-  color: white;
-  border: 1px solid red;         
-  box-sizing: border-box;
-  margin-top: 5px;               
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  padding: 2px 0;                
-  border-radius: 4px;            
-  z-index: 10;                   
-}
+
 
 
 #death-counter-container {
@@ -313,18 +299,19 @@ a {
   position: absolute;
   bottom: 5px;
   left: 20px;
-  width: calc(100% - 40px);  
+  width: calc(100% - 40px);
   padding: 12px 28px;
+  box-sizing: border-box;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
   background-color: #a00000;
   color: white;
-  border: none;
   border-radius: 60px;
   border: 1px solid #ff0000;
   cursor: pointer;
   transition: all 0.2s ease;
+  z-index: 101; /* aggiunto */
 }
 
 .other-visualization-button:hover {
@@ -337,8 +324,68 @@ a {
   left: 20px;
   width: calc(100% - 40px);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  font-size: 16px;
   color: white;
   text-align: center;
   line-height: 1.2;
+}
+
+
+/* Dropdown dei paesi */
+#filter-panel {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  width: calc(100% - 60px);  /* leggermente più stretto del bottone */
+  top: 70px;                  /* separazione dal bottone */
+  left: 46%;                  /* centro orizzontale */
+  transform: translateX(-50%); /* centrato rispetto al bottone */
+  max-height: 150px;          /* altezza per 4 paesi */
+  overflow-y: auto;
+  background-color: #191919;
+  border: 1px solid red;
+  border-radius: 12px;
+  z-index: 999;
+  padding: 5px 0;
+}
+
+
+
+
+/* Opzioni dei paesi */
+#filter-panel .country-option {
+  padding: 10px 16px;
+  color: white;
+  cursor: pointer;
+}
+
+
+#filter-panel .country-option:hover {
+  background-color: #800000;
+}
+
+
+#search-input {
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 40px); /* stessa larghezza dell'IMPUNITY */
+  padding: 12px 28px;       /* stesso padding */
+  background-color: #191919;
+  color: white;
+  border: 2px solid red;
+  border-radius: 60px;       /* stesso border-radius */
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;    /* come l'IMPUNITY */
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 100;
+  margin-left: 8px;          /* puoi regolare se vuoi margini diversi */
+}
+
+#search-input:focus {
+  outline: none; /* rimuove il bordo blu */
 }

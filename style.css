@@ -178,7 +178,7 @@ body {
   font-size: 1rem;
   text-decoration: none;
   border-radius: 60px;
-  border: 1px solid #ff0000;
+  border: 1px solid red;
   text-align: center;
   cursor: pointer;
   opacity: 0;
