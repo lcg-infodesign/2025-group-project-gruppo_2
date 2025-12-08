@@ -604,13 +604,15 @@ function spawnUpToCurrentYear() {
 
           let dot = new Dot(j.id, j.year, j.category); 
     // imposta la visibilità al momento della creazione
-    if (!selectedCountry) {
-      dot.visible = true;
-      dot.dimmed = false;
-    } else {
-      dot.visible = (dot.country && dot.country === selectedCountry.trim().toLowerCase());
-       dot.dimmed = false;
-    }
+  if (!selectedCountry) {
+  dot.visible = true;
+  dot.dimmed = false;
+} else {
+  const dotCountry = (dot.country || "").trim().toLowerCase();
+  dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
+  dot.dimmed = !dot.visible;
+}
+
     dots.push(dot);
     spawnedIds.add(j.id);
     spawnedCount++;
@@ -630,21 +632,22 @@ function spawnUpToCurrentYear() {
 function updateDotsVisibility() {
   if (!dots) return;
 
-  if (!selectedCountry) {
-    // Nessun filtro: tutti visibili
-    dots.forEach(d => {
+  const sel = selectedCountry ? selectedCountry.trim().toLowerCase() : null;
+
+  dots.forEach(d => {
+    const dotCountry = (d.country || "").trim().toLowerCase();
+    if (!sel) {
       d.visible = true;
-    });
-  } else {
-    const sel = selectedCountry.trim().toLowerCase();
-    dots.forEach(d => {
-      // Mostra solo i dots del paese selezionato
-      d.visible = d.country && d.country === sel;
-    });
-  }
+      d.dimmed = false;
+    } else {
+      d.visible = dotCountry === sel;
+      d.dimmed = !d.visible;
+    }
+  });
 
   console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
 }
+
 
 
 
@@ -1329,20 +1332,16 @@ function populateCountryPanel() {
     div.style.cursor = "pointer";
 
         div.addEventListener("click", () => {
-      // normalizziamo selectedCountry per i confronti
-      selectedCountry = country.trim().toLowerCase();
+  selectedCountry = country.trim().toLowerCase();
+  
+  updateDeathCounter(selectedCountry); // aggiorna contatore
+  updateDotsVisibility();              // aggiorna dots visibili
+  
+  panel.style.display = "none";
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) searchInput.value = "";
+});
 
-      // Aggiorna contatore vittime (ok anche se gli passi lowercase)
-      updateDeathCounter(selectedCountry);
-
-      // Aggiorna visibilità pallini (usa la funzione centrale)
-      updateDotsVisibility();
-
-      // Chiudi pannello e reset input ricerca
-      panel.style.display = "none";
-      const searchInput = document.getElementById("search-input");
-      if (searchInput) searchInput.value = "";
-    });
 
 
     panel.appendChild(div);
