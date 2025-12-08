@@ -785,6 +785,9 @@ class Dot {
     this.arrived = false;
     this.mass = 1;
     this.r = diam;
+
+    //stato hover
+    this.hover = false;
   }
 
   update() {
@@ -832,16 +835,25 @@ class Dot {
       dotColor = color(255, 0, 0);
 
     if (highlightUncertain && highlightUnknown)
-      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
+      dotColor = (this.category === "Uncertain" || this.category === "Unknown" || this.category === "Multiple") ? color(255) : color(150);
 
     else if (highlightUncertain)
       dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
 
     else if (highlightUnknown)
-      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
+      dotColor = (this.category === "Unknown" || this.category === "Multiple") ? color(255, 0, 0) : color(150);
 
     if (currentStep === 10)
       dotColor = color(150);
+
+    //quando il pallino è in hover
+    if(this.hover) {
+      //diventa rosso e si ingrandisce
+      noStroke();
+      fill(255, 0, 0);
+      ellipse(this.pos.x, this.pos.y, this.r * 3);
+      return;
+    }
 
     fill(dotColor);
     noStroke();
@@ -1218,6 +1230,21 @@ function draw() {
     drawCard(activeCard);
   }
 
+  let hoveredDot = null;
+
+  //reset
+  for(let d of dots) d.hover = false;
+
+  //trova dot in hover
+  for(let d of dots) {
+    if(d.isHovered()) {
+      hoveredDot = d;
+      d.hover = true;
+      break;
+    }
+  }
+
+  if(!hoveredDot) cursor(ARROW);
 }
 
 
