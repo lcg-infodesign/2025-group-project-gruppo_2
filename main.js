@@ -1230,6 +1230,7 @@ function draw() {
     drawCard(activeCard);
   }
 
+  //pallino in hover
   let hoveredDot = null;
 
   //reset
@@ -1243,8 +1244,6 @@ function draw() {
       break;
     }
   }
-
-  if(!hoveredDot) cursor(ARROW);
 }
 
 
