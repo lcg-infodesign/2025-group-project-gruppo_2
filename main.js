@@ -832,7 +832,8 @@ class Dot {
     this.mass = 1;
     this.r = diam;
 
-    this.visible = true;
+    //stato hover
+    this.hover = false;
   }
 
   update() {
@@ -879,26 +880,27 @@ class Dot {
       dotColor = color(255, 0, 0);
 
     if (highlightUncertain && highlightUnknown)
-      dotColor = (this.category === "Uncertain" || this.category === "Unknown") ? color(255) : color(150);
+      dotColor = (this.category === "Uncertain" || this.category === "Unknown" || this.category === "Multiple") ? color(255) : color(150);
 
     else if (highlightUncertain)
       dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
 
     else if (highlightUnknown)
-      dotColor = this.category === "Unknown" ? color(255, 0, 0) : color(150);
+      dotColor = (this.category === "Unknown" || this.category === "Multiple") ? color(255, 0, 0) : color(150);
 
     if (currentStep === 10)
       dotColor = color(150);
 
-    // determina alpha in base al filtro: se non c'è filtro alpha=255, altrimenti alpha ridotto se dimmed
-    let alphaValue = 255;
-    if (selectedCountry) {
-      alphaValue = this.dimmed ? 60 : 255; // regola qui il 60 per più/meno trasparenza
+    //quando il pallino è in hover
+    if(this.hover) {
+      //diventa rosso e si ingrandisce
+      noStroke();
+      fill(255, 0, 0);
+      ellipse(this.pos.x, this.pos.y, this.r * 3);
+      return;
     }
 
-    // p5.Color oggetto: estrai i livelli RGB e riapplica alpha
-    let levels = dotColor.levels || [255,255,255,255];
-    fill(levels[0], levels[1], levels[2], alphaValue);
+    fill(dotColor);
     noStroke();
     ellipse(this.pos.x, this.pos.y, this.r * 2);
   }
@@ -945,6 +947,9 @@ function drawCard(dot){
     ambiguous = "The date is ambiguous. Plausible dates: " + journalist.ambiguousEntryDate;
   }
   let place = journalist.city + ", " + journalist.country;
+  if(journalist.country == "Israel and the Occupied Palestinian Territory"){
+    place = journalist.city + ", Palestine";
+  }
   let org;
   if(journalist.organization !== ""){
     org = journalist.organization;
@@ -1051,10 +1056,10 @@ function drawCard(dot){
   drawingContext.clip();
 
   // disegna l'immagine nel rettangolo
-  if (photo) {
+  if (photo.width >= photo.height) {
     image(photo, leftX, topY, photoHeight * (photo.width/photo.height), photoHeight);
   } else {
-    rect(leftX, topY, photoWidth, photoHeight, radius);
+    image(photo, leftX, topY, photoWidth, photoWidth * (photo.height/photo.width));
   }
   
   drawingContext.restore(); // rimuove il clipping
@@ -1164,15 +1169,32 @@ function drawCard(dot){
   noStroke();
 
   textSize(35);
+  textLeading(37);
   text(name, leftX + photoWidth + padding, topY + 80, cardWidth - 3*padding - photoWidth);
 
   textSize(20);
+  textLeading(22);
   text(date, leftX + photoWidth + padding, topY + 127, cardWidth - 3*padding - photoWidth);
-  text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
-  text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
   text(impunity, width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 54);
+  if(textWidth(place) < cardWidth - 3*padding - photoWidth){
+    text(place, leftX + photoWidth + padding, topY + 127 + 47);
+  }else{
+    textSize(16);
+    textLeading(18);
+    text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
+  }
+  if(textWidth(org) < 350){
+    textSize(20);
+    textLeading(22);
+    text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+  }else{
+    textSize(14);
+    textLeading(16);
+    text(org, leftX + padding, topY + photoHeight + 2*padding + 20, 340);
+  }
 
   textSize(14);
+  textLeading(16);
   text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
   text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
   text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
@@ -1185,7 +1207,7 @@ function drawCard(dot){
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
-  image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 37, 37);
+  image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 36, 36);
 
   //Praticamente quando l'utente fa hover cpjButtonHover diventa true e in mousePressed() c'è una condizione:
   //Se cpjButtonHover è vera e l'utente clicca si apre la pagina di CPJ
@@ -1358,6 +1380,20 @@ function draw() {
     drawCard(activeCard);
   }
 
+  //pallino in hover
+  let hoveredDot = null;
+
+  //reset
+  for(let d of dots) d.hover = false;
+
+  //trova dot in hover
+  for(let d of dots) {
+    if(d.isHovered()) {
+      hoveredDot = d;
+      d.hover = true;
+      break;
+    }
+  }
 }
 
 
