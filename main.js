@@ -1100,9 +1100,9 @@ function drawCard(dot){
   rect(leftX, topY + photoHeight + padding, cardWidth - 2*padding, 3*padding + 40, 3);
   noFill();
   line(width/2 + verticalOffset, topY + photoHeight + padding, width/2 + verticalOffset, topY + photoHeight + padding + 3*padding + 40); //divisore verticale
-  line(leftX + padding, topY + photoHeight + 2*padding + 20, width/2 + verticalOffset - padding, topY + photoHeight + 2*padding + 20); //org
+  line(leftX + padding, topY + photoHeight + 2*padding + 15, width/2 + verticalOffset - padding, topY + photoHeight + 2*padding + 15); //org
   line(leftX + padding, topY + photoHeight + 3*padding + 37, width/2 + verticalOffset - padding, topY + photoHeight + 3*padding + 37); //job
-  line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 20, rightX - padding, topY + photoHeight + 2*padding + 20); //work-related
+  line(width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 15, rightX - padding, topY + photoHeight + 2*padding + 15); //work-related
   line(width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 37, rightX - padding, topY + photoHeight + 3*padding + 37); //type of death
   rectMode(CORNERS);
   rect(leftX, topY + photoHeight + 5*padding + 40, width/2 + verticalOffset, bottomY, 3); //per il violation status
@@ -1147,13 +1147,13 @@ function drawCard(dot){
   fill(red);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(11);
+  textSize(12);
   text("Name", leftX + photoWidth + padding, topY + 83);
   text("Date of death", leftX + photoWidth + padding, topY + 132);
   text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
-  text("Organization", leftX + padding, topY + photoHeight + 2*padding + 25);
+  text("Organization", leftX + padding, topY + photoHeight + 2*padding + 20);
   text("Job", leftX + padding, topY + photoHeight + 3*padding + 40);
-  text("Work-related", width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 23);
+  text("Work-related", width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
   text("Type of death", width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 40);
   text("Murderer's impunity", width/2 + verticalOffset + padding, topY + photoHeight + 6*padding + 56);
 
@@ -1186,20 +1186,20 @@ function drawCard(dot){
     textLeading(18);
     text(place, leftX + photoWidth + padding, topY + 127 + 47, cardWidth - 3*padding - photoWidth);
   }
-  if(textWidth(org) < 350){
+  if(textWidth(org) < 340){
     textSize(20);
     textLeading(22);
-    text(org, leftX + padding, topY + photoHeight + 2*padding + 20);
+    text(org, leftX + padding, topY + photoHeight + 2*padding + 15);
   }else{
     textSize(14);
     textLeading(16);
-    text(org, leftX + padding, topY + photoHeight + 2*padding + 20, 340);
+    text(org, leftX + padding, topY + photoHeight + 2*padding + 15, 340);
   }
 
   textSize(14);
   textLeading(16);
   text(job, leftX + padding, topY + photoHeight + 3*padding + 35, 350);
-  text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 18);
+  text(workRelated, width/2 + verticalOffset + padding, topY + photoHeight + 2*padding + 13);
   text(typeOfDeath, width/2 + verticalOffset + padding, topY + photoHeight + 3*padding + 35);
   text(threatened, leftX + padding + 200, topY + photoHeight + 5.5*padding + 54);
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
