@@ -30,14 +30,12 @@ let years = []; //elenco degli anni
 let currentYearIndex = 0; //anno corrente
 let spawnedIds = new Set(); //pallini che si caricano
 let inVisualizationArea = false;
+let allDotsSpawned = false; // flag per controllare se tutti i pallini sono stati spawnati
 
 // filtri
 let countries = [];
 let selectedCountry = null;
 let selectedState = null;
-
-
-
 
 // categorie source_of_fire
 let categories = [
@@ -587,8 +585,6 @@ function categoryToY(category) {
 
 //crea gradualmente i pallini
 function spawnUpToCurrentYear() {
-  if (!graphExplainedMode || graphExplainedStep < 2) return; 
-
   if (!years.length || currentYearIndex >= years.length) return;
 
   let yearLimit = years[currentYearIndex];
@@ -600,58 +596,32 @@ function spawnUpToCurrentYear() {
   if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
 
     // FILTRO PAESE
-
-
-          let dot = new Dot(j.id, j.year, j.category); 
+    let dot = new Dot(j.id, j.year, j.category); 
     // imposta la visibilità al momento della creazione
-  if (!selectedCountry) {
-  dot.visible = true;
-  dot.dimmed = false;
-} else {
-  const dotCountry = (dot.country || "").trim().toLowerCase();
-  dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
-  dot.dimmed = !dot.visible;
-}
-
+    if (!selectedCountry) {
+      dot.visible = true;
+      dot.dimmed = false;
+    } else {
+      const dotCountry = (dot.country || "").trim().toLowerCase();
+      dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
+      dot.dimmed = !dot.visible;
+    }
     dots.push(dot);
     spawnedIds.add(j.id);
     spawnedCount++;
-
-
   }
-}
+  }
 
-
+  // passa all'anno successivo solo quando tutti i pallini di questo anno sono spawnati
   if (spawnedCount === 0 && currentYearIndex < years.length - 1) {
     currentYearIndex++;
   }
+
+  // quando tutto è completato
+  if(spawnedIds.size === journalists.length) {
+    allDotsSpawned = true;
+  }
 }
-
-
-// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry (che deve essere normalized)
-function updateDotsVisibility() {
-  if (!dots) return;
-
-  const sel = selectedCountry ? selectedCountry.trim().toLowerCase() : null;
-
-  dots.forEach(d => {
-    const dotCountry = (d.country || "").trim().toLowerCase();
-    if (!sel) {
-      d.visible = true;
-      d.dimmed = false;
-    } else {
-      d.visible = dotCountry === sel;
-      d.dimmed = !d.visible;
-    }
-  });
-
-  console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
-}
-
-
-
-
-
 
 function applyRepulsion() {
   let minDist = diam * 3.5;
@@ -721,6 +691,7 @@ function updateVisualization() {
       showXAxis = true; 
       showGridLines = true;
       animationStarted = true;
+      inVisualizationArea = true;
       break;
 
     // highlight step
@@ -787,9 +758,7 @@ function updateVisualization() {
       inVisualizationArea = true; 
     break;
   }
-
 }
-
 
 /*
 function showAllDotsImmediately() {
@@ -914,20 +883,99 @@ class Dot {
   }
 }
 
-// conteggio vittime
-function updateDeathCounter(country) {
+// popola il pannello dei paesi
+function populateCountryPanel() {
+  const panel = document.getElementById("filter-panel");
+  const counterContainer = document.getElementById("death-counter-container");
+  const worldwideBtn = document.getElementById("worldwide-btn");
+
+  panel.innerHTML = "";
+  panel.style.display = "none";
+
+  // crea opzioni per ogni paese
+  countries.forEach(country => {
+    const div = document.createElement("div");
+    div.classList.add("country-option");
+    div.textContent = country;
+    div.style.cursor = "pointer";
+
+    div.addEventListener("click", () => {
+      selectedCountry = country;
+
+      // ripristina il bottone se c'è un input di ricerca
+      const searchInput = document.getElementById("search-input");
+      if(searchInput) {
+        searchInput.replaceWith(worldwideBtn);
+      }
+
+      // aggiorna il testo del bottone con il paese selezionato
+      worldwideBtn.textContent = country + ' ⌵';
+  
+      // aggiorna contatore e visibilità dei pallini
+      updateDeathCounter(country);
+      counterContainer.style.display = "flex";
+      updateDotsVisibility(); 
+  
+      // nascondi il pannello
+      panel.style.display = "none";
+
+      // mostra tutti i paesi per la prossima apertura
+      const allOptions = panel.querySelectorAll(".country-option");
+      allOptions.forEach(opt => {
+        opt.style.display = 'flex';
+      });
+    });
+
+    panel.appendChild(div);
+  });
+}
+
+// aggiorna il contatore delle vittime
+function updateDeathCounter(country = null) {
   let counter = document.getElementById("death-counter");
+  let container = document.getElementById('death-counter-container');
   
   let count = 0;
-  for (let i = 0; i < data.getRowCount(); i++) {
-    if ((data.get(i, "country") || "").trim().toLowerCase() === (country || "").trim().toLowerCase()) {
-  count++;
-  }
+
+  if(!country) {
+    // conteggio globale
+    count = journalists.length;
+  } else {
+    // conteggio per paese specifico
+    const countryLower = country.trim().toLowerCase();
+    count = journalists.filter(j => {
+      const journalistCountry = (j.country || "").trim().toLowerCase();
+      return journalistCountry === countryLower;
+    }).length;
   }
   
   counter.textContent = count;
+
+  // mostra/nascondi il contatore
+  container.style.display = country ? "flex" : "none";
 }
 
+// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry (che deve essere normalized)
+function updateDotsVisibility() {
+  if (!dots) return;
+
+  const sel = selectedCountry ? selectedCountry.trim().toLowerCase() : null;
+
+  dots.forEach(d => {
+    const dotCountry = (d.country || "").trim().toLowerCase();
+    if (!sel) {
+      // nessun paese selezionato - mostra tutti i pallini normalmente
+      d.visible = true;
+      d.dimmed = false;
+    } else {
+      // paese selezionato - mostra solo i pallini di quel paese
+      d.visible = dotCountry === sel;
+      d.dimmed = !d.visible;
+    }
+  });
+
+  console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
+}
 
 //funzione che disegna la card, per farla funzionare ci sono:
 // - delle variabili globali dichiarate all'inizio
@@ -1271,87 +1319,120 @@ function setup() {
   const worldwideBtn = document.getElementById("worldwide-btn");
   worldwideBtn.addEventListener("click", () => {
     
-    selectedCountry = null; // reset filtro
-    updateDeathCounter(""); // reset contatore
-    updateDotsVisibility();  // mostra tutti i pallini attraverso la funzione centrale
-
-
     const panel = document.getElementById("filter-panel");
+    const counterContainer = document.getElementById("death-counter-container");
 
-    // crea input di ricerca
+    //se c'è un paese selezionato, resetta a WORLDWIDE
+    if(selectedCountry) {
+      selectedCountry = null; // reset filtro
+      worldwideBtn.textContent = "WORLDWIDE ⌵";
+
+      // nascondi il contatore
+      counterContainer.style.display = "none";
+
+      // resetta il conteggio a 0
+      document.getElementById("death-counter").textContent = "0";
+
+      // mostra tutti i pallini
+      updateDotsVisibility();
+    }
+
+        // Se già c'è un input, rimuovilo e ripristina il bottone
+    const existingInput = document.getElementById("search-input");
+    if (existingInput) {
+      existingInput.replaceWith(worldwideBtn);
+    }
+    
+    // Nascondi il pannello dei paesi normali
+    panel.style.display = "none";
+    
+    // Crea input di ricerca
     const input = document.createElement("input");
     input.type = "text";
     input.id = "search-input";
     input.placeholder = "Search country...";
-
-    // copia stile bottone
+    
+    // Copia stile dal bottone
     input.style.cssText = worldwideBtn.style.cssText;
     input.style.width = worldwideBtn.offsetWidth + "px";
     input.style.height = worldwideBtn.offsetHeight + "px";
-
-    // sostituisci bottone con input
+    
+    // IMPORTANTE: Aggiungi stili specifici per l'input
+    input.style.color = "white";
+    input.style.textAlign = "center";
+    input.style.fontFamily = "'JetBrains Mono', monospace";
+    input.style.fontSize = "16px";
+    input.style.backgroundColor = "#191919";
+    input.style.border = "2px solid red";
+    input.style.borderRadius = "60px";
+    input.style.padding = "12px 28px";
+    input.style.boxSizing = "border-box";
+    input.style.cursor = "text";
+    
+    // Sostituisci bottone con input
     worldwideBtn.replaceWith(input);
-
-    // mostra pannello
+    
+    // Mostra pannello con tutti i paesi (per la ricerca)
     panel.style.display = "flex";
-
-    // filtro live
-    input.addEventListener("input", () => {
-      const query = input.value.toLowerCase();
+    panel.style.maxHeight = "200px"; // Altezza per lo scroll
+    
+    // Filtro live mentre si digita
+    input.addEventListener("input", (e) => {
+      e.stopPropagation();
+      const query = input.value.toLowerCase().trim();
       const options = panel.querySelectorAll(".country-option");
+      
       options.forEach(opt => {
-        opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
+        if (query === "") {
+          // Se la ricerca è vuota, mostra tutti i paesi
+          opt.style.display = "flex";
+        } else {
+          // Mostra solo i paesi che corrispondono alla ricerca
+          opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
+        }
       });
     });
-
+    
+    // Focus sull'input
     input.focus();
-
-    // torna bottone se si perde focus
+    
+    // Torna al bottone quando si perde focus O quando si seleziona un paese
     input.addEventListener("blur", () => {
-      panel.style.display = "none";
-      input.replaceWith(worldwideBtn);
+      setTimeout(() => {
+        const currentInput = document.getElementById("search-input");
+        if (currentInput) {
+          currentInput.replaceWith(worldwideBtn);
+          panel.style.display = "none";
+        }
+      }, 200); // Piccolo delay per permettere il click su un'opzione
     });
+    
+    // Previeni la chiusura quando si clicca nel pannello
+    panel.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  });
+
+  // Chiudi il pannello se si clicca fuori
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById("filter-panel");
+    const worldwideBtn = document.getElementById("worldwide-btn");
+    const searchInput = document.getElementById("search-input");
+    
+    if (!panel.contains(e.target) && 
+        !worldwideBtn.contains(e.target) && 
+        !(searchInput && searchInput.contains(e.target))) {
+      panel.style.display = "none";
+      
+      // Se c'è un input di ricerca, ripristina il bottone
+      if (searchInput) {
+        searchInput.replaceWith(worldwideBtn);
+      }
+    }
   });
 
   inVisualizationArea = true;
-
-
-
 }
-
-// --- POPOLAMENTO PANNELLO COUNTRY ---
-function populateCountryPanel() {
-  const panel = document.getElementById("filter-panel");
-  panel.innerHTML = "";
-  panel.style.display = "none";
-
-  countries.forEach(country => {
-    const div = document.createElement("div");
-    div.classList.add("country-option");
-    div.textContent = country;
-    div.style.cursor = "pointer";
-
-        div.addEventListener("click", () => {
-  selectedCountry = country.trim().toLowerCase();
-  
-  updateDeathCounter(selectedCountry); // aggiorna contatore
-  updateDotsVisibility();              // aggiorna dots visibili
-  
-  panel.style.display = "none";
-  const searchInput = document.getElementById("search-input");
-  if (searchInput) searchInput.value = "";
-});
-
-
-
-    panel.appendChild(div);
-  });
-}
-
-
-
-
-
 
 function draw() {
   background(25);
