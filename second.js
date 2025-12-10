@@ -2,7 +2,8 @@ let table;
 let bubbles = [];
 let sidebarWidth = 300;
 
-let showLabels = false;
+let activeLabel = null;
+
 
 function preload() {
     table = loadTable("assets/data.csv", "csv", "header");
@@ -65,9 +66,11 @@ window.onload = () => {
 
 function activateSection(wrapperId, categoryFilter) {
 
+    activeLabel = categoryFilter; // mostra solo etichetta corrente
+
     document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
 
-    const wrapper = document.getElementById(wrapperId);
+    let wrapper = document.getElementById(wrapperId);
     wrapper.style.display = "flex";
 
     for (let b of bubbles) {
@@ -101,17 +104,17 @@ function activateClosure() {
 
     document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
 
-    const wrapper = document.getElementById("closure-wrapper");
-    const bodyEl  = wrapper.querySelector(".section-body");
+    let wrapper = document.getElementById("closure-wrapper");
+    let bodyEl  = wrapper.querySelector(".section-body");
 
     wrapper.style.display = "flex";
 
     for (let b of bubbles) b.dimmed = false;
-    showLabels = true;
+    activeLabel = "ALL";
 
     bodyEl.style.visibility = "hidden";
 
-    const bodyHTML = bodyEl.innerHTML;
+    let bodyHTML = bodyEl.innerHTML;
 
     bodyEl.innerHTML = bodyHTML;
 
@@ -152,7 +155,7 @@ function draw() {
   let hoveringLabel = false;
 
     for (let b of bubbles) {
-        if (showLabels && b.labelClicked(mouseX, mouseY)) {
+        if (activeLabel && b.labelClicked(mouseX, mouseY)) {
             hoveringLabel = true;
             break;
         }
@@ -258,7 +261,7 @@ class Bubble {
     }
 
     update() {
-        let speedFactor = this.isHovered ? 0.1 : 1;
+        let speedFactor = this.isHovered ? 0 : 1;
 
         for (let p of this.points) {
             p.angle += p.speed * speedFactor;
@@ -279,7 +282,7 @@ class Bubble {
             circle(this.x + cos(p.angle) * rr, this.y + sin(p.angle) * rr, 3);
         }
 
-        if (showLabels) {
+        if (activeLabel === "ALL" || this.category === activeLabel) {
             fill(255);
             textAlign(CENTER, BOTTOM);
             textSize(12);
@@ -304,11 +307,13 @@ class Bubble {
 
 function mousePressed() {
     for (let b of bubbles) {
-        if (showLabels && b.labelClicked(mouseX, mouseY)) {
+        if ((activeLabel === "ALL" || activeLabel === b.category) &&
+            b.labelClicked(mouseX, mouseY)) {
             triggerSectionFromLabel(b.category);
         }
     }
 }
+
 
 function triggerSectionFromLabel(cat) {
     const map = {
