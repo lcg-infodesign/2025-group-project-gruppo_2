@@ -215,7 +215,13 @@ function typeWriter(element, speed = 20, callback = null) {
         }
 
         i++;
-        setTimeout(type, speed);
+        
+        // aggiungi una pausa per i caratteri non-tag
+        if(!insideTag) {
+          setTimeout(type, speed);
+        } else {
+          type(); // prosegui immediatamente se stiamo processando un tag
+        }
     }
     type();
 }
