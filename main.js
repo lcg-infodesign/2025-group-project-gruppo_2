@@ -857,14 +857,20 @@ class Dot {
     if (highlightIraq && this.year === 2006 && this.category === "Political Group")
       dotColor = color(255, 0, 0);
 
-    if (highlightUncertain && highlightUnknown)
-      dotColor = (this.category === "Uncertain" || this.category === "Unknown" || this.category === "Multiple") ? color(255) : color(150);
+    if (highlightUncertain && highlightUnknown) {
+      if (this.category === "Uncertain" || this.category === "Unknown" || this.category === "Multiple")
+      dotColor = color(255, 0, 0);
+    }
 
-    else if (highlightUncertain)
-      dotColor = this.category === "Uncertain" ? color(255, 0, 0) : color(150);
+    else if (highlightUncertain) {
+      if (this.category === "Uncertain")
+        dotColor = color(255, 0, 0);
+    }
 
-    else if (highlightUnknown)
-      dotColor = (this.category === "Unknown" || this.category === "Multiple") ? color(255, 0, 0) : color(150);
+    else if (highlightUnknown) {
+      if (this.category === "Unknown" || this.category === "Multiple")
+        dotColor = color(255, 0, 0);
+    }
 
     if (currentStep === 10)
       dotColor = color(150);
