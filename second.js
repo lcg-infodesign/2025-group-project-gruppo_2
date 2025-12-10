@@ -258,7 +258,7 @@ class Bubble {
     }
 
     update() {
-        let speedFactor = this.isHovered ? 0.45 : 1;
+        let speedFactor = this.isHovered ? 0.1 : 1;
 
         for (let p of this.points) {
             p.angle += p.speed * speedFactor;
