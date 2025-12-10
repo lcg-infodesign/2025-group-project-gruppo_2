@@ -187,6 +187,42 @@ html, body {
   line-height: 1.5;
 }
 
+/* BOTTONE */
+.other-visualization-button {
+  position: absolute;
+  bottom: 5px;
+  left: 20px;
+  width: calc(100% - 40px);
+  padding: 12px 28px;
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  background-color: #a00000;
+  color: white;
+  border-radius: 60px;
+  border: 1px solid #ff0000;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101; /* aggiunto */
+}
+
+.other-visualization-button:hover {
+  background-color: #cc0000;
+}
+
+.other-visualization-body{
+  position: absolute;
+  bottom: 70px; 
+  left: 20px;
+  width: calc(100% - 40px);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
+}
+
 .red {
   color: red;
   font-weight: bold;
