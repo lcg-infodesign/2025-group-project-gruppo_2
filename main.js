@@ -669,7 +669,7 @@ function updateVisualization() {
   showYAxis = false;
   showGridLines = false;
 
-  inVisualizationArea = false;
+  inVisualizationArea = animationStarted;
 
   // attiva in base allo step corrente
   switch(currentStep) {
@@ -691,6 +691,7 @@ function updateVisualization() {
       if (!animationInitialized) {
         currentYearIndex = 0;
         animationInitialized = true;
+        animationStarted = true;
       }
       break;
 
@@ -807,7 +808,7 @@ class Dot {
     this.pos = createVector(startX, -20);
     this.vel = createVector(0, 0);
     this.acc = createVector(0, 0);
-    this.speed = random(8, 10);
+    this.speed = random(2, 4);
     this.arrived = false;
     this.mass = 1;
     this.r = diam;
@@ -1489,7 +1490,6 @@ function draw() {
     }
   }
 }
-
 
 /*//applica campo di forze
 function applyForceTo(dot, force) {
