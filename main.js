@@ -272,8 +272,12 @@ function activateGlobalStep(step) {
       graphExplainedMode = true;
       graphExplainedStep = step;
       currentStep = step; // fondamentale per updateVisualization()
+    } else if (step === 13) {
+      currentStep = 11;
+      graphExplainedMode = false;
     } else {
         graphExplainedMode = false; // esci dalla modalità grafico
+        currentStep = step;
     }
 
     // nasconde tutte le sezioni
@@ -291,8 +295,9 @@ function activateGlobalStep(step) {
         if (bodyEl) typeWriter(bodyEl, 20);
     }
 
-    // da qui in poi puoi iniettare i tuoi boolean flags del grafico
     handleConflictsFlags(step);
+    
+    updateVisualization();
 }
 
 
@@ -410,17 +415,32 @@ function setupConflictsNavigation() {
         impunityWrapper.style.display = "flex";
         impunityWrapper.style.opacity = "1";
     });
-
-
-
 }
 
 
 window.addEventListener("load", () => {
-    setupGraphExplainedNavigation();
-    setupConflictsNavigation();
-    activateGlobalStep(0); // parte da explanation-categories
+  setupGraphExplainedNavigation();
+  setupConflictsNavigation();
+
+  let urlParams = new URLSearchParams(window.location.search);
+  let stepParam = urlParams.get("step");
+
+  if (stepParam !== null) {
+    let stepNumber = parseInt(stepParam);
+    if (!isNaN(stepNumber)) {
+      
+      // costruisce subito grafico completo
+      buildFullVisualization();
+
+      // attiva step desiderato
+      activateGlobalStep(stepNumber);
+    }
+  } else {
+    // comportamento normale
+    activateGlobalStep(0);
+  }
 });
+
 
 //disegna griglia
 function drawGridWithSteps() {
@@ -769,19 +789,32 @@ function updateVisualization() {
   }
 }
 
-/*
-function showAllDotsImmediately() {
+// genera tutti i pallini e il grafico (x quando si arriva dall header)
+function buildFullVisualization() {
+  dots = [];
+  spawnedIds = new Set();
+
   for (let j of journalists) {
     if (!spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
+      dot.visible = true;
+      dot.dimmed = false;
       dots.push(dot);
       spawnedIds.add(j.id);
-      dot.arrived = true; // piazza subito i pallini mancanti
     }
   }
-  animationCompleted = true; // marca l’animazione come completata
-  showAllDots = false;
-} */
+
+  allDotsSpawned = true;
+
+  // visibilita assi e griglia
+  showXAxis = true;
+  showYAxis = true;
+  showGridLines = true;
+  inVisualizationArea = true;
+
+  // aggiorna layout
+  drawLayout();
+}
 
 //crea pallini
 class Dot {
@@ -992,11 +1025,10 @@ function updateDotsVisibility() {
   console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
 }
 
-//funzione che disegna la card, per farla funzionare ci sono:
-// - delle variabili globali dichiarate all'inizio
-// - dei cicli if nella funzione mousePressed()
-// - un richiamo della funzione dentro draw()
-
+/* funzione che disegna la card, per farla funzionare ci sono:
+ - delle variabili globali dichiarate all'inizio
+ - dei cicli if nella funzione mousePressed()
+ - un richiamo della funzione dentro draw() */
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
