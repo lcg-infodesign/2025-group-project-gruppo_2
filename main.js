@@ -172,13 +172,15 @@ function handleConflictsFlags(step) {
 }
 
 
-/* 3. FILTRO X PAESE
+/* 3. FILTRO X PAESE -- FATTO mancherebbe accordion
 
     3.1 FUNZIONE CHE FA COMPARIRE I TESTI DI COUNTRY-INTRO -- FATTO
 
-    3.2 FUNZIONE CHE FA APPARIRE FILTER-CONTAINER, ACCORDION E OTHER-VISUALIZATION WRAPPER QUANDO SI CLICCA NEXT-ARROW-COUNTRY-INTRO
+    3.2 FUNZIONE CHE FA APPARIRE FILTER-CONTAINER E OTHER-VISUALIZATION WRAPPER QUANDO SI CLICCA NEXT-ARROW-COUNTRY-INTRO -- FATTO
 
-    3.3 FUNZIONE CHE FA FUNZIONARE IL FILTRO*/
+    3.3 FUNZIONE CHE FA FUNZIONARE IL FILTRO -- FATTO
+    
+    accordion??? */
 
 
 // animazione typewriter
@@ -991,7 +993,7 @@ function updateDotsVisibility() {
 
 //funzione che disegna la card, per farla funzionare ci sono:
 // - delle variabili globali dichiarate all'inizio
-// - dei cicli if() nella funzione mousePressed()
+// - dei cicli if nella funzione mousePressed()
 // - un richiamo della funzione dentro draw()
 
 function drawCard(dot){
