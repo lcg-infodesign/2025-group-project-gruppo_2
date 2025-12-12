@@ -300,7 +300,6 @@ function activateGlobalStep(step) {
     updateVisualization();
 }
 
-
 // navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
 
@@ -587,7 +586,6 @@ function buildJournalistsFromTable() {
   console.log("Sample journalist:", journalists[0]);
 }
 
-
 //calcola le dimensioni dell'area del grafico
 function drawLayout() {
   graphWidth = mainWidth - 2 * padding - yLabelWidth;
@@ -723,8 +721,16 @@ function updateVisualization() {
       inVisualizationArea = true;
       break;
 
+    case 4:
+    case 5:
+      showYAxis = true;
+      showXAxis = true;
+      showGridLines = true;
+      inVisualizationArea = true;
+    break;
+
     // highlight step
-    case 4: 
+    case 6: 
       showYAxis = true;
       showXAxis = true; 
       showGridLines = true; 
@@ -732,7 +738,7 @@ function updateVisualization() {
       highlightMaguindanao = true; 
     break;
 
-    case 5: 
+    case 7: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -740,7 +746,7 @@ function updateVisualization() {
       highlightPalestina = true; 
     break;
 
-    case 6: 
+    case 8: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -748,7 +754,7 @@ function updateVisualization() {
       highlightIraq = true; 
     break;
 
-    case 7: 
+    case 9: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -757,7 +763,7 @@ function updateVisualization() {
       highlightUnknown = true; 
     break;
     
-    case 8: 
+    case 10: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -765,7 +771,7 @@ function updateVisualization() {
       highlightUncertain = true; 
     break;
     
-    case 9: 
+    case 11: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -773,14 +779,14 @@ function updateVisualization() {
       highlightUnknown = true; 
     break;
 
-    case 10: 
+    case 12: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
       inVisualizationArea = true; 
     break;
     
-    case 11: 
+    case 13: 
       showYAxis = true; 
       showXAxis = true; 
       showGridLines = true; 
@@ -908,9 +914,6 @@ class Dot {
         dotColor = color(255, 0, 0);
     }
 
-    if (currentStep === 10)
-      dotColor = color(150);
-
     //quando il pallino è in hover
     if(this.hover) {
       //diventa rosso e si ingrandisce
@@ -1003,7 +1006,7 @@ function updateDeathCounter(country = null) {
   container.style.display = country ? "flex" : "none";
 }
 
-// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry (che deve essere normalized)
+// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry
 function updateDotsVisibility() {
   if (!dots) return;
 
@@ -1522,40 +1525,6 @@ function draw() {
     }
   }
 }
-
-/*//applica campo di forze
-function applyForceTo(dot, force) {
-  let f = p5.Vector.div(force, dot.mass);
-  dot.acc.add(f);
-}
-
-//applica campo di forze
-function applyRepulsion() {
-  let minDist = diam * 3;
-  let strength = 6.0;
-
-  for (let i = 0; i < dots.length; i++) {
-    if (!dots[i].arrived) continue;
-
-    for (let j = i + 1; j < dots.length; j++) {
-      if (!dots[j].arrived) continue;
-
-      let dir = p5.Vector.sub(dots[i].pos, dots[j].pos);
-      let d = dir.mag();
-
-      if (d < minDist && d > 0) {
-        let force = map(d, 0, minDist, strength, 0);
-        dir.normalize().mult(force);
-
-        dots[i].pos.add(dir);
-        dots[j].pos.sub(dir);
-
-        dots[i].pos.x = constrain(dots[i].pos.x, minX, maxX);
-        dots[j].pos.x = constrain(dots[j].pos.x, minX, maxX);
-      }
-    }
-  }
-}*/
 
 function mousePressed() {
    for (let d of dots) {
