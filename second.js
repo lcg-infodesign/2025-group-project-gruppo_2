@@ -93,13 +93,31 @@ function typeWriter(element, speed = 20, callback = null) {
 }
 
 window.onload = () => {
-    let headline = document.getElementById("headline");
-    let arrow = document.getElementById("arrow");
+  let headline = document.getElementById("headline");
+  let arrow = document.getElementById("arrow");
 
-    typeWriter(headline, 35, () => {
-        arrow.style.opacity = "1";
-    });
+  typeWriter(headline, 35, () => {
+      arrow.style.opacity = "1";
+  });
+
+  // se la pagina viene aperta dall header, salta tutta la intro
+  goToStepFromURL();
 };
+
+// apre la pagina dall header direttamente a closure
+function goToStepFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const step = params.get("step");
+
+    if (step === "closure") {
+        // nasconde headline
+        let headlineWrapper = document.getElementById("headline-wrapper");
+        if (headlineWrapper) headlineWrapper.style.display = "none";
+
+        // attiva direttamente closure
+        activateClosure();
+    }
+}
 
 function activateSection(wrapperId, categoryFilter) {
 
