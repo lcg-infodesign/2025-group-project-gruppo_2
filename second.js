@@ -24,7 +24,13 @@ let closeCard = null;
 let activeLabel = null;
 let activeCardDot = null;
 
-
+let sectionSequence = [
+    { wrapperId: "unknown-wrapper", category: "Unknown" },
+    { wrapperId: "complete-wrapper", category: "Complete Impunity" },
+    { wrapperId: "partial-wrapper", category: "Partial Impunity" },
+    { wrapperId: "full-wrapper", category: "Full Justice" },
+    { wrapperId: "closure-wrapper", category: "ALL" }
+];
 
 function preload() {
   table = loadTable("assets/data.csv", "csv", "header");
@@ -94,7 +100,7 @@ function typeWriter(element, speed = 20, callback = null) {
 
 window.onload = () => {
   let headline = document.getElementById("headline");
-  let arrow = document.getElementById("arrow");
+  let arrow = document.getElementById("next-arrow-headline");
 
   typeWriter(headline, 35, () => {
       arrow.style.opacity = "1";
@@ -119,11 +125,36 @@ function goToStepFromURL() {
     }
 }
 
+function goToNextSection(currentWrapperId) {
+    const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
+    if(index !== -1 && index < sectionSequence.length - 1){
+        const next = sectionSequence[index + 1];
+        if(next.wrapperId === "closure-wrapper"){
+            activateClosure();
+        } else {
+            activateSection(next.wrapperId, next.category);
+        }
+    }
+}
+
+function goToPrevSection(currentWrapperId) {
+    const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
+    if(index > 0){
+        const prev = sectionSequence[index - 1];
+        if(prev.wrapperId === "closure-wrapper"){
+            activateClosure();
+        } else {
+            activateSection(prev.wrapperId, prev.category);
+        }
+    }
+}
+
 function activateSection(wrapperId, categoryFilter) {
 
-    activeLabel = categoryFilter; // mostra solo etichetta corrente
+    activeLabel = categoryFilter;
 
-    document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
+    document.querySelectorAll(".section-wrapper")
+        .forEach(w => w.style.display = "none");
 
     let wrapper = document.getElementById(wrapperId);
     wrapper.style.display = "flex";
@@ -133,24 +164,26 @@ function activateSection(wrapperId, categoryFilter) {
     }
 
     let titleEl = wrapper.querySelector(".section-title");
-    let bodyEl  = wrapper.querySelector(".section-body");
-    let arrowEl = wrapper.querySelector(".arrow");
+    let bodyEl = wrapper.querySelector(".section-body");
+    let arrows = wrapper.querySelectorAll(".arrow");
 
     titleEl.style.visibility = "hidden";
-    bodyEl.style.visibility = "hidden";
-    arrowEl.style.visibility = "hidden";
-    arrowEl.style.opacity = "0";
+    bodyEl.style.visibility  = "hidden";
 
-    let titleHTML = titleEl.innerHTML;
-    let bodyHTML  = bodyEl.innerHTML;
+    arrows.forEach(arrow => {
+        arrow.style.visibility = "hidden";
+        arrow.style.opacity = "0";
+    });
 
-    titleEl.innerHTML = titleHTML;
-    bodyEl.innerHTML = bodyHTML;
+    titleEl.innerHTML = titleEl.innerHTML;
+    bodyEl.innerHTML  = bodyEl.innerHTML;
 
     typeWriter(titleEl, 35, () => {
         typeWriter(bodyEl, 15, () => {
-            arrowEl.style.visibility = "visible";
-            arrowEl.style.opacity = "1";
+            arrows.forEach(arrow => {
+                arrow.style.visibility = "visible";
+                arrow.style.opacity = "1";
+            });
         });
     });
 }
@@ -177,31 +210,25 @@ function activateClosure() {
 }
 
 // primo click apre unknown
-document.getElementById("arrow").addEventListener("click", () => {
+document.getElementById("next-arrow-headline").addEventListener("click", () => {
     document.getElementById("headline-wrapper").style.display = "none";
     activateSection("unknown-wrapper", "Unknown");
 });
 
-// unknown → complete
-document.getElementById("arrow-unknown").addEventListener("click", () => {
-    activateSection("complete-wrapper", "Complete Impunity");
+// listener frecce
+document.querySelectorAll(".navigation-arrows .arrow").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+        const parentWrapper = e.target.closest(".section-wrapper");
+        if(!parentWrapper) return;
+
+        if(e.target.id.startsWith("next-arrow")){
+            goToNextSection(parentWrapper.id);
+        } else if(e.target.id.startsWith("prev-arrow")){
+            goToPrevSection(parentWrapper.id);
+        }
+    });
 });
 
-// complete → partial
-document.getElementById("arrow-complete").addEventListener("click", () => {
-    activateSection("partial-wrapper", "Partial Impunity");
-});
-
-// partial → full
-document.getElementById("arrow-partial").addEventListener("click", () => {
-    activateSection("full-wrapper", "Full Justice");
-});
-
-// full → closure
-document.getElementById("arrow-full").addEventListener("click", () => {
-    document.getElementById("full-wrapper").style.display = "none";
-    activateClosure();
-});
 
 function drawCard(dot){
   let journalist = journalists[dot.id];
