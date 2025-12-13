@@ -588,7 +588,7 @@ function buildBubbles() {
 
     let cx = width / 2;
     let cy = height / 2;
-    let offset = 200;
+    let offset = min(width, height) * 0.26;
 
     let positions = [
         { x: cx - offset, y: cy },
@@ -599,7 +599,9 @@ function buildBubbles() {
 
     cats.forEach((cat, i) => {
         let n = data[cat].length;
-        let r = constrain(sqrt(n) * 4, 40, 220);
+        let maxR = min(width, height) * 0.28;
+        let r = constrain(sqrt(n) * 4.8, 60, maxR);
+
 
         bubbles.push(new Bubble(
             positions[i].x,
@@ -736,24 +738,25 @@ class Bubble {
               fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
               circle(px, py, 3);
             }
-
         }  
 
 
         if (activeLabel === "ALL" || this.category === activeLabel) {
             fill(255);
             textAlign(CENTER, BOTTOM);
-            textSize(12);
             textFont("JetBrains Mono");
-            text(this.category, this.x, this.y - this.r - 8);
+            let labelSize = min(width, height) * 0.018;
+            textSize(labelSize);
+            text(this.category, this.x, this.y - this.r - labelSize * 0.8);
         }
     }
 
     labelClicked(mx, my) {
-        textSize(12);
+        let labelSize = min(width, height) * 0.018;
+        textSize(labelSize);
         textFont("JetBrains Mono");
         let tw = textWidth(this.category);
-        let th = 14;
+        let th = labelSize;
 
         let lx = this.x - tw / 2;
         let ly = this.y - this.r - 8;
