@@ -1,6 +1,9 @@
 let table;
 let bubbles = [];
 let journalists = []; 
+let selectedCountry = null;
+let countries = [];
+
 
 let sidebarWidth = 300;
 
@@ -47,18 +50,41 @@ function preload() {
 }
 
 function setup() {
-    let mainWidth = windowWidth - sidebarWidth;
-    let canvas = createCanvas(mainWidth, windowHeight);
-    canvas.position(0, 30);
+  let mainWidth = windowWidth - sidebarWidth;
+  let canvas = createCanvas(mainWidth, windowHeight);
+  canvas.position(0, 30);
 
-    white = color(255);
-    red = color(255, 0, 0);
-    red_translucent = color(255, 0, 0, 60);
-    red_hover = color(255, 0, 0, 80);
+  // colori
+  white = color(255);
+  red = color(255, 0, 0);
+  red_translucent = color(255, 0, 0, 60);
+  red_hover = color(255, 0, 0, 80);
 
-    buildJournalistsFromTable();
-    buildBubbles();
+  // dati
+  buildJournalistsFromTable();
+  buildBubbles();
+
+  // filtro paese
+  populateCountryPanel();
+  updatePointsVisibility();
+  updateDeathCounter(null);
+
+  // bottone
+  let worldwideBtn = document.getElementById("worldwide-btn");
+  let panel = document.getElementById("filter-panel");
+
+  worldwideBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panel.style.display =
+      panel.style.display === "flex" ? "none" : "flex";
+  });
+
+  // il click fuori chiude il pannello
+  document.addEventListener("click", () => {
+    panel.style.display = "none";
+  });
 }
+
 
 function typeWriter(element, speed = 20, callback = null) {
     let html = element.innerHTML.trim();
@@ -190,24 +216,20 @@ function activateSection(wrapperId, categoryFilter) {
 
 function activateClosure() {
 
-    document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
+  document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
 
-    let wrapper = document.getElementById("closure-wrapper");
-    let bodyEl  = wrapper.querySelector(".section-body");
+  let wrapper = document.getElementById("closure-wrapper");
+  wrapper.style.display = "flex";
 
-    wrapper.style.display = "flex";
+  document.getElementById("filter-container").style.display = "block";
 
-    for (let b of bubbles) b.dimmed = false;
-    activeLabel = "ALL";
+  for (let b of bubbles) b.dimmed = false;
+  activeLabel = "ALL";
 
-    bodyEl.style.visibility = "hidden";
-
-    let bodyHTML = bodyEl.innerHTML;
-
-    bodyEl.innerHTML = bodyHTML;
-
-    typeWriter(bodyEl, 20);
+  selectedCountry = null;
+  updatePointsVisibility();
 }
+
 
 // primo click apre unknown
 document.getElementById("next-arrow-headline").addEventListener("click", () => {
@@ -676,6 +698,14 @@ function buildJournalistsFromTable() {
   console.log("Journalists loaded:", journalists.length);
   console.log("Years available:", years);
   console.log("Sample journalist:", journalists[0]);
+
+  countries = [];
+    journalists.forEach(j => {
+      if (j.country && !countries.includes(j.country)) {
+      countries.push(j.country);
+      }
+  });
+  countries.sort((a, b) => a.localeCompare(b));
 }
 
 class Bubble {
@@ -684,7 +714,7 @@ class Bubble {
         this.y = y;
         this.r = r;
         this.category = category;
-        this.indices = indices;  // array degli ID giornalisti
+        this.indices = indices;
         this.count = indices.length;
 
         this.isHovered = false;
@@ -693,14 +723,16 @@ class Bubble {
         this.points = [];
 
         for (let i = 0; i < this.indices.length; i++) {
-            this.points.push({
-                id: this.indices[i],  // ID giornalista
+            let p = {
+                id: this.indices[i],
                 angle: random(TWO_PI),
                 rad: this.r * sqrt(random()),
                 offset: random(1000),
                 speed: random(-0.003, 0.003),
-                hover: false 
-            });
+                hover: false,
+                visible: true
+            };
+            this.points.push(p);
         }
     }
 
@@ -723,22 +755,16 @@ class Bubble {
 
         for (let p of this.points) {
 
-            // calcolo rr
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          if (p.visible === false) continue;
 
-            let px = this.x + cos(p.angle) * rr;
-            let py = this.y + sin(p.angle) * rr;
+          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          let px = this.x + cos(p.angle) * rr;
+          let py = this.y + sin(p.angle) * rr;
 
-            if (p.hover) {
-              noStroke();
-              fill(white);
-              circle(px, py, 7);
-            } else {
-              noStroke();
-              fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
-              circle(px, py, 3);
-            }
-        }  
+          fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+          circle(px, py, 3);
+        }
+
 
 
         if (activeLabel === "ALL" || this.category === activeLabel) {
@@ -764,6 +790,67 @@ class Bubble {
         return mx > lx && mx < lx + tw && my > ly - th && my < ly;
     }
 }
+
+/* funzioni per il funzionamento del filtro */
+function updatePointsVisibility() {
+  bubbles.forEach(b => {
+    b.points.forEach(p => {
+      let j = journalists[p.id];
+      if (!selectedCountry) {
+        p.visible = true;
+      } else {
+        p.visible = j.countryNorm === selectedCountry;
+      }
+    });
+  });
+}
+
+function updateDeathCounter(country = null) {
+  let counter = document.getElementById("death-counter");
+  let container = document.getElementById("death-counter-container");
+
+  let count = 0;
+
+  if (!country) {
+    count = journalists.length;
+  } else {
+    count = journalists.filter(j =>
+      j.countryNorm === country
+    ).length;
+  }
+
+  counter.textContent = count;
+  container.style.display = country ? "flex" : "none";
+}
+
+function populateCountryPanel() {
+  let panel = document.getElementById("filter-panel");
+  let worldwideBtn = document.getElementById("worldwide-btn");
+
+  panel.innerHTML = "";
+  panel.style.display = "none";
+
+  countries.forEach(country => {
+    let div = document.createElement("div");
+    div.classList.add("country-option");
+    div.textContent = country;
+
+    div.addEventListener("click", () => {
+      selectedCountry = country.toLowerCase();
+
+      worldwideBtn.textContent = country + " ⌵";
+
+      updateDeathCounter(selectedCountry);
+      updatePointsVisibility();
+
+      panel.style.display = "none";
+    });
+
+    panel.appendChild(div);
+  });
+}
+
+
 
 function mousePressed() {
     for (let b of bubbles) {
