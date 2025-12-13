@@ -55,7 +55,7 @@ function setup() {
 }
 
 function typeWriter(element, speed = 20, callback = null) {
-    const html = element.innerHTML.trim();
+    let html = element.innerHTML.trim();
     let output = "", buffer = "";
     let i = 0, insideTag = false;
 
@@ -68,7 +68,7 @@ function typeWriter(element, speed = 20, callback = null) {
             return;
         }
 
-        const char = html[i];
+        let char = html[i];
 
         if (char === "<") {
             insideTag = true;
@@ -123,8 +123,8 @@ function activateSection(wrapperId, categoryFilter) {
     arrowEl.style.visibility = "hidden";
     arrowEl.style.opacity = "0";
 
-    const titleHTML = titleEl.innerHTML;
-    const bodyHTML  = bodyEl.innerHTML;
+    let titleHTML = titleEl.innerHTML;
+    let bodyHTML  = bodyEl.innerHTML;
 
     titleEl.innerHTML = titleHTML;
     bodyEl.innerHTML = bodyHTML;
@@ -158,8 +158,6 @@ function activateClosure() {
     typeWriter(bodyEl, 20);
 }
 
-
-
 // primo click apre unknown
 document.getElementById("arrow").addEventListener("click", () => {
     document.getElementById("headline-wrapper").style.display = "none";
@@ -190,11 +188,10 @@ document.getElementById("arrow-full").addEventListener("click", () => {
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
-  //Imposto tutte le variabili con le informazioni sul giornalista per la card
   let id = journalist.id;
   let name = journalist.name;
   let date = journalist.date;
-  let ambiguous, dateIcon; //Queste variabili servono per mettere un'icona e un tooltip che spiega se la data è certa o meno
+  let ambiguous, dateIcon; // tooltip x data di morte certa o no
   if(!journalist.ambiguousEntryDate){
     dateIcon = "tick";
     ambiguous = "The date\nis confirmed";
@@ -244,15 +241,15 @@ function drawCard(dot){
   let impunity = journalist.impunity;
   let url = journalist.url;
 
-  //fondo nero trasparente che oscura il grafico
+  // sfondo che oscura il grafico
   noStroke();
   fill(0,0,0,175);
   rectMode(CORNER);
   rect(0,0, width, height);
 
-  // DISEGNO LA CARD
+  // CARD
 
-  //variabili per le dimensioni
+  //variabili dimensioni
   let cardWidth = 700;
   let cardHeight = 572;
   let cardX = width/2;
@@ -266,19 +263,19 @@ function drawCard(dot){
   let bg = color(19,19,19);
   let grey = color(38,38,38);
 
-  //rettangolo di base
+  // rettangolo base
   stroke(grey);
   strokeWeight(2);
   fill(bg);
   rectMode(CENTER);
   rect(cardX, cardY, cardWidth, cardHeight, 20);
 
-  //--------------------------- FOTO ---------------------------
+  //foto
 
   let photoWidth = 180;
   let photoHeight = 190;
 
-  //Serve memorizzare se la foto è stata caricata e fare un ciclo if in modo che la foto viene caricata una volta sola
+  // carica la foto una volta sola
   if(!hasLoadedPhoto){
     photo = loadImage("assets/images/" + (id + 1) + ".jpg");
     hasLoadedPhoto = true;
@@ -286,17 +283,15 @@ function drawCard(dot){
 
   imageMode(CORNER);
 
-  //Disegno la foto di default in modo che
-  // - se esiste la foto del giornalista viene disegnata sopra e copre quella di default
-  // - se non esiste la foto del giornalista non viene disegnato nulla sopra quella di default e si vede quella
+  // foto di default
+
   image(defaultPhoto, leftX, topY, photoWidth, photoHeight);
 
-  //tutte ste righe servono per fare una maschera rettangolare con gli angoli arrotondati in modo che:
-  // - se la foto non ha il formato giusto non serve deformarla perchè tanto l'eccesso viene mascherato
-  // - ci sono gli angoli arrotondati :)
-  drawingContext.save(); // salva lo stato del canvas
+  // maschera rettangolare con gli angoli arrotondati 
+  drawingContext.save();
 
-  // crea un rettangolo arrotondato come maschera per le foto
+  // rettangolo arrotondato come maschera per le foto
+
   let radius = 5;
   drawingContext.beginPath();
   drawingContext.moveTo(leftX + radius, topY);
@@ -311,17 +306,16 @@ function drawCard(dot){
   drawingContext.closePath();
   drawingContext.clip();
 
-  // disegna l'immagine nel rettangolo
   if (photo.width >= photo.height) {
     image(photo, leftX, topY, photoHeight * (photo.width/photo.height), photoHeight);
   } else {
     image(photo, leftX, topY, photoWidth, photoWidth * (photo.height/photo.width));
   }
   
-  drawingContext.restore(); // rimuove il clipping
+  drawingContext.restore();
 
 
-  //--------------------------- X PER CHIUDERE LA CARD ---------------------------
+  // x che chiude la card
   noFill();
   stroke(red);
   let crossWidth = 16;
@@ -338,9 +332,9 @@ function drawCard(dot){
     cursor(ARROW);
   }
 
-  //--------------------------- GRAFICA DELLA CARD ---------------------------
+  // grafica
 
-  let verticalOffset = 40; // quanto la linea verticale che divide il rettangolo centrale è spostata rispetto al centro della card
+  let verticalOffset = 40;
 
   noFill();
   stroke(red);
@@ -368,7 +362,7 @@ function drawCard(dot){
   strokeWeight(2);
   rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
 
-  //icona e tooltip per la data
+  // icona e tooltip per la data
   noStroke();
   circle(rightX - 20, topY + 80 + 40, 40);
   if(dateIcon == "tick"){
@@ -382,7 +376,7 @@ function drawCard(dot){
     text("?", rightX - 20, topY + 80 + 43);
   }
 
-  //tooltip
+  // tooltip
   let dDate = dist(mouseX, mouseY, rightX - 20, topY + 80 + 40);
   if(dDate <= 20){
     fill(bg);
@@ -396,11 +390,11 @@ function drawCard(dot){
     text(ambiguous, rightX + 2*padding + padding/2, topY + 80 + 40, rectWidth - padding/2);
   }
 
-  //Etichette
+  // etichette
   fill(red);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(12);
+  textSize(13);
   text("Name", leftX + photoWidth + padding, topY + 83);
   text("Date of death", leftX + photoWidth + padding, topY + 132);
   text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
@@ -416,8 +410,7 @@ function drawCard(dot){
   text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
   text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //--------------------------- TESTI DELLA CARD ---------------------------
-  
+  // testi
   textAlign(LEFT, BOTTOM);
   textFont(font);
   textWrap(WORD);
@@ -458,15 +451,14 @@ function drawCard(dot){
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
   text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //Bottone Discover more
+  // bottone discover more
   textAlign(CENTER);
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
   image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 36, 36);
 
-  //Praticamente quando l'utente fa hover cpjButtonHover diventa true e in mousePressed() c'è una condizione:
-  //Se cpjButtonHover è vera e l'utente clicca si apre la pagina di CPJ
+  // ciclo if che fa aprire la pagina di cpj
   if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
     cpjButtonHover = true;
     cpjUrl = url;
@@ -497,9 +489,17 @@ function draw() {
     background(25);
 
     for (let b of bubbles) {
-        let d = dist(mouseX, mouseY, b.x, b.y);
-        b.isHovered = d < b.r;
+        b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
+
+        for (let p of b.points) {
+            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+            let px = b.x + cos(p.angle) * rr;
+            let py = b.y + sin(p.angle) * rr;
+
+            p.hover = dist(mouseX, mouseY, px, py) < 6;
+        }
     }
+
 
     for (let b of bubbles) {
         b.update();
@@ -587,7 +587,7 @@ function buildJournalistsFromTable() {
 
     // workRelated
     let workRelated = "Unknown";
-    const wr = row.get("confirmed work related or unconfirmed (may be work related)");
+    let wr = row.get("confirmed work related or unconfirmed (may be work related)");
     if (wr === "Journalist - Confirmed") workRelated = "Confirmed";
     if (wr === "Journalist - Unconfirmed") workRelated = "Unconfirmed";
     if (wr === "Media Worker") workRelated = "Media Worker";
@@ -651,7 +651,8 @@ class Bubble {
                 angle: random(TWO_PI),
                 rad: this.r * sqrt(random()),
                 offset: random(1000),
-                speed: random(-0.003, 0.003)
+                speed: random(-0.003, 0.003),
+                hover: false 
             });
         }
     }
@@ -675,13 +676,22 @@ class Bubble {
 
         for (let p of this.points) {
 
-            // calcolo RR (UGUALE a quello che userai in mousePressed!)
+            // calcolo rr
             let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
 
             let px = this.x + cos(p.angle) * rr;
             let py = this.y + sin(p.angle) * rr;
 
-            circle(px, py, 3);
+            if (p.hover) {
+              noStroke();
+              fill(white);
+              circle(px, py, 7);
+            } else {
+              noStroke();
+              fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+              circle(px, py, 3);
+            }
+
         }  
 
 
@@ -726,6 +736,7 @@ function mousePressed() {
         }
     }
 
+    // chiude la card al click sulla x
     if (closeCard) {
         activeCardDot = null;
         closeCard = null;
@@ -749,9 +760,8 @@ function mousePressed() {
     }
 }
 
-
 function triggerSectionFromLabel(cat) {
-    const map = {
+    let map = {
         "Unknown":      ["unknown-wrapper", "Unknown"],
         "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
         "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
@@ -760,11 +770,10 @@ function triggerSectionFromLabel(cat) {
 
     if (!map[cat]) return;
     
-    const [wrapperId, filter] = map[cat];
+    let [wrapperId, filter] = map[cat];
 
     activateSection(wrapperId, filter);
 }
-
 
 function windowResized() {
     resizeCanvas(windowWidth - sidebarWidth, windowHeight);

@@ -141,29 +141,33 @@ function handleConflictsFlags(step) {
     switch(step) {
 
         case 6: // conflicts-philippines
-            highlightMaguindanao = true;
-            break;
+          highlightMaguindanao = true;
+          break;
 
         case 7: // conflicts-palestine
-            highlightPalestina = true;
-            break;
+          highlightPalestina = true;
+          break;
 
         case 8: // conflicts-iraq
-            highlightIraq = true;
-            break;
+          highlightIraq = true;
+          break;
 
         case 9: // without-perpetrators-intro
-            highlightUncertain = true;
-            highlightUnknown = true;
-            break;
+          highlightUncertain = true;
+          highlightUnknown = true;
+          break;
 
         case 10: // section-uncertain
-            highlightUncertain = true;
-            break;
+          highlightUncertain = true;
+          break;
 
         case 11: // section-unknown
-            highlightUnknown = true;
-            break;
+          highlightUnknown = true;
+          break;
+
+        case 12:
+          highlightNone = true;
+          break;
         
         default:
           // tutti gli highlight si resettano
@@ -400,17 +404,17 @@ function setupConflictsNavigation() {
 
     document.getElementById("next-arrow-country-intro").addEventListener("click", () => {
 
-        // 1. Nasconde country-intro
-        const countryIntro = document.getElementById("country-intro");
+        // nasconde country-intro
+        let countryIntro = document.getElementById("country-intro");
         countryIntro.style.display = "none";
 
-        // 2. Mostra filter-container
-        const filterContainer = document.getElementById("filter-container");
+        // mostra filter-container
+        let filterContainer = document.getElementById("filter-container");
         filterContainer.style.display = "flex";
         filterContainer.style.opacity = "1";
 
-        // 3. Mostra impunity-status-wrapper
-        const impunityWrapper = document.getElementById("impunity-status-wrapper");
+        // mostra impunity-status-wrapper
+        let impunityWrapper = document.getElementById("impunity-status-wrapper");
         impunityWrapper.style.display = "flex";
         impunityWrapper.style.opacity = "1";
     });
@@ -542,7 +546,7 @@ function buildJournalistsFromTable() {
 
     // workRelated
     let workRelated = "Unknown";
-    const wr = row.get("confirmed work related or unconfirmed (may be work related)");
+    let wr = row.get("confirmed work related or unconfirmed (may be work related)");
     if (wr === "Journalist - Confirmed") workRelated = "Confirmed";
     if (wr === "Journalist - Unconfirmed") workRelated = "Unconfirmed";
     if (wr === "Media Worker") workRelated = "Media Worker";
@@ -628,7 +632,7 @@ function spawnUpToCurrentYear() {
       dot.visible = true;
       dot.dimmed = false;
     } else {
-      const dotCountry = (dot.country || "").trim().toLowerCase();
+      let dotCountry = (dot.country || "").trim().toLowerCase();
       dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
       dot.dimmed = !dot.visible;
     }
@@ -914,12 +918,11 @@ class Dot {
         dotColor = color(255, 0, 0);
     }
 
-    //quando il pallino è in hover
+    // quando il pallino è in hover
     if(this.hover) {
-      //diventa rosso e si ingrandisce
+      // si ingrandisce
       noStroke();
-      fill(255, 0, 0);
-      ellipse(this.pos.x, this.pos.y, this.r * 3);
+      ellipse(this.pos.x, this.pos.y, this.r * 4.5);
       return;
     }
 
@@ -936,16 +939,16 @@ class Dot {
 
 // popola il pannello dei paesi
 function populateCountryPanel() {
-  const panel = document.getElementById("filter-panel");
-  const counterContainer = document.getElementById("death-counter-container");
-  const worldwideBtn = document.getElementById("worldwide-btn");
+  let panel = document.getElementById("filter-panel");
+  let counterContainer = document.getElementById("death-counter-container");
+  let worldwideBtn = document.getElementById("worldwide-btn");
 
   panel.innerHTML = "";
   panel.style.display = "none";
 
   // crea opzioni per ogni paese
   countries.forEach(country => {
-    const div = document.createElement("div");
+    let div = document.createElement("div");
     div.classList.add("country-option");
     div.textContent = country;
     div.style.cursor = "pointer";
@@ -954,7 +957,7 @@ function populateCountryPanel() {
       selectedCountry = country;
 
       // ripristina il bottone se c'è un input di ricerca
-      const searchInput = document.getElementById("search-input");
+      let searchInput = document.getElementById("search-input");
       if(searchInput) {
         searchInput.replaceWith(worldwideBtn);
       }
@@ -967,11 +970,11 @@ function populateCountryPanel() {
       counterContainer.style.display = "flex";
       updateDotsVisibility(); 
   
-      // nascondi il pannello
+      // nasconde il pannello
       panel.style.display = "none";
 
       // mostra tutti i paesi per la prossima apertura
-      const allOptions = panel.querySelectorAll(".country-option");
+      let allOptions = panel.querySelectorAll(".country-option");
       allOptions.forEach(opt => {
         opt.style.display = 'flex';
       });
@@ -993,16 +996,16 @@ function updateDeathCounter(country = null) {
     count = journalists.length;
   } else {
     // conteggio per paese specifico
-    const countryLower = country.trim().toLowerCase();
+    let countryLower = country.trim().toLowerCase();
     count = journalists.filter(j => {
-      const journalistCountry = (j.country || "").trim().toLowerCase();
+      let journalistCountry = (j.country || "").trim().toLowerCase();
       return journalistCountry === countryLower;
     }).length;
   }
   
   counter.textContent = count;
 
-  // mostra/nascondi il contatore
+  // mostra/nasconde il contatore
   container.style.display = country ? "flex" : "none";
 }
 
@@ -1010,10 +1013,10 @@ function updateDeathCounter(country = null) {
 function updateDotsVisibility() {
   if (!dots) return;
 
-  const sel = selectedCountry ? selectedCountry.trim().toLowerCase() : null;
+  let sel = selectedCountry ? selectedCountry.trim().toLowerCase() : null;
 
   dots.forEach(d => {
-    const dotCountry = (d.country || "").trim().toLowerCase();
+    let dotCountry = (d.country || "").trim().toLowerCase();
     if (!sel) {
       // nessun paese selezionato - mostra tutti i pallini normalmente
       d.visible = true;
@@ -1035,11 +1038,10 @@ function updateDotsVisibility() {
 function drawCard(dot){
   let journalist = journalists[dot.id];
 
-  //Imposto tutte le variabili con le informazioni sul giornalista per la card
   let id = journalist.id;
   let name = journalist.name;
   let date = journalist.date;
-  let ambiguous, dateIcon; //Queste variabili servono per mettere un'icona e un tooltip che spiega se la data è certa o meno
+  let ambiguous, dateIcon; // tooltip x data di morte certa o no
   if(!journalist.ambiguousEntryDate){
     dateIcon = "tick";
     ambiguous = "The date\nis confirmed";
@@ -1089,15 +1091,15 @@ function drawCard(dot){
   let impunity = journalist.impunity;
   let url = journalist.url;
 
-  //fondo nero trasparente che oscura il grafico
+  // sfondo che oscura il grafico
   noStroke();
   fill(0,0,0,175);
   rectMode(CORNER);
   rect(0,0, width, height);
 
-  // DISEGNO LA CARD
+  // CARD
 
-  //variabili per le dimensioni
+  //variabili dimensioni
   let cardWidth = 700;
   let cardHeight = 572;
   let cardX = width/2;
@@ -1111,19 +1113,19 @@ function drawCard(dot){
   let bg = color(19,19,19);
   let grey = color(38,38,38);
 
-  //rettangolo di base
+  // rettangolo base
   stroke(grey);
   strokeWeight(2);
   fill(bg);
   rectMode(CENTER);
   rect(cardX, cardY, cardWidth, cardHeight, 20);
 
-  //--------------------------- FOTO ---------------------------
+  //foto
 
   let photoWidth = 180;
   let photoHeight = 190;
 
-  //Serve memorizzare se la foto è stata caricata e fare un ciclo if in modo che la foto viene caricata una volta sola
+  // carica la foto una volta sola
   if(!hasLoadedPhoto){
     photo = loadImage("assets/images/" + (id + 1) + ".jpg");
     hasLoadedPhoto = true;
@@ -1131,17 +1133,15 @@ function drawCard(dot){
 
   imageMode(CORNER);
 
-  //Disegno la foto di default in modo che
-  // - se esiste la foto del giornalista viene disegnata sopra e copre quella di default
-  // - se non esiste la foto del giornalista non viene disegnato nulla sopra quella di default e si vede quella
+  // foto di default
+
   image(defaultPhoto, leftX, topY, photoWidth, photoHeight);
 
-  //tutte ste righe servono per fare una maschera rettangolare con gli angoli arrotondati in modo che:
-  // - se la foto non ha il formato giusto non serve deformarla perchè tanto l'eccesso viene mascherato
-  // - ci sono gli angoli arrotondati :)
-  drawingContext.save(); // salva lo stato del canvas
+  // maschera rettangolare con gli angoli arrotondati 
+  drawingContext.save();
 
-  // crea un rettangolo arrotondato come maschera per le foto
+  // rettangolo arrotondato come maschera per le foto
+
   let radius = 5;
   drawingContext.beginPath();
   drawingContext.moveTo(leftX + radius, topY);
@@ -1156,17 +1156,16 @@ function drawCard(dot){
   drawingContext.closePath();
   drawingContext.clip();
 
-  // disegna l'immagine nel rettangolo
   if (photo.width >= photo.height) {
     image(photo, leftX, topY, photoHeight * (photo.width/photo.height), photoHeight);
   } else {
     image(photo, leftX, topY, photoWidth, photoWidth * (photo.height/photo.width));
   }
   
-  drawingContext.restore(); // rimuove il clipping
+  drawingContext.restore();
 
 
-  //--------------------------- X PER CHIUDERE LA CARD ---------------------------
+  // x che chiude la card
   noFill();
   stroke(red);
   let crossWidth = 16;
@@ -1183,9 +1182,9 @@ function drawCard(dot){
     cursor(ARROW);
   }
 
-  //--------------------------- GRAFICA DELLA CARD ---------------------------
+  // grafica
 
-  let verticalOffset = 40; // quanto la linea verticale che divide il rettangolo centrale è spostata rispetto al centro della card
+  let verticalOffset = 40;
 
   noFill();
   stroke(red);
@@ -1213,7 +1212,7 @@ function drawCard(dot){
   strokeWeight(2);
   rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
 
-  //icona e tooltip per la data
+  // icona e tooltip per la data
   noStroke();
   circle(rightX - 20, topY + 80 + 40, 40);
   if(dateIcon == "tick"){
@@ -1227,7 +1226,7 @@ function drawCard(dot){
     text("?", rightX - 20, topY + 80 + 43);
   }
 
-  //tooltip
+  // tooltip
   let dDate = dist(mouseX, mouseY, rightX - 20, topY + 80 + 40);
   if(dDate <= 20){
     fill(bg);
@@ -1241,11 +1240,11 @@ function drawCard(dot){
     text(ambiguous, rightX + 2*padding + padding/2, topY + 80 + 40, rectWidth - padding/2);
   }
 
-  //Etichette
+  // etichette
   fill(red);
   noStroke();
   textAlign(LEFT, TOP);
-  textSize(12);
+  textSize(13);
   text("Name", leftX + photoWidth + padding, topY + 83);
   text("Date of death", leftX + photoWidth + padding, topY + 132);
   text("Place of death", leftX + photoWidth + padding, topY + 127 + 52);
@@ -1261,8 +1260,7 @@ function drawCard(dot){
   text("Tortured", leftX + padding, topY + photoHeight + 6.5*padding + 54 + 14);
   text("Held captive", leftX + padding, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //--------------------------- TESTI DELLA CARD ---------------------------
-  
+  // testi
   textAlign(LEFT, BOTTOM);
   textFont(font);
   textWrap(WORD);
@@ -1303,15 +1301,14 @@ function drawCard(dot){
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
   text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //Bottone Discover more
+  // bottone discover more
   textAlign(CENTER);
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
   image(cpjLogo, width/2 + verticalOffset + 3*padding, bottomY - 22, 36, 36);
 
-  //Praticamente quando l'utente fa hover cpjButtonHover diventa true e in mousePressed() c'è una condizione:
-  //Se cpjButtonHover è vera e l'utente clicca si apre la pagina di CPJ
+  // ciclo if che fa aprire la pagina di cpj
   if(mouseX > width/2 + verticalOffset + padding && mouseX < rightX && mouseY > bottomY - padding - 14 && mouseY < bottomY){
     cpjButtonHover = true;
     cpjUrl = url;
@@ -1362,22 +1359,22 @@ function setup() {
   }
   countries.sort((a, b) => a.localeCompare(b));
 
-  // Popola pannello paesi
+  // popola pannello paesi
   populateCountryPanel();
 
-  // Bottone worldwide → reset filtro + input di ricerca
-  const worldwideBtn = document.getElementById("worldwide-btn");
+  // bottone worldwide → reset filtro + input di ricerca
+  let worldwideBtn = document.getElementById("worldwide-btn");
   worldwideBtn.addEventListener("click", () => {
     
-    const panel = document.getElementById("filter-panel");
-    const counterContainer = document.getElementById("death-counter-container");
+    let panel = document.getElementById("filter-panel");
+    let counterContainer = document.getElementById("death-counter-container");
 
-    //se c'è un paese selezionato, resetta a WORLDWIDE
+    // se c'è un paese selezionato resetta a WORLDWIDE
     if(selectedCountry) {
       selectedCountry = null; // reset filtro
       worldwideBtn.textContent = "WORLDWIDE ⌵";
 
-      // nascondi il contatore
+      // nasconde il contatore
       counterContainer.style.display = "none";
 
       // resetta il conteggio a 0
@@ -1387,27 +1384,27 @@ function setup() {
       updateDotsVisibility();
     }
 
-        // Se già c'è un input, rimuovilo e ripristina il bottone
-    const existingInput = document.getElementById("search-input");
+        // se già c'è un input lo rimuove e ripristina il bottone
+    let existingInput = document.getElementById("search-input");
     if (existingInput) {
       existingInput.replaceWith(worldwideBtn);
     }
     
-    // Nascondi il pannello dei paesi normali
+    // nasconde pannello paesi
     panel.style.display = "none";
     
-    // Crea input di ricerca
-    const input = document.createElement("input");
+    // crea input di ricerca
+    let input = document.createElement("input");
     input.type = "text";
     input.id = "search-input";
     input.placeholder = "Search country...";
     
-    // Copia stile dal bottone
+    // copia stile dal bottone
     input.style.cssText = worldwideBtn.style.cssText;
     input.style.width = worldwideBtn.offsetWidth + "px";
     input.style.height = worldwideBtn.offsetHeight + "px";
     
-    // IMPORTANTE: Aggiungi stili specifici per l'input
+    // stili imput
     input.style.color = "white";
     input.style.textAlign = "center";
     input.style.fontFamily = "'JetBrains Mono', monospace";
@@ -1419,62 +1416,61 @@ function setup() {
     input.style.boxSizing = "border-box";
     input.style.cursor = "text";
     
-    // Sostituisci bottone con input
+    // sostituisce bottone con input
     worldwideBtn.replaceWith(input);
     
-    // Mostra pannello con tutti i paesi (per la ricerca)
+    // mostra pannello con tutti i paesi
     panel.style.display = "flex";
-    panel.style.maxHeight = "200px"; // Altezza per lo scroll
+    panel.style.maxHeight = "200px"; // altezza x scroll
     
-    // Filtro live mentre si digita
+    // filtro mentre si digita
     input.addEventListener("input", (e) => {
       e.stopPropagation();
-      const query = input.value.toLowerCase().trim();
-      const options = panel.querySelectorAll(".country-option");
+      let query = input.value.toLowerCase().trim();
+      let options = panel.querySelectorAll(".country-option");
       
       options.forEach(opt => {
         if (query === "") {
-          // Se la ricerca è vuota, mostra tutti i paesi
+          // se la ricerca è vuota mostra tutti i paesi
           opt.style.display = "flex";
         } else {
-          // Mostra solo i paesi che corrispondono alla ricerca
+          // mostra solo i paesi che corrispondono alla ricerca
           opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
         }
       });
     });
     
-    // Focus sull'input
     input.focus();
     
-    // Torna al bottone quando si perde focus O quando si seleziona un paese
+    // torna al bottone quando si perde focus o quando si seleziona un paese
     input.addEventListener("blur", () => {
       setTimeout(() => {
-        const currentInput = document.getElementById("search-input");
+        let currentInput = document.getElementById("search-input");
         if (currentInput) {
           currentInput.replaceWith(worldwideBtn);
           panel.style.display = "none";
         }
-      }, 200); // Piccolo delay per permettere il click su un'opzione
+      }, 200);
     });
     
-    // Previeni la chiusura quando si clicca nel pannello
+    // previene chiusura quando si clicca nel pannello
     panel.addEventListener("click", (e) => {
       e.stopPropagation();
     });
   });
 
-  // Chiudi il pannello se si clicca fuori
+  // chiude pannello se si clicca fuori
   document.addEventListener('click', (e) => {
-    const panel = document.getElementById("filter-panel");
-    const worldwideBtn = document.getElementById("worldwide-btn");
-    const searchInput = document.getElementById("search-input");
+    let panel = document.getElementById("filter-panel");
+    let worldwideBtn = document.getElementById("worldwide-btn");
+    let searchInput = document.getElementById("search-input");
     
     if (!panel.contains(e.target) && 
         !worldwideBtn.contains(e.target) && 
         !(searchInput && searchInput.contains(e.target))) {
       panel.style.display = "none";
       
-      // Se c'è un input di ricerca, ripristina il bottone
+      // se c'è un input di ricerca ripristina il bottone
       if (searchInput) {
         searchInput.replaceWith(worldwideBtn);
       }
@@ -1487,8 +1483,7 @@ function setup() {
 function draw() {
   background(25);
 
-  //disegna sempre la griglia  completa
-  //ma controlla cosa rendere visibile in base allo step
+  //disegna sempre la griglia  completa ma controlla cosa rendere visibile in base allo step
   updateVisualization();
   drawGridWithSteps();
 
@@ -1497,7 +1492,7 @@ function draw() {
   }
 
  for (let d of dots) {
-  if (d.visible) {   // <--- Mostra solo i pallini visibili
+  if (d.visible) {   // mostra solo i pallini visibili
     d.update();
   }
   }
@@ -1505,18 +1500,18 @@ function draw() {
   
   applyRepulsion();
 
-  //Disegna la card se activeCard è vero (cioè quando si preme su un pallino)
+  // disegna la card se activeCard è vero (cioè quando si preme su un pallino)
   if (activeCard) {
     drawCard(activeCard);
   }
 
-  //pallino in hover
+  // pallino in hover
   let hoveredDot = null;
 
-  //reset
+  // reset
   for(let d of dots) d.hover = false;
 
-  //trova dot in hover
+  // trova dot in hover
   for(let d of dots) {
     if(d.isHovered()) {
       hoveredDot = d;
@@ -1529,7 +1524,7 @@ function draw() {
 function mousePressed() {
    for (let d of dots) {
 
-    // se è dimmed (cioè non è del paese selezionato), ignoralo per l'interazione
+    // se è dimmed (cioè non è del paese selezionato), ignora l'interazione
     if (d.dimmed) continue;
 
     if (d.isHovered()) {
@@ -1537,8 +1532,7 @@ function mousePressed() {
     }
     }
 
-
-  //Condizione per chiudere la card quando si preme sulla croce
+  // chiude la card quando si clicca sulla x
   if(closeCard){
     activeCard = null;
     closeCard = null;
@@ -1546,7 +1540,7 @@ function mousePressed() {
     hasLoadedPhoto = null;
   }
 
-  //Condizione per aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+  // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
   if(cpjButtonHover){
     window.open(cpjUrl);
     cpjButtonHover = null;
