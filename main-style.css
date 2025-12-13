@@ -9,6 +9,7 @@ html, body {
 
 a {
   text-decoration: none;
+  color: white;
 }
 
 .red {
@@ -56,49 +57,13 @@ a {
   transition: color 0.2s ease-in-out;
 }
 
-.nav-menu > .nav-link, 
-.dropdown {
+.nav-menu > .nav-link {
   margin-left: 40px;
 }
 
 .nav-link:hover {
   text-decoration: underline;
 }
-
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none; 
-  position: absolute;
-  background-color: #191919;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 9999;
-  top: 100%;
-  padding-top: 10px;
-}
-
-.dropdown-content a {
-  color: rgb(255, 245, 233);
-  padding: 15px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 0.85rem;
-  
-}
-
-.dropdown-content a:hover {
-  text-decoration: underline;
-}
-
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
 
 /* CONTAINER E SIDEBAR */
 #container {
@@ -151,7 +116,6 @@ a {
   font-family: 'JetBrains Mono', monospace;
 }
 
-
 #graph-explained, #main-accordion, #conflicts {
   width: 100%;
   right: 15px;
@@ -159,8 +123,6 @@ a {
   align-items: center;
   z-index: 10;
 }
-
-
 
 .explanation-wrapper, .conflicts-wrapper {
   display: flex;
@@ -210,34 +172,32 @@ a {
 
 /* BOTTONE FILTRO*/
 .filter-dropdown {
-  position: absolute; /* rispetto al contenitore padre */
-  top: 20px;          /* distanza dal bordo superiore */
+  position: absolute;
+  top: 20px;
   left: 20px;
   width: calc(100% - 40px);
-
 }
 
 .filter-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% - 40px); /* stessa larghezza dell'IMPUNITY */
-  padding: 12px 28px;       /* stesso padding */
+  width: calc(100% - 40px);
+  padding: 10px 28px;
   background-color: #191919;
   color: white;
   border: 2px solid red;
-  border-radius: 60px;       /* stesso border-radius */
+  border-radius: 60px;       
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   font-size: 16px;
   text-align: center;
   position: relative;
-  box-sizing: border-box;    /* come l'IMPUNITY */
+  box-sizing: border-box;   
   transition: transform 0.2s ease, background-color 0.2s ease;
   z-index: 100;
-  margin-left: 8px;          /* puoi regolare se vuoi margini diversi */
+  margin-left: 8px;
 }
-
 
 .filter-btn:hover {
   border-color: darkred;
@@ -248,18 +208,15 @@ a {
   margin-bottom: 10px;
 }
 
-.filter-input:focus { /* questa classe non esiste, va gestita in js */
+.filter-input:focus {
   outline: none;              
   border: 1px solid red;      
   box-shadow: 0 0 0 1px red; 
 }
 
-.filter-input::placeholder { /* questa classe non esiste, va gestita in js */
+.filter-input::placeholder {
   color: rgba(80, 79, 79, 0.3);
 }
-
-
-
 
 #death-counter-container {
   position: absolute;
@@ -291,6 +248,59 @@ a {
   border: none;              
   width: auto;
   height: auto;
+}
+
+#filter-panel {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  width: calc(100% - 60px);
+  top: 70px;               
+  left: 46%;
+  transform: translateX(-50%);
+  max-height: 150px;
+  overflow-y: auto;
+  background-color: #191919;
+  border: 1px solid red;
+  border-radius: 12px;
+  z-index: 999;
+  padding: 5px 0;
+}
+
+/* opzioni dei paesi */
+#filter-panel .country-option {
+  padding: 10px 16px;
+  color: white;
+  cursor: pointer;
+}
+
+#filter-panel .country-option:hover {
+  background-color: #800000;
+}
+
+#search-input {
+ display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 40px);
+  padding: 12px 28px;
+  background-color: #191919;
+  color: white;
+  border: 2px solid red;
+  border-radius: 60px;    
+  cursor: pointer;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  text-align: center;
+  position: relative;
+  box-sizing: border-box;    
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  z-index: 100;
+  margin-left: 8px;      
+}
+
+#search-input:focus {
+  outline: none; 
 }
 
 /* BOTTONE IMPUNITY */
@@ -330,61 +340,13 @@ a {
 }
 
 
-/* Dropdown dei paesi */
-#filter-panel {
-  display: none;
-  flex-direction: column;
-  position: absolute;
-  width: calc(100% - 60px);  /* leggermente più stretto del bottone */
-  top: 70px;                  /* separazione dal bottone */
-  left: 46%;                  /* centro orizzontale */
-  transform: translateX(-50%); /* centrato rispetto al bottone */
-  max-height: 150px;          /* altezza per 4 paesi */
-  overflow-y: auto;
-  background-color: #191919;
-  border: 1px solid red;
-  border-radius: 12px;
-  z-index: 999;
-  padding: 5px 0;
-}
-
-
-
-
-/* Opzioni dei paesi */
-#filter-panel .country-option {
-  padding: 10px 16px;
-  color: white;
-  cursor: pointer;
-}
-
-
-#filter-panel .country-option:hover {
-  background-color: #800000;
-}
-
-
-#search-input {
- display: flex;
-  align-items: center;
-  justify-content: center;
-  width: calc(100% - 40px); /* stessa larghezza dell'IMPUNITY */
-  padding: 12px 28px;       /* stesso padding */
-  background-color: #191919;
-  color: white;
-  border: 2px solid red;
-  border-radius: 60px;       /* stesso border-radius */
-  cursor: pointer;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
-  text-align: center;
+/* link per tornare ai picchi */
+.back-to-peaks{
   position: relative;
-  box-sizing: border-box;    /* come l'IMPUNITY */
-  transition: transform 0.2s ease, background-color 0.2s ease;
-  z-index: 100;
-  margin-left: 8px;          /* puoi regolare se vuoi margini diversi */
-}
 
-#search-input:focus {
-  outline: none; /* rimuove il bordo blu */
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
 }
