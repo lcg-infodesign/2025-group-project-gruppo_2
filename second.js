@@ -574,45 +574,56 @@ function drawCard(dot){
 }
 
 function draw() {
+
   let hoveringLabel = false;
+  let hoveringPoint = false;
 
-    for (let b of bubbles) {
-        if (activeLabel && b.labelClicked(mouseX, mouseY)) {
-            hoveringLabel = true;
-            break;
-        }
-    }
+  for (let b of bubbles) {
+      if (activeLabel && b.labelClicked(mouseX, mouseY)) {
+          hoveringLabel = true;
+      }
 
-    // pointer
-    if (hoveringLabel) {
-        cursor(HAND);
-    } else {
-        cursor(ARROW);
-    }
+      // controllo hover sui punti
+      for (let p of b.points) {
+          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          let px = b.x + cos(p.angle) * rr;
+          let py = b.y + sin(p.angle) * rr;
 
-    background(25);
+          p.hover = dist(mouseX, mouseY, px, py) < 6;
 
-    for (let b of bubbles) {
-        b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
+          if (p.hover) hoveringPoint = true;
+      }
+  }
 
-        for (let p of b.points) {
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-            let px = b.x + cos(p.angle) * rr;
-            let py = b.y + sin(p.angle) * rr;
+  if (hoveringLabel || hoveringPoint) {
+      cursor(HAND);
+  } else {
+      cursor(ARROW);
+  }
 
-            p.hover = dist(mouseX, mouseY, px, py) < 6;
-        }
-    }
+  background(25);
+
+  for (let b of bubbles) {
+      b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
+
+      for (let p of b.points) {
+          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          let px = b.x + cos(p.angle) * rr;
+          let py = b.y + sin(p.angle) * rr;
+
+          p.hover = dist(mouseX, mouseY, px, py) < 6;
+      }
+  }
 
 
-    for (let b of bubbles) {
-        b.update();
-        b.show();
-    }
+  for (let b of bubbles) {
+      b.update();
+      b.show();
+  }
 
-    if (activeCardDot !== null) {
-    drawCard(activeCardDot);
-    }
+  if (activeCardDot !== null) {
+  drawCard(activeCardDot);
+  }
   
 }
 
@@ -788,21 +799,21 @@ class Bubble {
 
     show() {
         noStroke();
-        fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
 
         for (let p of this.points) {
+            if (p.visible === false) continue;
 
-          if (p.visible === false) continue;
+            // calcola posizione
+            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+            let px = this.x + cos(p.angle) * rr;
+            let py = this.y + sin(p.angle) * rr;
 
-          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-          let px = this.x + cos(p.angle) * rr;
-          let py = this.y + sin(p.angle) * rr;
+            // dimensione punti ingrandita se hover
+            let dSize = p.hover ? 6 : 3;
 
-          fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
-          circle(px, py, 3);
+            fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+            circle(px, py, dSize);
         }
-
-
 
         if (activeLabel === "ALL" || this.category === activeLabel) {
             fill(255);
