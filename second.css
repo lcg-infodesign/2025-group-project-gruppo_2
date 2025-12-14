@@ -11,6 +11,18 @@ a {
   text-decoration: none;
 }
 
+.red {
+  color: red;
+  font-weight: bold;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+
+/* HEADER */
+
 #main-header {
   position: fixed;
   top: 0;
@@ -54,6 +66,9 @@ a {
   text-decoration: underline;
 }
 
+
+/* CONTAINER E SIDEBAR */
+
 #container {
   display: flex;
   width: 100vw;
@@ -63,7 +78,6 @@ a {
   overflow: hidden;
   background-color: #191919;
 }
-
 
 #sketch-container {
   flex: 1;
@@ -88,6 +102,9 @@ a {
   margin: 0;
   position: relative;
 }
+
+
+/* CORPO */
 
 #headline {
   padding: 28px;
@@ -147,7 +164,6 @@ a {
   text-decoration: underline;
 }
 
-
 #headline-wrapper {
   display: flex;
   flex-direction: column;
@@ -191,7 +207,9 @@ a {
   line-height: 1.5;
 }
 
-/* BOTTONE FILTRO*/
+
+/* FILTRO*/
+
 .filter-dropdown {
   position: absolute;
   top: 20px;
@@ -200,7 +218,6 @@ a {
   width: 100%;
   max-width: 260px;
 }
-
 
 .filter-btn {
   display: flex;
@@ -319,7 +336,9 @@ a {
   outline: none; 
 }
 
+
 /* BOTTONE */
+
 #other-visualization-wrapper {
     display: none;
 }
@@ -357,13 +376,4 @@ a {
   color: white;
   text-align: center;
   line-height: 1.2;
-}
-
-.red {
-  color: red;
-  font-weight: bold;
-}
-
-.bold {
-  font-weight: bold;
 }

@@ -1007,7 +1007,7 @@ function updateDeathCounter(country = null) {
   container.style.display = country ? "flex" : "none";
 }
 
-// aggiorna la visibilità / stato "dimmed" dei dots in base a selectedCountry
+// aggiorna la visibilità in base a selectedCountry
 function updateDotsVisibility() {
   if (!dots) return;
 

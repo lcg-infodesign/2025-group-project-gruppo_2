@@ -20,6 +20,9 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
+
+/* HEADER */
+
 #main-header {
   position: fixed;
   top: 0;
@@ -33,8 +36,8 @@ body {
   box-sizing: border-box;
   z-index: 1000;
   background-color: #191919;
-  opacity: 0;           /* nascosto all’inizio */
-  pointer-events: none;  /* non cliccabile */
+  opacity: 0; 
+  pointer-events: none;
   transition: opacity 0.6s ease;
 }
 
@@ -58,8 +61,7 @@ body {
   transition: color 0.2s ease-in-out;
 }
 
-.nav-menu > .nav-link, 
-.dropdown {
+.nav-menu > .nav-link {
   margin-left: 40px;
 }
 
@@ -67,43 +69,14 @@ body {
   text-decoration: underline;
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
 
-.dropdown-content {
-  display: none; 
-  position: absolute;
-  background-color: #191919;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 9999;
-  top: 100%;
-  padding-top: 10px;
-}
-
-.dropdown-content a {
-  color: rgb(255, 245, 233);
-  padding: 15px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 0.85rem;
-}
-
-.dropdown-content a:hover {
-  text-decoration: underline;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
+/* CONTAINER */
 
 #container {
   display: flex;
   width: 100vw;
-  height: calc(100vh - 60px); /* altezza header reale */
-  padding-top: 60px;         /* uguale a header */
+  height: calc(100vh - 60px);
+  padding-top: 60px;
   box-sizing: border-box;
   overflow: hidden;
   background-color: #191919;
@@ -118,6 +91,8 @@ body {
     top: 80px !important;
 }
 
+
+/* CORPO */
 
 #title-container {
   position: relative;
@@ -189,19 +164,5 @@ body {
 
 #button:hover {
   background-color: #cc0000;
-}
-
-#navigation-help {
-  position: fixed;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: underline;
-  text-align: center;
-  pointer-events: none;
-  opacity: 0;
-  transition: none;
 }
 

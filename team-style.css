@@ -20,6 +20,9 @@ body {
   font-family: "JetBrains Mono", monospace;
 }
 
+
+/* HEADER */
+
 #main-header {
   position: fixed;
   top: 0;
@@ -55,8 +58,7 @@ body {
   transition: color 0.2s ease-in-out;
 }
 
-.nav-menu > .nav-link, 
-.dropdown {
+.nav-menu > .nav-link {
   margin-left: 40px;
 }
 
@@ -64,37 +66,7 @@ body {
   text-decoration: underline;
 }
 
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none; 
-  position: absolute;
-  background-color: #191919;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 9999;
-  top: 100%;
-  padding-top: 10px;
-}
-
-.dropdown-content a {
-  color: rgb(255, 245, 233);
-  padding: 15px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 0.85rem;
-}
-
-.dropdown-content a:hover {
-  text-decoration: underline;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
+/* CONTAINER */
 
 #container {
   display: flex;
@@ -106,7 +78,6 @@ body {
   background-color: #191919;
 }
 
-
 #sketch-container {
   flex: 1;
   position: relative;   
@@ -115,6 +86,8 @@ body {
 #sketch-container canvas {
     top: 80px !important;
 }
+
+/* CORPO */
 
 #team-content {
   position: absolute;
@@ -154,7 +127,6 @@ body {
   transition: color 0.3s ease-in-out;
   white-space: nowrap;
 }
-
 
 .team-name:hover {
   color: red;

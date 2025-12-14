@@ -1,7 +1,7 @@
 let titleText = "MEET THE TEAM";
 let titleIndex = 0;
 
-let typingSpeed = 70;   // velocità typing
+let typingSpeed = 70;
 let nameTypingSpeed = 70;
 
 let titleElement;

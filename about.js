@@ -7,8 +7,8 @@ let SECTIONS = [
 
 function setup() {
     createCanvas(windowWidth, windowHeight);
-    populateContent(); // 1. Popola i testi nell'HTML
-    setupAccordion();  // 2. Attiva la logica click
+    populateContent();
+    setupAccordion();
 }
 
 function draw() {
@@ -21,25 +21,25 @@ function windowResized() {
 
 function populateContent() {
     SECTIONS.forEach(section => {
-        // Inserisce il titolo
+
         let titleEl = document.getElementById(`${section.id}-title`);
         if(titleEl) titleEl.innerText = section.title;
-        // Inserisce il testo
+
         let textEl = document.getElementById(`${section.id}-text`);
         if(textEl) textEl.innerText = section.text;
     });
 }
 
 function setupAccordion() {
-    // Seleziona tutti gli header
-    const headers = document.querySelectorAll('.accordion-header');
+
+    let headers = document.querySelectorAll('.accordion-header');
 
     headers.forEach(header => {
         header.addEventListener('click', function() {
-            // Trova la sezione genitore
-            const section = this.parentElement;
+
+            let section = this.parentElement;
             
-            // Chiudi tutte le altre sezioni
+            // chiude le altre sezioni
             document.querySelectorAll('.accordion-section').forEach(item => {
                 if (item !== section) {
                     item.classList.remove('active');
@@ -47,13 +47,13 @@ function setupAccordion() {
                 }
             });
 
-            // Toggle della classe active
+            // toggle classe active
             section.classList.toggle('active');
 
-            // Gestione altezza
-            const content = section.querySelector('.accordion-content');
+            // gestione altezza
+            let content = section.querySelector('.accordion-content');
             if (section.classList.contains('active')) {
-            // Imposto max-height
+            // max-height
                 content.style.maxHeight = content.scrollHeight + "px";
             } else {
                 content.style.maxHeight = null;

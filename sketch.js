@@ -3,7 +3,6 @@ let data;
 let titleText = "STOLEN VOICES";
 let titleIndex = 0;
 
-// singola sezione di testo
 let introTextContent =
   "Every story deserves justice. Every year, dozens of journalists are killed for informing the world."
 let typingIndex = 0;
@@ -34,8 +33,8 @@ function setup() {
 
     window.scrollTo({ top: scrollTarget, behavior: "smooth" });
 
-    // mostra l'header
-  const header = document.getElementById("main-header");
+    // mostra header
+  let header = document.getElementById("main-header");
   header.style.opacity = "1";
   header.style.pointerEvents = "auto";
   });
@@ -73,7 +72,7 @@ function setupIntroTrigger() {
 
 // animazione typing singola sezione
 function typeIntro() {
-  const introEl = document.getElementById("intro-text");
+  let introEl = document.getElementById("intro-text");
   introEl.style.opacity = 1;
 
   typingIndex = 0;
@@ -98,7 +97,7 @@ function typeIntro() {
 
 // mostra il bottone alla fine dell'animazione
 function showButton() {
-  const btn = document.getElementById("button");
+  let btn = document.getElementById("button");
   if (btn) btn.style.opacity = "1";
 }
 
