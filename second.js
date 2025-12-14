@@ -32,7 +32,8 @@ let sectionSequence = [
     { wrapperId: "complete-wrapper", category: "Complete Impunity" },
     { wrapperId: "partial-wrapper", category: "Partial Impunity" },
     { wrapperId: "full-wrapper", category: "Full Justice" },
-    { wrapperId: "closure-wrapper", category: "ALL" }
+    { wrapperId: "closure-wrapper", category: "ALL" },
+    { wrapperId: "final-wrapper", category: "ALL" }
 ];
 
 function preload() {
@@ -80,11 +81,20 @@ function setup() {
   });
 
   // il click fuori chiude il pannello
-  document.addEventListener("click", () => {
-    panel.style.display = "none";
+  document.addEventListener("click", (e) => {
+      if (!panel.contains(e.target) && !worldwideBtn.contains(e.target)) {
+
+          panel.style.display = "none";
+
+          // reset filtro
+          selectedCountry = null;
+          worldwideBtn.innerHTML = 'WORLDWIDE <span id="dropdown-arrow"> ⌵ </span>';
+
+          updatePointsVisibility();
+          updateDeathCounter(null);
+      }
   });
 }
-
 
 function typeWriter(element, speed = 20, callback = null) {
     let html = element.innerHTML.trim();
@@ -142,21 +152,20 @@ function goToStepFromURL() {
     const step = params.get("step");
 
     if (step === "closure") {
-        // nasconde headline
         let headlineWrapper = document.getElementById("headline-wrapper");
         if (headlineWrapper) headlineWrapper.style.display = "none";
 
-        // attiva direttamente closure
-        activateClosure();
+        activateSection("closure-wrapper", "ALL");
     }
 }
 
 function goToNextSection(currentWrapperId) {
     const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
-    if(index !== -1 && index < sectionSequence.length - 1){
+    if (index !== -1 && index < sectionSequence.length - 1) {
         const next = sectionSequence[index + 1];
-        if(next.wrapperId === "closure-wrapper"){
-            activateClosure();
+
+        if (next.wrapperId === "final-wrapper") {
+            activateFinal();
         } else {
             activateSection(next.wrapperId, next.category);
         }
@@ -165,10 +174,11 @@ function goToNextSection(currentWrapperId) {
 
 function goToPrevSection(currentWrapperId) {
     const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
-    if(index > 0){
+    if (index > 0) {
         const prev = sectionSequence[index - 1];
-        if(prev.wrapperId === "closure-wrapper"){
-            activateClosure();
+
+        if (currentWrapperId === "final-wrapper") {
+            activateSection("closure-wrapper", "ALL");
         } else {
             activateSection(prev.wrapperId, prev.category);
         }
@@ -186,50 +196,53 @@ function activateSection(wrapperId, categoryFilter) {
     wrapper.style.display = "flex";
 
     for (let b of bubbles) {
-        b.dimmed = b.category.toLowerCase() !== categoryFilter.toLowerCase();
+        b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
     }
 
     let titleEl = wrapper.querySelector(".section-title");
-    let bodyEl = wrapper.querySelector(".section-body");
-    let arrows = wrapper.querySelectorAll(".arrow");
+    let bodyEl  = wrapper.querySelector(".section-body");
+    let arrows  = wrapper.querySelectorAll(".arrow");
 
-    titleEl.style.visibility = "hidden";
-    bodyEl.style.visibility  = "hidden";
+    if (titleEl) titleEl.style.visibility = "hidden";
+    if (bodyEl)  bodyEl.style.visibility  = "hidden";
 
-    arrows.forEach(arrow => {
-        arrow.style.visibility = "hidden";
-        arrow.style.opacity = "0";
+    arrows.forEach(a => {
+        a.style.visibility = "hidden";
+        a.style.opacity = "0";
     });
 
-    titleEl.innerHTML = titleEl.innerHTML;
-    bodyEl.innerHTML  = bodyEl.innerHTML;
-
-    typeWriter(titleEl, 35, () => {
-        typeWriter(bodyEl, 15, () => {
-            arrows.forEach(arrow => {
-                arrow.style.visibility = "visible";
-                arrow.style.opacity = "1";
-            });
+    const showArrows = () => {
+        arrows.forEach(a => {
+            a.style.visibility = "visible";
+            a.style.opacity = "1";
         });
-    });
+    };
+
+    if (titleEl && bodyEl) {
+        typeWriter(titleEl, 35, () => {
+            typeWriter(bodyEl, 15, showArrows);
+        });
+    } else if (bodyEl) {
+        typeWriter(bodyEl, 15, showArrows);
+    }
 }
 
-function activateClosure() {
+function activateFinal() {
+    document.querySelectorAll(".section-wrapper")
+        .forEach(w => w.style.display = "none");
 
-  document.querySelectorAll(".section-wrapper").forEach(w => w.style.display = "none");
+    let wrapper = document.getElementById("final-wrapper");
+    wrapper.style.display = "flex";
 
-  let wrapper = document.getElementById("closure-wrapper");
-  wrapper.style.display = "flex";
+    document.getElementById("other-visualization-wrapper").style.display = "flex";
 
-  document.getElementById("filter-container").style.display = "block";
+    activeLabel = "ALL";
 
-  for (let b of bubbles) b.dimmed = false;
-  activeLabel = "ALL";
-
-  selectedCountry = null;
-  updatePointsVisibility();
+    document.getElementById("filter-container").style.display = "block";
+    selectedCountry = null;
+    updatePointsVisibility();
+    updateDeathCounter(null);
 }
-
 
 // primo click apre unknown
 document.getElementById("next-arrow-headline").addEventListener("click", () => {

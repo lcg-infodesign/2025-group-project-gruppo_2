@@ -297,6 +297,10 @@ a {
 }
 
 /* BOTTONE */
+#other-visualization-wrapper {
+    display: none;
+}
+
 .other-visualization-button {
   position: absolute;
   bottom: 5px;
