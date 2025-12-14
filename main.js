@@ -95,39 +95,6 @@ function preload() {
   console.log("photos " + photos);
 }
 
-/* 1. PRESENTAZIONE GRAFICO -- FATTO
-
-    1.1 FUNZIONE CHE FA COMPARIRE I TESTI DI GRAPH-EXPLAINED
-
-    1.2 FUNZIONE CHE FA APPARIRE IL GRAFICO UNO STEP ALLA VOLTA
-
-      le due funzioni vanno combinate insieme in modo che siano coordinate in
-      questo ordine:
-        - categorie (sono già presenti) + id="explanation-categories"
-        - timeline + id="explanation-timeline"
-        - inzia l'animazione della cascata + id="explanation-dot"
-        - la cascata continua (non viene toccata) + id="explanation-closure" 
-        
-      dopo il click su next-arrow-closure, sparisce tutto graph-explained */
-
-
-/* 2. SPIEGAZIONE DEI PICCHI -- FATTO
-
-    2.1 FUNZIONE CHE FA COMPARIRE I TESTI DI CONFLICTS
-
-    2.2 FUNZIONE CHE EVIDENZIA I PALLINI RELATIVI AL CONFLITTO
-
-      le due funzioni vanno combinate insieme in modo che siano coordinate in
-      questo ordine:
-        - id="intro-first-paragraph"
-        - id="intro-second paragraph"
-        - let highlightMaguindanao = true + id="conflicts-philippines" (al click su next-arrow-philippines let highlightMaguindanao torna false)
-        - let highlightPalestina = true + id="conflicts-palestine" (al click su next-arrow-palestine let highlightPalestina torna false)
-        - let highlightIraq = true + id="conflicts-iraq" (al click su next-arrow-iraq let highlightIraq torna false)
-        - let highlightUncertain = true + let highlightUnknown = true + id="without-perpetrators-intro" (al click su next-arrow-without-perpetrators let highlightUnknown torna false)
-        - let highlightUncertain = true (lo era già) + id="section-uncertain" (al click su next-arrow-uncertain let highlightUncertain torna false)
-        - let highlightUnknown = true + id="section-unknown" (al click su next-arrow-unknown tutte le variabili highlight tornano false)*/
-
 function handleConflictsFlags(step) {
 
     // reset di tutti gli highlight
@@ -174,16 +141,6 @@ function handleConflictsFlags(step) {
           break;
     }
 }
-
-
-/* 3. FILTRO X PAESE -- FATTO
-
-    3.1 FUNZIONE CHE FA COMPARIRE I TESTI DI COUNTRY-INTRO -- FATTO
-
-    3.2 FUNZIONE CHE FA APPARIRE FILTER-CONTAINER E OTHER-VISUALIZATION WRAPPER QUANDO SI CLICCA NEXT-ARROW-COUNTRY-INTRO -- FATTO
-
-    3.3 FUNZIONE CHE FA FUNZIONARE IL FILTRO -- FATTO */
-
 
 // animazione typewriter
 function typeWriter(element, speed = 20, callback = null) {
@@ -1481,41 +1438,40 @@ function setup() {
 function draw() {
   background(25);
 
-  //disegna sempre la griglia  completa ma controlla cosa rendere visibile in base allo step
+  // disegna sempre la griglia completa ma controlla cosa rendere visibile in base allo step
   updateVisualization();
   drawGridWithSteps();
 
-  if(inVisualizationArea) {
+  if (inVisualizationArea) {
     spawnUpToCurrentYear();
   }
 
- for (let d of dots) {
-  if (d.visible) {   // mostra solo i pallini visibili
-    d.update();
-  }
-  }
+  // reset hover e cursore
+  cursor(ARROW);
+  for (let d of dots) d.hover = false;
 
-  
-  applyRepulsion();
-
-  // disegna la card se activeCard è vero (cioè quando si preme su un pallino)
-  if (activeCard) {
-    drawCard(activeCard);
-  }
-
-  // pallino in hover
+  // hover
   let hoveredDot = null;
-
-  // reset
-  for(let d of dots) d.hover = false;
-
-  // trova dot in hover
-  for(let d of dots) {
-    if(d.isHovered()) {
+  for (let d of dots) {
+    if (d.visible && d.isHovered()) {
       hoveredDot = d;
       d.hover = true;
-      break;
+      cursor(HAND); // cambia cursore se il mouse è sopra
+      break; // considera un dot alla volta
     }
+  }
+
+  for (let d of dots) {
+    if (d.visible) {
+      d.update();
+    }
+  }
+
+  applyRepulsion();
+
+  // disegna la card se activeCard è vero (cioè quando si clicca su un dot)
+  if (activeCard) {
+    drawCard(activeCard);
   }
 }
 
