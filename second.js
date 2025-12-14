@@ -4,7 +4,6 @@ let journalists = [];
 let selectedCountry = null;
 let countries = [];
 
-
 let sidebarWidth = 300;
 
 let defaultPhoto;       
@@ -23,8 +22,8 @@ let cpjUrl = null;
 
 let closeCard = null;
 
-
 let activeLabel = null;
+let openedFromLabel = false;
 let activeCardDot = null;
 
 let sectionSequence = [
@@ -160,41 +159,47 @@ function goToStepFromURL() {
 }
 
 function goToNextSection(currentWrapperId) {
-    const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
-    if (index !== -1 && index < sectionSequence.length - 1) {
-        const next = sectionSequence[index + 1];
+  openedFromLabel = false;
 
-        if (next.wrapperId === "final-wrapper") {
-            activateFinal();
-        } else {
-            activateSection(next.wrapperId, next.category);
-        }
-    }
+  let index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
+  if (index !== -1 && index < sectionSequence.length - 1) {
+      const next = sectionSequence[index + 1];
+
+      if (next.wrapperId === "final-wrapper") {
+          activateFinal();
+      } else {
+          activateSection(next.wrapperId, next.category);
+      }
+  }
 }
 
 function goToPrevSection(currentWrapperId) {
-    const index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
-    if (index > 0) {
-        const prev = sectionSequence[index - 1];
+  openedFromLabel = false;
 
-        if (currentWrapperId === "final-wrapper") {
-            activateSection("closure-wrapper", "ALL");
-        } else {
-            activateSection(prev.wrapperId, prev.category);
-        }
-    }
+  let index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
+  if (index > 0) {
+      const prev = sectionSequence[index - 1];
+
+      if (currentWrapperId === "final-wrapper") {
+          activateSection("closure-wrapper", "ALL");
+      } else {
+          activateSection(prev.wrapperId, prev.category);
+      }
+  }
 }
 
 function activateSection(wrapperId, categoryFilter) {
 
     activeLabel = categoryFilter;
 
+    // nasconde tutte le sezioni
     document.querySelectorAll(".section-wrapper")
         .forEach(w => w.style.display = "none");
 
     let wrapper = document.getElementById(wrapperId);
     wrapper.style.display = "flex";
 
+    // dim delle bubbles delle altre categorie
     for (let b of bubbles) {
         b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
     }
@@ -211,21 +216,39 @@ function activateSection(wrapperId, categoryFilter) {
         a.style.opacity = "0";
     });
 
-    const showArrows = () => {
-        arrows.forEach(a => {
-            a.style.visibility = "visible";
-            a.style.opacity = "1";
-        });
+    let closeLabel = wrapper.querySelector(".close-label");
+
+    if (closeLabel) {
+        // inizialmente nascosto
+        closeLabel.classList.remove("visible");
+
+        // il click porta direttamente a closure
+        closeLabel.onclick = () => {
+            activateSection("closure-wrapper", "ALL");
+        };
+    }
+
+    let showNavigation = () => {
+        if (openedFromLabel && closeLabel) {
+            // mostra close-label con classe .visible
+            closeLabel.classList.add("visible");
+        } else {
+            arrows.forEach(a => {
+                a.style.visibility = "visible";
+                a.style.opacity = "1";
+            });
+        }
     };
 
     if (titleEl && bodyEl) {
         typeWriter(titleEl, 35, () => {
-            typeWriter(bodyEl, 15, showArrows);
+            typeWriter(bodyEl, 15, showNavigation);
         });
     } else if (bodyEl) {
-        typeWriter(bodyEl, 15, showArrows);
+        typeWriter(bodyEl, 15, showNavigation);
     }
 }
+
 
 function activateFinal() {
     document.querySelectorAll(".section-wrapper")
@@ -246,6 +269,7 @@ function activateFinal() {
 
 // primo click apre unknown
 document.getElementById("next-arrow-headline").addEventListener("click", () => {
+    openedFromLabel = false;
     document.getElementById("headline-wrapper").style.display = "none";
     activateSection("unknown-wrapper", "Unknown");
 });
@@ -917,11 +941,13 @@ function triggerSectionFromLabel(cat) {
     };
 
     if (!map[cat]) return;
-    
+
     let [wrapperId, filter] = map[cat];
 
+    openedFromLabel = true;
     activateSection(wrapperId, filter);
 }
+
 
 function windowResized() {
     resizeCanvas(windowWidth - sidebarWidth, windowHeight);

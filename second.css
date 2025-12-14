@@ -125,6 +125,29 @@ a {
   justify-content: center;
 }
 
+.close-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  line-height: 1.2;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, text-decoration 0.2s;
+}
+
+.close-label.visible {
+  opacity: 0.5;
+  visibility: visible;
+}
+
+.close-label.visible:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+
 #headline-wrapper {
   display: flex;
   flex-direction: column;

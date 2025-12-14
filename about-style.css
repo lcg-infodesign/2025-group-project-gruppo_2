@@ -26,7 +26,6 @@ body {
   --header-height: 80px; 
 }
 
-/* HEADER */
 #main-header {
   position: fixed;
   top: 0;
@@ -42,7 +41,6 @@ body {
   background-color: #191919;
 }
 
-/* HEADER */
 .logo {
   color: rgb(255, 245, 233);
   font-size: 1.2rem;
@@ -50,13 +48,11 @@ body {
   letter-spacing: -1px;
 }
 
-/* HEADER */
 .nav-menu {
   display: flex;
   align-items: center;
 }
 
-/* HEADER */
 .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
@@ -65,76 +61,34 @@ body {
   transition: color 0.2s ease-in-out;
 }
 
-/* HEADER */
-.nav-menu > .nav-link, 
-.dropdown {
+.nav-menu > .nav-link {
   margin-left: 40px;
 }
 
-/* HEADER */
 .nav-link:hover {
   text-decoration: underline;
 }
 
-/* HEADER */
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-/* HEADER */
-.dropdown-content {
-  display: none; 
-  position: absolute;
-  background-color: #191919;
-  min-width: 160px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  z-index: 9999;
-  top: 100%;
-  padding-top: 10px;
-}
-
-/* HEADER */
-.dropdown-content a {
-  color: rgb(255, 245, 233);
-  padding: 15px 16px;
-  text-decoration: none;
-  display: block;
-  font-size: 0.85rem;
-}
-
-/* HEADER */
-.dropdown-content a:hover {
-  text-decoration: underline;
-}
-
-/* HEADER */
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-/* ACCORDION BLOCCO */
+/* ACCORDION */
 #accordion-wrapper {
   width: 70%;
   max-width: 900px;
-  margin: 0 auto; /* orizzontale */
-  min-height: 100vh; /* Alto quanto lo schermo */
+  margin: 0 auto; 
+  min-height: 100vh; 
   display: flex;  
-  flex-direction: column; /* Elementi in colonna */
-  justify-content: center; /* Spinge il contenuto al centro verticale */
-  padding-top: 80px; /* Spazio sotto l'header */
+  flex-direction: column; 
+  justify-content: center;
+  padding-top: 80px;
   padding-bottom: 40px; 
-  box-sizing: border-box; /* Padding non sballa l'altezza */
+  box-sizing: border-box;
 }
 
-/* SEPARATORI BIANCHI */
+/* linee separatori */
 .accordion-section {
   width: 100%;
-  /* La linea bianca sottile separatrice */
   border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-/* TITOLI ROSSI */
 .accordion-header {
   font-size: 2.2rem;
   font-weight: 700;
@@ -148,7 +102,7 @@ body {
   align-items: center;
 }
 
-/* FRECCETTA A LATO */
+/* freccetta a lato */
 .accordion-header::after {
   content: '\2335';
   color: rgb(255, 245, 233);
@@ -161,19 +115,17 @@ body {
   vertical-align: middle; 
 }
 
-/* FRECCETTA A LATO GIRATA */
+/* freccetta a lato ruotata */
 .accordion-section.active .accordion-header::after {
   transform: rotate(180deg); 
 }
 
-/* CONTENITORE TESTO CHIUSO DI DEFAULT */
 .accordion-content {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.5s ease-out;
 }
 
-/* TESTO INTERNO BIANCO */
 .about-text {
   font-size: 1.1rem;
   line-height: 1.6;
