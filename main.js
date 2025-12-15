@@ -942,27 +942,25 @@ function populateCountryPanel() {
 // aggiorna il contatore delle vittime
 function updateDeathCounter(country = null) {
   let counter = document.getElementById("death-counter");
-  let container = document.getElementById('death-counter-container');
-  
-  let count = 0;
+  let container = document.getElementById("death-counter-container");
 
-  if(!country) {
-    // conteggio globale
-    count = journalists.length;
-  } else {
-    // conteggio per paese specifico
-    let countryLower = country.trim().toLowerCase();
-    count = journalists.filter(j => {
-      let journalistCountry = (j.country || "").trim().toLowerCase();
-      return journalistCountry === countryLower;
-    }).length;
+  // in worldwide è sempre nascosto
+  if (!country) {
+    counter.textContent = "";
+    container.style.display = "none";
+    return;
   }
-  
-  counter.textContent = count;
 
-  // mostra/nasconde il contatore
-  container.style.display = country ? "flex" : "none";
+  let countryLower = country.trim().toLowerCase();
+  let count = journalists.filter(j => {
+    let journalistCountry = (j.country || "").trim().toLowerCase();
+    return journalistCountry === countryLower;
+  }).length;
+
+  counter.textContent = count;
+  container.style.display = "flex";
 }
+
 
 // aggiorna la visibilità in base a selectedCountry
 function updateDotsVisibility() {
@@ -984,6 +982,237 @@ function updateDotsVisibility() {
   });
 
   console.log("Filter:", selectedCountry, "Visible dots:", dots.filter(d => d.visible).length);
+}
+
+function setup() {
+  sidebarWidth = 300;
+  mainWidth = windowWidth - sidebarWidth;
+  padding = 30;
+
+  let canvas = createCanvas(mainWidth, windowHeight);
+  canvas.position(0, 30);
+
+  yLabelWidth = padding + 60;
+  xLabelHeight = 50;
+  rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
+  initialX = padding + yLabelWidth;
+  yearWidth = (mainWidth - 2 * padding - yLabelWidth) / (2025 - 1992);
+  diam = 2;
+  gravity = 2;
+
+  // colori
+  white = color(255);
+  red = color(255, 0, 0);
+  red_translucent = color(255, 0, 0, 60);
+  red_hover = color(255, 0, 0, 80);
+
+  buildJournalistsFromTable();
+  drawLayout();
+
+  minX = yearToX(1992)-13;
+  maxX = yearToX(2025)+15;
+
+  dots = [];
+  countries = [];
+
+  let nRows = data.getRowCount();
+
+  // crea lista paesi unici
+  for (let i = 0; i < nRows; i++) {
+    let country = (data.get(i, "country") || "").trim();
+    if (country && !countries.includes(country)) {countries.push(country)};
+  }
+  countries.sort((a, b) => a.localeCompare(b));
+
+  // popola pannello paesi
+  populateCountryPanel();
+
+  let counterContainer = document.getElementById("death-counter-container");
+  let counter = document.getElementById("death-counter");
+
+  counter.textContent = "";
+  counterContainer.style.display = "none";
+
+
+  // bottone worldwide → reset filtro + input di ricerca
+  let worldwideBtn = document.getElementById("worldwide-btn");
+  worldwideBtn.addEventListener("click", () => {
+    
+    let panel = document.getElementById("filter-panel");
+    let counterContainer = document.getElementById("death-counter-container");
+
+    // se c'è un paese selezionato resetta a WORLDWIDE
+    if(selectedCountry) {
+      selectedCountry = null; // reset filtro
+      worldwideBtn.textContent = "WORLDWIDE ⌵";
+
+      // nasconde il contatore
+      counterContainer.style.display = "none";
+
+      // mostra tutti i pallini
+      updateDotsVisibility();
+    }
+
+        // se già c'è un input lo rimuove e ripristina il bottone
+    let existingInput = document.getElementById("search-input");
+    if (existingInput) {
+      existingInput.replaceWith(worldwideBtn);
+    }
+    
+    // nasconde pannello paesi
+    panel.style.display = "none";
+    
+    // crea input di ricerca
+    let input = document.createElement("input");
+    input.type = "text";
+    input.id = "search-input";
+    input.placeholder = "Search country...";
+    
+    // copia stile dal bottone
+    input.style.cssText = worldwideBtn.style.cssText;
+    input.style.width = worldwideBtn.offsetWidth + "px";
+    input.style.height = worldwideBtn.offsetHeight + "px";
+    
+    // stili imput
+    input.style.color = "white";
+    input.style.textAlign = "center";
+    input.style.fontFamily = "'JetBrains Mono', monospace";
+    input.style.fontSize = "16px";
+    input.style.backgroundColor = "#191919";
+    input.style.border = "2px solid red";
+    input.style.borderRadius = "60px";
+    input.style.padding = "12px 28px";
+    input.style.boxSizing = "border-box";
+    input.style.cursor = "text";
+    
+    // sostituisce bottone con input
+    worldwideBtn.replaceWith(input);
+    
+    // mostra pannello con tutti i paesi
+    panel.style.display = "flex";
+    panel.style.maxHeight = "200px"; // altezza x scroll
+    
+    // filtro mentre si digita
+    input.addEventListener("input", (e) => {
+      e.stopPropagation();
+      let query = input.value.toLowerCase().trim();
+      let options = panel.querySelectorAll(".country-option");
+      
+      options.forEach(opt => {
+        if (query === "") {
+          // se la ricerca è vuota mostra tutti i paesi
+          opt.style.display = "flex";
+        } else {
+          // mostra solo i paesi che corrispondono alla ricerca
+          opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
+        }
+      });
+    });
+    
+    input.focus();
+    
+    // torna al bottone quando si perde focus o quando si seleziona un paese
+    input.addEventListener("blur", () => {
+      setTimeout(() => {
+        let currentInput = document.getElementById("search-input");
+        if (currentInput) {
+          currentInput.replaceWith(worldwideBtn);
+          panel.style.display = "none";
+        }
+      }, 200);
+    });
+    
+    // previene chiusura quando si clicca nel pannello
+    panel.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
+  });
+
+  // chiude pannello se si clicca fuori
+  document.addEventListener('click', (e) => {
+    let panel = document.getElementById("filter-panel");
+    let worldwideBtn = document.getElementById("worldwide-btn");
+    let searchInput = document.getElementById("search-input");
+    
+    if (!panel.contains(e.target) && 
+        !worldwideBtn.contains(e.target) && 
+        !(searchInput && searchInput.contains(e.target))) {
+      panel.style.display = "none";
+      
+      // se c'è un input di ricerca ripristina il bottone
+      if (searchInput) {
+        searchInput.replaceWith(worldwideBtn);
+      }
+    }
+  });
+
+  inVisualizationArea = true;
+}
+
+function draw() {
+  background(25);
+
+  // disegna sempre la griglia completa ma controlla cosa rendere visibile in base allo step
+  updateVisualization();
+  drawGridWithSteps();
+
+  if (inVisualizationArea) {
+    spawnUpToCurrentYear();
+  }
+
+  // reset hover e cursore
+  cursor(ARROW);
+  for (let d of dots) d.hover = false;
+
+  // hover
+  let hoveredDot = null;
+  for (let d of dots) {
+    if (d.visible && d.isHovered()) {
+      hoveredDot = d;
+      d.hover = true;
+      cursor(HAND); // cambia cursore se il mouse è sopra
+      break; // considera un dot alla volta
+    }
+  }
+
+  for (let d of dots) {
+    if (d.visible) {
+      d.update();
+    }
+  }
+
+  applyRepulsion();
+
+  // disegna la card se activeCard è vero (cioè quando si clicca su un dot)
+  if (activeCard) {
+    drawCard(activeCard);
+  }
+}
+
+function mousePressed() {
+   for (let d of dots) {
+
+    // se è dimmed (cioè non è del paese selezionato), ignora l'interazione
+    if (d.dimmed) continue;
+
+    if (d.isHovered()) {
+      activeCard = d;
+    }
+    }
+
+  // chiude la card quando si clicca sulla x
+  if(closeCard){
+    activeCard = null;
+    closeCard = null;
+    cursor(ARROW);
+    hasLoadedPhoto = null;
+  }
+
+  // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+  if(cpjButtonHover){
+    window.open(cpjUrl);
+    cpjButtonHover = null;
+  }
 }
 
 /* funzione che disegna la card, per farla funzionare ci sono:
@@ -1272,231 +1501,4 @@ function drawCard(dot){
     cpjButtonHover = null;
   }
 
-}
-
-function setup() {
-  sidebarWidth = 300;
-  mainWidth = windowWidth - sidebarWidth;
-  padding = 30;
-
-  let canvas = createCanvas(mainWidth, windowHeight);
-  canvas.position(0, 30);
-
-  yLabelWidth = padding + 60;
-  xLabelHeight = 50;
-  rowHeight = (height - 2 * padding - xLabelHeight) / categories.length;
-  initialX = padding + yLabelWidth;
-  yearWidth = (mainWidth - 2 * padding - yLabelWidth) / (2025 - 1992);
-  diam = 2;
-  gravity = 2;
-
-  // colori
-  white = color(255);
-  red = color(255, 0, 0);
-  red_translucent = color(255, 0, 0, 60);
-  red_hover = color(255, 0, 0, 80);
-
-  buildJournalistsFromTable();
-  drawLayout();
-
-  minX = yearToX(1992)-13;
-  maxX = yearToX(2025)+15;
-
-  dots = [];
-  countries = [];
-
-  let nRows = data.getRowCount();
-
-  // crea lista paesi unici
-  for (let i = 0; i < nRows; i++) {
-    let country = (data.get(i, "country") || "").trim();
-    if (country && !countries.includes(country)) {countries.push(country)};
-  }
-  countries.sort((a, b) => a.localeCompare(b));
-
-  // popola pannello paesi
-  populateCountryPanel();
-
-  // bottone worldwide → reset filtro + input di ricerca
-  let worldwideBtn = document.getElementById("worldwide-btn");
-  worldwideBtn.addEventListener("click", () => {
-    
-    let panel = document.getElementById("filter-panel");
-    let counterContainer = document.getElementById("death-counter-container");
-
-    // se c'è un paese selezionato resetta a WORLDWIDE
-    if(selectedCountry) {
-      selectedCountry = null; // reset filtro
-      worldwideBtn.textContent = "WORLDWIDE ⌵";
-
-      // nasconde il contatore
-      counterContainer.style.display = "none";
-
-      // resetta il conteggio a 0
-      document.getElementById("death-counter").textContent = "0";
-
-      // mostra tutti i pallini
-      updateDotsVisibility();
-    }
-
-        // se già c'è un input lo rimuove e ripristina il bottone
-    let existingInput = document.getElementById("search-input");
-    if (existingInput) {
-      existingInput.replaceWith(worldwideBtn);
-    }
-    
-    // nasconde pannello paesi
-    panel.style.display = "none";
-    
-    // crea input di ricerca
-    let input = document.createElement("input");
-    input.type = "text";
-    input.id = "search-input";
-    input.placeholder = "Search country...";
-    
-    // copia stile dal bottone
-    input.style.cssText = worldwideBtn.style.cssText;
-    input.style.width = worldwideBtn.offsetWidth + "px";
-    input.style.height = worldwideBtn.offsetHeight + "px";
-    
-    // stili imput
-    input.style.color = "white";
-    input.style.textAlign = "center";
-    input.style.fontFamily = "'JetBrains Mono', monospace";
-    input.style.fontSize = "16px";
-    input.style.backgroundColor = "#191919";
-    input.style.border = "2px solid red";
-    input.style.borderRadius = "60px";
-    input.style.padding = "12px 28px";
-    input.style.boxSizing = "border-box";
-    input.style.cursor = "text";
-    
-    // sostituisce bottone con input
-    worldwideBtn.replaceWith(input);
-    
-    // mostra pannello con tutti i paesi
-    panel.style.display = "flex";
-    panel.style.maxHeight = "200px"; // altezza x scroll
-    
-    // filtro mentre si digita
-    input.addEventListener("input", (e) => {
-      e.stopPropagation();
-      let query = input.value.toLowerCase().trim();
-      let options = panel.querySelectorAll(".country-option");
-      
-      options.forEach(opt => {
-        if (query === "") {
-          // se la ricerca è vuota mostra tutti i paesi
-          opt.style.display = "flex";
-        } else {
-          // mostra solo i paesi che corrispondono alla ricerca
-          opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
-        }
-      });
-    });
-    
-    input.focus();
-    
-    // torna al bottone quando si perde focus o quando si seleziona un paese
-    input.addEventListener("blur", () => {
-      setTimeout(() => {
-        let currentInput = document.getElementById("search-input");
-        if (currentInput) {
-          currentInput.replaceWith(worldwideBtn);
-          panel.style.display = "none";
-        }
-      }, 200);
-    });
-    
-    // previene chiusura quando si clicca nel pannello
-    panel.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-  });
-
-  // chiude pannello se si clicca fuori
-  document.addEventListener('click', (e) => {
-    let panel = document.getElementById("filter-panel");
-    let worldwideBtn = document.getElementById("worldwide-btn");
-    let searchInput = document.getElementById("search-input");
-    
-    if (!panel.contains(e.target) && 
-        !worldwideBtn.contains(e.target) && 
-        !(searchInput && searchInput.contains(e.target))) {
-      panel.style.display = "none";
-      
-      // se c'è un input di ricerca ripristina il bottone
-      if (searchInput) {
-        searchInput.replaceWith(worldwideBtn);
-      }
-    }
-  });
-
-  inVisualizationArea = true;
-}
-
-function draw() {
-  background(25);
-
-  // disegna sempre la griglia completa ma controlla cosa rendere visibile in base allo step
-  updateVisualization();
-  drawGridWithSteps();
-
-  if (inVisualizationArea) {
-    spawnUpToCurrentYear();
-  }
-
-  // reset hover e cursore
-  cursor(ARROW);
-  for (let d of dots) d.hover = false;
-
-  // hover
-  let hoveredDot = null;
-  for (let d of dots) {
-    if (d.visible && d.isHovered()) {
-      hoveredDot = d;
-      d.hover = true;
-      cursor(HAND); // cambia cursore se il mouse è sopra
-      break; // considera un dot alla volta
-    }
-  }
-
-  for (let d of dots) {
-    if (d.visible) {
-      d.update();
-    }
-  }
-
-  applyRepulsion();
-
-  // disegna la card se activeCard è vero (cioè quando si clicca su un dot)
-  if (activeCard) {
-    drawCard(activeCard);
-  }
-}
-
-function mousePressed() {
-   for (let d of dots) {
-
-    // se è dimmed (cioè non è del paese selezionato), ignora l'interazione
-    if (d.dimmed) continue;
-
-    if (d.isHovered()) {
-      activeCard = d;
-    }
-    }
-
-  // chiude la card quando si clicca sulla x
-  if(closeCard){
-    activeCard = null;
-    closeCard = null;
-    cursor(ARROW);
-    hasLoadedPhoto = null;
-  }
-
-  // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
-  if(cpjButtonHover){
-    window.open(cpjUrl);
-    cpjButtonHover = null;
-  }
 }
