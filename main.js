@@ -452,7 +452,7 @@ function drawGridWithSteps() {
       
       // pallini
       let yPallino = height - padding - 45;
-      let radius = 8;
+      let radius = 15;
       let glowWidth = 6;
       let maxAlpha = 120;
 
