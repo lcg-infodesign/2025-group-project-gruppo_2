@@ -240,12 +240,17 @@ function activateSection(wrapperId, categoryFilter) {
         }
     };
 
-    if (titleEl && bodyEl) {
-        typeWriter(titleEl, 35, () => {
-            typeWriter(bodyEl, 15, showNavigation);
-        });
-    } else if (bodyEl) {
-        typeWriter(bodyEl, 15, showNavigation);
+    if (wrapperId === "closure-wrapper") {
+
+        if (bodyEl) {
+            typeWriter(bodyEl, 20, showNavigation);
+        }
+
+    } else {
+        // tutte le altre sezioni: mostra subito il testo
+        if (titleEl) titleEl.style.visibility = "visible";
+        if (bodyEl) bodyEl.style.visibility = "visible";
+        showNavigation();
     }
 }
 
@@ -897,7 +902,6 @@ function populateCountryPanel() {
     panel.appendChild(div);
   });
 }
-
 
 
 function mousePressed() {
