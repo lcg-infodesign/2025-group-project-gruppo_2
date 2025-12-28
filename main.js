@@ -533,7 +533,8 @@ function buildJournalistsFromTable() {
       workRelated: workRelated,
       threatened: row.get("threatened") || "Unknown",
       tortured: row.get("tortured") || "Unknown",
-      heldCaptive: row.get("held_captive") || "Unknown"
+      heldCaptive: row.get("held_captive") || "Unknown",
+      photoCredit: row.get("photoCredit")
     };
 
     journalists.push(journalist);
@@ -1274,6 +1275,7 @@ function drawCard(dot){
   }
   let impunity = journalist.impunity;
   let url = journalist.url;
+  let photoCredit = journalist.photoCredit;
 
   // sfondo che oscura il grafico
   noStroke();
@@ -1485,8 +1487,15 @@ function drawCard(dot){
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
   text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
 
+  //photo credit
+  textSize(9);
+  textLeading(9);
+  textAlign(LEFT, TOP);
+  text(photoCredit, leftX, topY + photoHeight + 5, photoWidth);
+
   // bottone discover more
-  textAlign(CENTER);
+  textAlign(CENTER, BOTTOM);
+  textSize(14);
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
