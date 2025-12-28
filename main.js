@@ -247,11 +247,12 @@ function activateGlobalStep(step) {
 
     // mostra la sezione corretta
     let active = document.getElementById(globalSteps[step]);
-    if (active) {
+    if (active) 
         active.style.display = "flex";
 
-        let bodyEl = active.querySelector(".section-body");
-        if (bodyEl) typeWriter(bodyEl, 20);
+    if (active.id === "explanation-closure") {
+    let bodyEl = active.querySelector(".section-body");
+    if (bodyEl) typeWriter(bodyEl, 20);
     }
 
     handleConflictsFlags(step);
