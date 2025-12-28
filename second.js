@@ -543,7 +543,8 @@ function buildJournalistsFromTable() {
       workRelated: workRelated,
       threatened: row.get("threatened") || "Unknown",
       tortured: row.get("tortured") || "Unknown",
-      heldCaptive: row.get("held_captive") || "Unknown"
+      heldCaptive: row.get("held_captive") || "Unknown",
+      photoCredit: row.get("photoCredit")
     };
 
     journalists.push(journalist);
