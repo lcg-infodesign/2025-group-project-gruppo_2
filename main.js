@@ -1067,7 +1067,7 @@ function setup() {
     let input = document.createElement("input");
     input.type = "text";
     input.id = "search-input";
-    input.placeholder = "Search country...";
+    input.placeholder = "Search country..."; 
     
     // copia stile dal bottone
     input.style.cssText = worldwideBtn.style.cssText;

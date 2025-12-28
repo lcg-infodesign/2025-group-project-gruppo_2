@@ -66,32 +66,119 @@ function setup() {
 
   // filtro paese
   populateCountryPanel();
-  updatePointsVisibility();
+  updateDotsVisibility();
   updateDeathCounter(null);
 
-  // bottone
+    // bottone worldwide → reset filtro + input di ricerca
   let worldwideBtn = document.getElementById("worldwide-btn");
-  let panel = document.getElementById("filter-panel");
+  worldwideBtn.addEventListener("click", () => {
+    
+    let panel = document.getElementById("filter-panel");
+    let counterContainer = document.getElementById("death-counter-container");
 
-  worldwideBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    panel.style.display =
-      panel.style.display === "flex" ? "none" : "flex";
+    // se c'è un paese selezionato resetta a WORLDWIDE
+    if(selectedCountry) {
+      selectedCountry = null; // reset filtro
+      worldwideBtn.textContent = "WORLDWIDE ⌵";
+
+      // nasconde il contatore
+      counterContainer.style.display = "none";
+
+      // mostra tutti i pallini
+      updateDotsVisibility();
+    }
+
+        // se già c'è un input lo rimuove e ripristina il bottone
+    let existingInput = document.getElementById("search-input");
+    if (existingInput) {
+      existingInput.replaceWith(worldwideBtn);
+    }
+    
+    // nasconde pannello paesi
+    panel.style.display = "none";
+    
+    // crea input di ricerca
+    let input = document.createElement("input");
+    input.type = "text";
+    input.id = "search-input";
+    input.placeholder = "Search country..."; 
+    
+    // copia stile dal bottone
+    input.style.cssText = worldwideBtn.style.cssText;
+    input.style.width = worldwideBtn.offsetWidth + "px";
+    input.style.height = worldwideBtn.offsetHeight + "px";
+    
+    // stili imput
+    input.style.color = "white";
+    input.style.textAlign = "center";
+    input.style.fontFamily = "'JetBrains Mono', monospace";
+    input.style.fontSize = "16px";
+    input.style.backgroundColor = "#191919";
+    input.style.border = "2px solid red";
+    input.style.borderRadius = "60px";
+    input.style.padding = "12px 28px";
+    input.style.boxSizing = "border-box";
+    input.style.cursor = "text";
+    
+    // sostituisce bottone con input
+    worldwideBtn.replaceWith(input);
+    
+    // mostra pannello con tutti i paesi
+    panel.style.display = "flex";
+    panel.style.maxHeight = "200px"; // altezza x scroll
+    
+    // filtro mentre si digita
+    input.addEventListener("input", (e) => {
+      e.stopPropagation();
+      let query = input.value.toLowerCase().trim();
+      let options = panel.querySelectorAll(".country-option");
+      
+      options.forEach(opt => {
+        if (query === "") {
+          // se la ricerca è vuota mostra tutti i paesi
+          opt.style.display = "flex";
+        } else {
+          // mostra solo i paesi che corrispondono alla ricerca
+          opt.style.display = opt.textContent.toLowerCase().includes(query) ? "flex" : "none";
+        }
+      });
+    });
+    
+    input.focus();
+    
+    // torna al bottone quando si perde focus o quando si seleziona un paese
+    input.addEventListener("blur", () => {
+      setTimeout(() => {
+        let currentInput = document.getElementById("search-input");
+        if (currentInput) {
+          currentInput.replaceWith(worldwideBtn);
+          panel.style.display = "none";
+        }
+      }, 200);
+    });
+    
+    // previene chiusura quando si clicca nel pannello
+    panel.addEventListener("click", (e) => {
+      e.stopPropagation();
+    });
   });
 
-  // il click fuori chiude il pannello
-  document.addEventListener("click", (e) => {
-      if (!panel.contains(e.target) && !worldwideBtn.contains(e.target)) {
-
-          panel.style.display = "none";
-
-          // reset filtro
-          selectedCountry = null;
-          worldwideBtn.innerHTML = 'WORLDWIDE <span id="dropdown-arrow"> ⌵ </span>';
-
-          updatePointsVisibility();
-          updateDeathCounter(null);
+  // chiude pannello se si clicca fuori
+  document.addEventListener('click', (e) => {
+    let panel = document.getElementById("filter-panel");
+    let worldwideBtn = document.getElementById("worldwide-btn");
+    let searchInput = document.getElementById("search-input");
+    
+    if (!panel.contains(e.target) && 
+        !worldwideBtn.contains(e.target) && 
+        !(searchInput && searchInput.contains(e.target))) {
+      panel.style.display = "none";
+      
+      // se c'è un input di ricerca ripristina il bottone
+      if (searchInput) {
+        searchInput.replaceWith(worldwideBtn);
       }
+    }
   });
 }
 
@@ -268,7 +355,7 @@ function activateFinal() {
 
     document.getElementById("filter-container").style.display = "block";
     selectedCountry = null;
-    updatePointsVisibility();
+    updateDotsVisibility();
     updateDeathCounter(null);
 }
 
@@ -292,6 +379,410 @@ document.querySelectorAll(".navigation-arrows .arrow").forEach(btn => {
         }
     });
 });
+
+function draw() {
+
+  let hoveringLabel = false;
+  let hoveringPoint = false;
+
+  for (let b of bubbles) {
+      if (activeLabel && b.labelClicked(mouseX, mouseY)) {
+          hoveringLabel = true;
+      }
+
+      // controllo hover sui punti
+      for (let p of b.points) {
+          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          let px = b.x + cos(p.angle) * rr;
+          let py = b.y + sin(p.angle) * rr;
+
+          p.hover = dist(mouseX, mouseY, px, py) < 6;
+
+          if (p.hover) hoveringPoint = true;
+      }
+  }
+
+  if (hoveringLabel || hoveringPoint) {
+      cursor(HAND);
+  } else {
+      cursor(ARROW);
+  }
+
+  background(25);
+
+  for (let b of bubbles) {
+      b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
+
+      for (let p of b.points) {
+          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+          let px = b.x + cos(p.angle) * rr;
+          let py = b.y + sin(p.angle) * rr;
+
+          p.hover = dist(mouseX, mouseY, px, py) < 6;
+      }
+  }
+
+
+  for (let b of bubbles) {
+      b.update();
+      b.show();
+  }
+
+  if (activeCardDot !== null) {
+  drawCard(activeCardDot);
+  }
+  
+}
+
+function buildBubbles() {
+    if (!table) return;
+
+    let impCol = -1;
+
+    for (let c = 0; c < table.getColumnCount(); c++) {
+        if (table.columns[c].toLowerCase().includes("impunity"))
+            impCol = c;
+    }
+
+    if (impCol === -1) {
+        console.error("Colonna impunity non trovata.");
+        return;
+    }
+
+    let data = {};
+
+    for (let r = 0; r < table.getRowCount(); r++) {
+        let v = table.getString(r, impCol).trim();
+        if (v === "") v = "Unknown";
+        if (!data[v]) data[v] = [];
+        data[v].push(r);
+    }
+
+    let order = ["Unknown", "Full Justice", "Complete Impunity", "Partial Impunity"];
+    let cats = order.filter(c => data[c]);
+
+    bubbles = [];
+
+    let cx = width / 2;
+    let cy = height / 2;
+    let offset = min(width, height) * 0.26;
+
+    let positions = [
+        { x: cx - offset, y: cy },
+        { x: cx, y: cy - offset },
+        { x: cx + offset, y: cy },
+        { x: cx, y: cy + offset }
+    ];
+
+    cats.forEach((cat, i) => {
+        let n = data[cat].length;
+        let maxR = min(width, height) * 0.28;
+        let r = constrain(sqrt(n) * 4.8, 60, maxR);
+
+
+        bubbles.push(new Bubble(
+            positions[i].x,
+            positions[i].y,
+            r,
+            data[cat],
+            cat
+        ));
+
+    });
+
+}
+
+function buildJournalistsFromTable() {
+  journalists = [];
+
+  for (let j = 0; j < table.getRowCount(); j++) {
+    let row = table.getRow(j);
+    let dateStr = row.get("entry_date") || "";
+    let parts = dateStr.split("/");
+    let year = Number(parts[2]) || 0;
+
+    if (year < 100) {
+      if (year >= 90) {
+        year += 1900;
+      } else {
+        year += 2000;
+      }
+    }
+
+    // workRelated
+    let workRelated = "Unknown";
+    let wr = row.get("confirmed work related or unconfirmed (may be work related)");
+    if (wr === "Journalist - Confirmed") workRelated = "Confirmed";
+    if (wr === "Journalist - Unconfirmed") workRelated = "Unconfirmed";
+    if (wr === "Media Worker") workRelated = "Media Worker";
+
+    // country: normalizziamo qui
+    let rawCountry = (row.get("country") || "");
+    let country = rawCountry.trim(); // per mostrare nella UI
+    let countryNorm = country.toLowerCase(); // per confronti (no spazi esterni)
+
+    let journalist = {
+      id: j,
+      year: year,
+      date: row.get("entry_date"),
+      ambiguousEntryDate: row.get("ambiguous_entry_date"),
+      category: row.get("source_of_fire") || "Unknown",
+      name: row.get("journalist/media worker_name") || "",
+      country: country,
+      countryNorm: countryNorm,
+      motive: row.get("motive") || "",
+      role: row.get("role") || "",
+      city: row.get("city") || "",
+      typeOfDeath: row.get("type_of_death") || "",
+      impunity: row.get("impunity") || "",
+      organization: row.get("organization") || "",
+      medium: row.get("mediums") || "",
+      beats: row.get("beats_covered") || "",
+      job: row.get("job") || "",
+      url: row.get("cpj.org_url") || "",
+      workRelated: workRelated,
+      threatened: row.get("threatened") || "Unknown",
+      tortured: row.get("tortured") || "Unknown",
+      heldCaptive: row.get("held_captive") || "Unknown"
+    };
+
+    journalists.push(journalist);
+  }
+
+  years = Array.from(new Set(journalists.map(j => j.year))).sort((a,b) => a-b);
+  console.log("Journalists loaded:", journalists.length);
+  console.log("Years available:", years);
+  console.log("Sample journalist:", journalists[0]);
+
+  countries = [];
+    journalists.forEach(j => {
+      if (j.country && !countries.includes(j.country)) {
+      countries.push(j.country);
+      }
+  });
+  countries.sort((a, b) => a.localeCompare(b));
+}
+
+class Bubble {
+    constructor(x, y, r, indices, category) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.category = category;
+        this.indices = indices;
+        this.count = indices.length;
+
+        this.isHovered = false;
+        this.dimmed = false;
+
+        this.points = [];
+
+        for (let i = 0; i < this.indices.length; i++) {
+            let p = {
+                id: this.indices[i],
+                angle: random(TWO_PI),
+                rad: this.r * sqrt(random()),
+                offset: random(1000),
+                speed: random(-0.003, 0.003),
+                hover: false,
+                visible: true
+            };
+            this.points.push(p);
+        }
+    }
+
+    update() {
+        let speedFactor = this.isHovered ? 0 : 1;
+
+        for (let p of this.points) {
+            p.angle += p.speed * speedFactor;
+            p.rad = constrain(
+                p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
+                0,
+                this.r
+            );
+        }
+    }
+
+    show() {
+        noStroke();
+
+        for (let p of this.points) {
+            if (p.visible === false) continue;
+
+            // calcola posizione
+            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+            let px = this.x + cos(p.angle) * rr;
+            let py = this.y + sin(p.angle) * rr;
+
+            // dimensione punti ingrandita se hover
+            let dSize = p.hover ? 6 : 3;
+
+            fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+            circle(px, py, dSize);
+        }
+
+        if (activeLabel === "ALL" || this.category === activeLabel) {
+            fill(255);
+            textAlign(CENTER, BOTTOM);
+            textFont("JetBrains Mono");
+            let labelSize = min(width, height) * 0.018;
+            textSize(labelSize);
+            text(this.category, this.x, this.y - this.r - labelSize * 0.8);
+        }
+    }
+
+    labelClicked(mx, my) {
+        let labelSize = min(width, height) * 0.018;
+        textSize(labelSize);
+        textFont("JetBrains Mono");
+        let tw = textWidth(this.category);
+        let th = labelSize;
+
+        let lx = this.x - tw / 2;
+        let ly = this.y - this.r - 8;
+
+        return mx > lx && mx < lx + tw && my > ly - th && my < ly;
+    }
+}
+
+/* funzioni per il funzionamento del filtro */
+function updateDotsVisibility(country = null) {
+  bubbles.forEach(b => {
+    b.points.forEach(p => {
+      let j = journalists[p.id];
+      if (!country) {
+        p.visible = true;
+      } else {
+        p.visible = j.countryNorm === country;
+      }
+    });
+  });
+}
+
+function updateDeathCounter(country = null) {
+  let counter = document.getElementById("death-counter");
+  let container = document.getElementById("death-counter-container");
+
+  let count = 0;
+
+  if (!country) {
+    count = journalists.length;
+  } else {
+    count = journalists.filter(j =>
+      j.countryNorm === country
+    ).length;
+  }
+
+  counter.textContent = count;
+  container.style.display = country ? "flex" : "none";
+}
+
+function populateCountryPanel() {
+  let panel = document.getElementById("filter-panel");
+  let counterContainer = document.getElementById("death-counter-container");
+  let worldwideBtn = document.getElementById("worldwide-btn");
+
+  panel.innerHTML = "";
+  panel.style.display = "none";
+
+  // crea opzioni per ogni paese
+  countries.forEach(country => {
+    let div = document.createElement("div");
+    div.classList.add("country-option");
+    div.textContent = country;
+    div.style.cursor = "pointer";
+
+    div.addEventListener("click", () => {
+      selectedCountry = country.toLowerCase();
+
+      // ripristina il bottone se c'è un input di ricerca
+      let searchInput = document.getElementById("search-input");
+      if(searchInput) {
+        searchInput.replaceWith(worldwideBtn);
+      }
+
+      // aggiorna il testo del bottone con il paese selezionato
+      worldwideBtn.textContent = country + ' ⌵';
+  
+      // aggiorna contatore e visibilità dei pallini
+      updateDeathCounter(selectedCountry);
+      counterContainer.style.display = "flex";
+      updateDotsVisibility(selectedCountry); 
+  
+      // nasconde il pannello
+      panel.style.display = "none";
+
+      // mostra tutti i paesi per la prossima apertura
+      let allOptions = panel.querySelectorAll(".country-option");
+      allOptions.forEach(opt => {
+        opt.style.display = 'flex';
+      });
+    });
+
+    panel.appendChild(div);
+  });
+}
+
+
+function mousePressed() {
+    for (let b of bubbles) {
+
+        for (let p of b.points) {
+
+            // coordinate dot
+            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+
+            let px = b.x + cos(p.angle) * rr;
+            let py = b.y + sin(p.angle) * rr;
+
+            if (dist(mouseX, mouseY, px, py) < 6) {
+                activeCardDot = p;
+                hasLoadedPhoto = false;
+                return;
+            }
+        }
+    }
+
+    // chiude la card al click sulla x
+    if (closeCard) {
+        activeCardDot = null;
+        closeCard = null;
+        cursor(ARROW);
+        hasLoadedPhoto = false; 
+        return;
+    }
+
+    // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+    if(cpjButtonHover){
+        window.open(cpjUrl);
+        cpjButtonHover = null;
+    }
+
+
+    for (let b of bubbles) {
+        if ((activeLabel === "ALL" || activeLabel === b.category) &&
+            b.labelClicked(mouseX, mouseY)) {
+            triggerSectionFromLabel(b.category);
+        }
+    }
+}
+
+function triggerSectionFromLabel(cat) {
+    let map = {
+        "Unknown":      ["unknown-wrapper", "Unknown"],
+        "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
+        "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
+        "Full Justice":      ["full-wrapper", "Full Justice"]
+    };
+
+    if (!map[cat]) return;
+
+    let [wrapperId, filter] = map[cat];
+
+    openedFromLabel = true;
+    activateSection(wrapperId, filter);
+}
 
 
 function drawCard(dot){
@@ -576,391 +1067,6 @@ function drawCard(dot){
     cpjButtonHover = null;
   }
 
-}
-
-function draw() {
-
-  let hoveringLabel = false;
-  let hoveringPoint = false;
-
-  for (let b of bubbles) {
-      if (activeLabel && b.labelClicked(mouseX, mouseY)) {
-          hoveringLabel = true;
-      }
-
-      // controllo hover sui punti
-      for (let p of b.points) {
-          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-          let px = b.x + cos(p.angle) * rr;
-          let py = b.y + sin(p.angle) * rr;
-
-          p.hover = dist(mouseX, mouseY, px, py) < 6;
-
-          if (p.hover) hoveringPoint = true;
-      }
-  }
-
-  if (hoveringLabel || hoveringPoint) {
-      cursor(HAND);
-  } else {
-      cursor(ARROW);
-  }
-
-  background(25);
-
-  for (let b of bubbles) {
-      b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
-
-      for (let p of b.points) {
-          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-          let px = b.x + cos(p.angle) * rr;
-          let py = b.y + sin(p.angle) * rr;
-
-          p.hover = dist(mouseX, mouseY, px, py) < 6;
-      }
-  }
-
-
-  for (let b of bubbles) {
-      b.update();
-      b.show();
-  }
-
-  if (activeCardDot !== null) {
-  drawCard(activeCardDot);
-  }
-  
-}
-
-function buildBubbles() {
-    if (!table) return;
-
-    let impCol = -1;
-
-    for (let c = 0; c < table.getColumnCount(); c++) {
-        if (table.columns[c].toLowerCase().includes("impunity"))
-            impCol = c;
-    }
-
-    if (impCol === -1) {
-        console.error("Colonna impunity non trovata.");
-        return;
-    }
-
-    let data = {};
-
-    for (let r = 0; r < table.getRowCount(); r++) {
-        let v = table.getString(r, impCol).trim();
-        if (v === "") v = "Unknown";
-        if (!data[v]) data[v] = [];
-        data[v].push(r);
-    }
-
-    let order = ["Unknown", "Full Justice", "Complete Impunity", "Partial Impunity"];
-    let cats = order.filter(c => data[c]);
-
-    bubbles = [];
-
-    let cx = width / 2;
-    let cy = height / 2;
-    let offset = min(width, height) * 0.26;
-
-    let positions = [
-        { x: cx - offset, y: cy },
-        { x: cx, y: cy - offset },
-        { x: cx + offset, y: cy },
-        { x: cx, y: cy + offset }
-    ];
-
-    cats.forEach((cat, i) => {
-        let n = data[cat].length;
-        let maxR = min(width, height) * 0.28;
-        let r = constrain(sqrt(n) * 4.8, 60, maxR);
-
-
-        bubbles.push(new Bubble(
-            positions[i].x,
-            positions[i].y,
-            r,
-            data[cat],
-            cat
-        ));
-
-    });
-
-}
-
-function buildJournalistsFromTable() {
-  journalists = [];
-
-  for (let j = 0; j < table.getRowCount(); j++) {
-    let row = table.getRow(j);
-    let dateStr = row.get("entry_date") || "";
-    let parts = dateStr.split("/");
-    let year = Number(parts[2]) || 0;
-
-    if (year < 100) {
-      if (year >= 90) {
-        year += 1900;
-      } else {
-        year += 2000;
-      }
-    }
-
-    // workRelated
-    let workRelated = "Unknown";
-    let wr = row.get("confirmed work related or unconfirmed (may be work related)");
-    if (wr === "Journalist - Confirmed") workRelated = "Confirmed";
-    if (wr === "Journalist - Unconfirmed") workRelated = "Unconfirmed";
-    if (wr === "Media Worker") workRelated = "Media Worker";
-
-    // country: normalizziamo qui
-    let rawCountry = (row.get("country") || "");
-    let country = rawCountry.trim(); // per mostrare nella UI
-    let countryNorm = country.toLowerCase(); // per confronti (no spazi esterni)
-
-    let journalist = {
-      id: j,
-      year: year,
-      date: row.get("entry_date"),
-      ambiguousEntryDate: row.get("ambiguous_entry_date"),
-      category: row.get("source_of_fire") || "Unknown",
-      name: row.get("journalist/media worker_name") || "",
-      country: country,
-      countryNorm: countryNorm,
-      motive: row.get("motive") || "",
-      role: row.get("role") || "",
-      city: row.get("city") || "",
-      typeOfDeath: row.get("type_of_death") || "",
-      impunity: row.get("impunity") || "",
-      organization: row.get("organization") || "",
-      medium: row.get("mediums") || "",
-      beats: row.get("beats_covered") || "",
-      job: row.get("job") || "",
-      url: row.get("cpj.org_url") || "",
-      workRelated: workRelated,
-      threatened: row.get("threatened") || "Unknown",
-      tortured: row.get("tortured") || "Unknown",
-      heldCaptive: row.get("held_captive") || "Unknown"
-    };
-
-    journalists.push(journalist);
-  }
-
-  years = Array.from(new Set(journalists.map(j => j.year))).sort((a,b) => a-b);
-  console.log("Journalists loaded:", journalists.length);
-  console.log("Years available:", years);
-  console.log("Sample journalist:", journalists[0]);
-
-  countries = [];
-    journalists.forEach(j => {
-      if (j.country && !countries.includes(j.country)) {
-      countries.push(j.country);
-      }
-  });
-  countries.sort((a, b) => a.localeCompare(b));
-}
-
-class Bubble {
-    constructor(x, y, r, indices, category) {
-        this.x = x;
-        this.y = y;
-        this.r = r;
-        this.category = category;
-        this.indices = indices;
-        this.count = indices.length;
-
-        this.isHovered = false;
-        this.dimmed = false;
-
-        this.points = [];
-
-        for (let i = 0; i < this.indices.length; i++) {
-            let p = {
-                id: this.indices[i],
-                angle: random(TWO_PI),
-                rad: this.r * sqrt(random()),
-                offset: random(1000),
-                speed: random(-0.003, 0.003),
-                hover: false,
-                visible: true
-            };
-            this.points.push(p);
-        }
-    }
-
-    update() {
-        let speedFactor = this.isHovered ? 0 : 1;
-
-        for (let p of this.points) {
-            p.angle += p.speed * speedFactor;
-            p.rad = constrain(
-                p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
-                0,
-                this.r
-            );
-        }
-    }
-
-    show() {
-        noStroke();
-
-        for (let p of this.points) {
-            if (p.visible === false) continue;
-
-            // calcola posizione
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-            let px = this.x + cos(p.angle) * rr;
-            let py = this.y + sin(p.angle) * rr;
-
-            // dimensione punti ingrandita se hover
-            let dSize = p.hover ? 6 : 3;
-
-            fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
-            circle(px, py, dSize);
-        }
-
-        if (activeLabel === "ALL" || this.category === activeLabel) {
-            fill(255);
-            textAlign(CENTER, BOTTOM);
-            textFont("JetBrains Mono");
-            let labelSize = min(width, height) * 0.018;
-            textSize(labelSize);
-            text(this.category, this.x, this.y - this.r - labelSize * 0.8);
-        }
-    }
-
-    labelClicked(mx, my) {
-        let labelSize = min(width, height) * 0.018;
-        textSize(labelSize);
-        textFont("JetBrains Mono");
-        let tw = textWidth(this.category);
-        let th = labelSize;
-
-        let lx = this.x - tw / 2;
-        let ly = this.y - this.r - 8;
-
-        return mx > lx && mx < lx + tw && my > ly - th && my < ly;
-    }
-}
-
-/* funzioni per il funzionamento del filtro */
-function updatePointsVisibility() {
-  bubbles.forEach(b => {
-    b.points.forEach(p => {
-      let j = journalists[p.id];
-      if (!selectedCountry) {
-        p.visible = true;
-      } else {
-        p.visible = j.countryNorm === selectedCountry;
-      }
-    });
-  });
-}
-
-function updateDeathCounter(country = null) {
-  let counter = document.getElementById("death-counter");
-  let container = document.getElementById("death-counter-container");
-
-  let count = 0;
-
-  if (!country) {
-    count = journalists.length;
-  } else {
-    count = journalists.filter(j =>
-      j.countryNorm === country
-    ).length;
-  }
-
-  counter.textContent = count;
-  container.style.display = country ? "flex" : "none";
-}
-
-function populateCountryPanel() {
-  let panel = document.getElementById("filter-panel");
-  let worldwideBtn = document.getElementById("worldwide-btn");
-
-  panel.innerHTML = "";
-  panel.style.display = "none";
-
-  countries.forEach(country => {
-    let div = document.createElement("div");
-    div.classList.add("country-option");
-    div.textContent = country;
-
-    div.addEventListener("click", () => {
-      selectedCountry = country.toLowerCase();
-
-      worldwideBtn.textContent = country + " ⌵";
-
-      updateDeathCounter(selectedCountry);
-      updatePointsVisibility();
-
-      panel.style.display = "none";
-    });
-
-    panel.appendChild(div);
-  });
-}
-
-
-function mousePressed() {
-    for (let b of bubbles) {
-
-        for (let p of b.points) {
-
-            // coordinate dot
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-
-            let px = b.x + cos(p.angle) * rr;
-            let py = b.y + sin(p.angle) * rr;
-
-            if (dist(mouseX, mouseY, px, py) < 6) {
-                activeCardDot = p;
-                hasLoadedPhoto = false;
-                return;
-            }
-        }
-    }
-
-    // chiude la card al click sulla x
-    if (closeCard) {
-        activeCardDot = null;
-        closeCard = null;
-        cursor(ARROW);
-        hasLoadedPhoto = false; 
-        return;
-    }
-
-    // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
-    if(cpjButtonHover){
-        window.open(cpjUrl);
-        cpjButtonHover = null;
-    }
-
-
-    for (let b of bubbles) {
-        if ((activeLabel === "ALL" || activeLabel === b.category) &&
-            b.labelClicked(mouseX, mouseY)) {
-            triggerSectionFromLabel(b.category);
-        }
-    }
-}
-
-function triggerSectionFromLabel(cat) {
-    let map = {
-        "Unknown":      ["unknown-wrapper", "Unknown"],
-        "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
-        "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
-        "Full Justice":      ["full-wrapper", "Full Justice"]
-    };
-
-    if (!map[cat]) return;
-
-    let [wrapperId, filter] = map[cat];
-
-    openedFromLabel = true;
-    activateSection(wrapperId, filter);
 }
 
 
