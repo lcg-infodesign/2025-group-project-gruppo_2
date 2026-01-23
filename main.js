@@ -383,20 +383,6 @@ window.addEventListener("load", () => {
   let urlParams = new URLSearchParams(window.location.search);
   let stepParam = urlParams.get("step");
 
-  if (stepParam !== null) {
-    let stepNumber = parseInt(stepParam);
-    if (!isNaN(stepNumber)) {
-      
-      // costruisce subito grafico completo
-      buildFullVisualization();
-
-      // attiva step desiderato
-      activateGlobalStep(stepNumber);
-    }
-  } else {
-    // comportamento normale
-    activateGlobalStep(0);
-  }
 });
 
 
@@ -571,6 +557,8 @@ function categoryToY(category) {
 
 //crea gradualmente i pallini
 function spawnUpToCurrentYear() {
+  if(animationCompleted) return; 
+
   if (!years.length || currentYearIndex >= years.length) return;
 
   let yearLimit = years[currentYearIndex];
@@ -763,8 +751,15 @@ function buildFullVisualization() {
   for (let j of journalists) {
     if (!spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
+
+      //forza lo stato finale
+      dot.pos.x = dot.finalX;
+      dot.pos.y = dot.finalY;
+      dot.arrived = true;
+
       dot.visible = true;
       dot.dimmed = false;
+
       dots.push(dot);
       spawnedIds.add(j.id);
     }
@@ -1148,6 +1143,31 @@ function setup() {
   });
 
   inVisualizationArea = true;
+
+  // gestione step da url
+  let urlParams = new URLSearchParams(window.location.search);
+  let stepParam = urlParams.get("step");
+
+  if (stepParam !== null) {
+    let stepNumber = parseInt(stepParam);
+    if (!isNaN(stepNumber)) {
+
+      selectedCountry = null;
+
+      buildFullVisualization();
+
+      animationInitialized = true;
+      animationStarted = true;
+      animationCompleted = true;
+
+      currentYearIndex = years.length - 1;
+
+      activateGlobalStep(stepNumber);
+      return;
+    }
+  }
+
+  activateGlobalStep(0);
 }
 
 function draw() {
@@ -1157,7 +1177,7 @@ function draw() {
   updateVisualization();
   drawGridWithSteps();
 
-  if (inVisualizationArea) {
+  if (inVisualizationArea && !animationCompleted) {
     spawnUpToCurrentYear();
   }
 
