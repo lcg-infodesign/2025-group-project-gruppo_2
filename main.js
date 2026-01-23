@@ -220,21 +220,21 @@ let globalSteps = [...explanationSections, ...conflictSections, ...countrySectio
 let currentGlobalStep = 0;
 
 
-// funzione globale di attivazione sezioni + evento correlato (passaggi 1 e 2)
+// funzione globale di attivazione sezioni + evento correlato
 function activateGlobalStep(step) {
     if (step < 0 || step >= globalSteps.length) return;
     currentGlobalStep = step;
 
-    // mappa i primi 4 step (graph-explained) sugli step del grafico
+    // x i primi 4 step (graph-explained)
     if (step < explanationSections.length) {
       graphExplainedMode = true;
       graphExplainedStep = step;
-      currentStep = step; // fondamentale per updateVisualization()
+      currentStep = step;
     } else if (step === 14) {
-      currentStep = 11;
+      currentStep = 13;
       graphExplainedMode = false;
     } else {
-        graphExplainedMode = false; // esci dalla modalità grafico
+        graphExplainedMode = false; // esca dalla modalita grafico
         currentStep = step;
     }
 
@@ -246,18 +246,25 @@ function activateGlobalStep(step) {
 
     // mostra la sezione corretta
     let active = document.getElementById(globalSteps[step]);
-    if (active) 
-        active.style.display = "flex";
 
-    if (active.id === "explanation-closure") {
-    let bodyEl = active.querySelector(".section-body");
-    if (bodyEl) typeWriter(bodyEl, 20);
+    // MODIFICA: se siamo allo step 13, mostra filtro + wrapper
+    if (step === 13) {
+        document.getElementById("filter-container").style.display = "flex";
+        document.getElementById("impunity-status-wrapper").style.display = "flex";
+    } else if (active) {
+        active.style.display = "flex";
+    }
+
+    if (active && active.id === "explanation-closure") {
+        let bodyEl = active.querySelector(".section-body");
+        if (bodyEl) typeWriter(bodyEl, 20);
     }
 
     handleConflictsFlags(step);
     
     updateVisualization();
 }
+
 
 // navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
