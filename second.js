@@ -237,13 +237,20 @@ function goToStepFromURL() {
     const params = new URLSearchParams(window.location.search);
     const step = params.get("step");
 
-    if (step === "closure") {
-        let headlineWrapper = document.getElementById("headline-wrapper");
-        if (headlineWrapper) headlineWrapper.style.display = "none";
+    if (!step) return;
 
+    let headlineWrapper = document.getElementById("headline-wrapper");
+    if (headlineWrapper) headlineWrapper.style.display = "none";
+
+    if (step === "closure") {
         activateSection("closure-wrapper", "ALL");
     }
+
+    if (step === "final") {
+        activateFinal();
+    }
 }
+
 
 function goToNextSection(currentWrapperId) {
   openedFromLabel = false;
