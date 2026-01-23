@@ -63,7 +63,7 @@ let tickIcon;
 
 //variabili per la navigazione
 let currentStep = 0;
-let totalSteps = 12;
+let totalSteps = 13;
 let showYAxis = false;
 let showXAxis = false;
 let showGridLines = false;
@@ -230,7 +230,7 @@ function activateGlobalStep(step) {
       graphExplainedMode = true;
       graphExplainedStep = step;
       currentStep = step; // fondamentale per updateVisualization()
-    } else if (step === 13) {
+    } else if (step === 14) {
       currentStep = 11;
       graphExplainedMode = false;
     } else {
