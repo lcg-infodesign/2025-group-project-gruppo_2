@@ -51,10 +51,10 @@ let categories = [
 ];
 
 // variabili per le card
-let activeCard = null; //variabile che stabilisce se/quale card mostrare
+let activeCard = null;
 let closeCard = null;
-let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
-let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
+let cpjLogo;
+let cpjButtonHover = null; 
 let cpjUrl;
 let photo;
 let hasLoadedPhoto = null;
