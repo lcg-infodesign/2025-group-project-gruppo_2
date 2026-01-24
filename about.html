@@ -1,23 +1,18 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About - Stolen Voices</title>
-
     <link rel="stylesheet" type="text/css" href="about-style.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script> 
   </head>
-
   <body>
     
-    <!-- HEADER -->
     <header id="main-header">
         <div class="logo">STOLEN VOICES</div>
         <nav class="nav-menu">
@@ -29,17 +24,11 @@
         </nav>
     </header> 
 
-    <!-- LANGUAGE SWITCHER -->
-    <div id="lang-control">
-        <button id="btn-it" class="lang-btn active">IT</button>
-        <span class="separator">|</span>
-        <button id="btn-en" class="lang-btn">EN</button>
-    </div>
-
-    <!-- ACCORDION WRAPPER (Popolato da JS) -->
-    <div id="accordion-wrapper"></div>
+    <!-- allineo centralmente -->
+    <main id="about-container">
+        <div id="accordion-wrapper"></div>
+    </main>
 
     <script src="about.js"></script>
-
   </body>
 </html>

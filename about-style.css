@@ -2,8 +2,8 @@ html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%; 
-  overflow-x: hidden; 
+  height: 100vh;
+  overflow: hidden; 
   background: #191919;
   color: rgb(255, 245, 233);
   font-family: "JetBrains Mono", monospace;
@@ -12,18 +12,15 @@ html, body {
 canvas {
   display: block;
   position: fixed; 
-  top: 0;
-  left: 0;
+  top: 0; left: 0;
   z-index: -1; 
 }
 
 /* HEADER */
 #main-header {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
+  top: 0; left: 0;
+  width: 100%; height: 60px;
   display: flex;
   justify-content: space-between; 
   align-items: center;
@@ -33,52 +30,27 @@ canvas {
   background-color: #191919;
 }
 
-.logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  letter-spacing: -1px;
-}
-
+.logo { font-size: 1.2rem; font-weight: bold; letter-spacing: -1px; }
 .nav-menu .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
   font-size: 0.9rem;
   margin-left: 40px;
-  transition: color 0.2s;
 }
 
-.nav-link:hover { text-decoration: underline; }
-
-/* LANGUAGE SWITCHER */
-#lang-control {
-  position: fixed;
-  top: 100px;
-  right: 5%;
-  z-index: 1001;
+/* CONTAINER CENTRALE */
+#about-container {
+  width: 100%;
+  height: calc(100vh - 60px); 
+  margin-top: 60px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
 }
 
-.lang-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 245, 233, 0.4);
-  font-family: inherit;
-  font-size: 1rem;
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-.lang-btn.active { color: #ff0000; font-weight: bold; }
-
-/* ACCORDION */
 #accordion-wrapper {
-  width: 70%;
+  width: 75%;
   max-width: 900px;
-  margin: 0 auto; 
-  padding-top: 150px;
-  padding-bottom: 80px;
 }
 
 .accordion-section {
@@ -89,7 +61,7 @@ canvas {
   font-size: 2.2rem;
   font-weight: 700;
   color: red;
-  padding: 30px 0;
+  padding: 12px 0;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -100,30 +72,46 @@ canvas {
 
 .accordion-header::after {
   content: '\2335';
-  font-size: 1.8rem; 
+  font-size: 1.6rem; 
   transition: transform 0.3s ease;
 }
+.accordion-section.active .accordion-header::after { transform: rotate(180deg); }
 
-.accordion-section.active .accordion-header::after {
-  transform: rotate(180deg);
-}
-
+/* CONTENUTO */
 .accordion-content {
   max-height: 0;
-  overflow-y: auto; /* Attiva lo scroll interno */
-  transition: max-height 0.5s ease-out;
+  overflow-y: auto; 
+  transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Stile scrollbar interna */
+/* SCROLLBAR ROSSA */
 .accordion-content::-webkit-scrollbar { width: 4px; }
+.accordion-content::-webkit-scrollbar-track { background: transparent; }
 .accordion-content::-webkit-scrollbar-thumb { background: red; }
 
 .about-text {
   font-size: 1.1rem;
   line-height: 1.6;
   font-weight: 300;
-  text-transform: none; /* Mantiene il testo normale */
   white-space: pre-line;
   padding-right: 20px;
-  padding-bottom: 30px;
+  padding-top: 10px;
+  padding-bottom: 30px; /* Spazio a fine scroll */
+}
+
+/* LOGHI */
+.credits-logo-polimi {
+  display: block;
+  height: 60px; 
+  margin: 20px 0;
+}
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  margin-top: 20px;
+}
+.credits-logo-bottom {
+  height: 70px;
+  width: auto;
 }
