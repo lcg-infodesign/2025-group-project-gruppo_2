@@ -237,20 +237,13 @@ function goToStepFromURL() {
     const params = new URLSearchParams(window.location.search);
     const step = params.get("step");
 
-    if (!step) return;
-
-    let headlineWrapper = document.getElementById("headline-wrapper");
-    if (headlineWrapper) headlineWrapper.style.display = "none";
-
     if (step === "closure") {
+        let headlineWrapper = document.getElementById("headline-wrapper");
+        if (headlineWrapper) headlineWrapper.style.display = "none";
+
         activateSection("closure-wrapper", "ALL");
     }
-
-    if (step === "final") {
-        activateFinal();
-    }
 }
-
 
 function goToNextSection(currentWrapperId) {
   openedFromLabel = false;
@@ -418,6 +411,7 @@ function draw() {
   background(25);
 
   for (let b of bubbles) {
+    if (activeCardDot === null) {
       b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
 
       for (let p of b.points) {
@@ -427,7 +421,13 @@ function draw() {
 
           p.hover = dist(mouseX, mouseY, px, py) < 6;
       }
+  } else {
+    b.isHovered = false;
+    for (let p of b.points) {
+      p.hover = false;
+    }
   }
+}
 
 
   for (let b of bubbles) {
@@ -734,6 +734,26 @@ function populateCountryPanel() {
 
 
 function mousePressed() {
+      // SE C'È UNA CARD APERTA, GESTISCI SOLO LA CHIUSURA E IL BOTTONE CPJ
+    if (activeCardDot !== null) {
+        // chiude la card al click sulla x
+        if (closeCard) {
+            activeCardDot = null;
+            closeCard = null;
+            cursor(ARROW);
+            hasLoadedPhoto = false; 
+            return;
+        }
+        
+        // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+        if(cpjButtonHover){
+            window.open(cpjUrl);
+            cpjButtonHover = null;
+        }
+        
+        return; // Esce dalla funzione senza controllare pallini o label
+    }
+
     for (let b of bubbles) {
 
         for (let p of b.points) {
@@ -799,8 +819,13 @@ function drawCard(dot){
   let id = journalist.id;
   let name = journalist.name;
   let date = journalist.date;
-  if(journalist.ambiguousEntryDate){
-    date = journalist.ambiguousEntryDate;
+  let ambiguous, dateIcon; // tooltip x data di morte certa o no
+  if(!journalist.ambiguousEntryDate){
+    dateIcon = "tick";
+    ambiguous = "The date\nis confirmed";
+  }else{
+    dateIcon = "?";
+    ambiguous = "The date is ambiguous. Plausible dates: " + journalist.ambiguousEntryDate;
   }
   let place = journalist.city + ", " + journalist.country;
   if(journalist.country == "Israel and the Occupied Palestinian Territory"){
@@ -843,7 +868,6 @@ function drawCard(dot){
   }
   let impunity = journalist.impunity;
   let url = journalist.url;
-  let photoCredit = journalist.photoCredit;
 
   // sfondo che oscura il grafico
   noStroke();
@@ -928,7 +952,7 @@ function drawCard(dot){
   let crossCenterX = rightX - crossWidth/2;
   let crossCenterY = topY + crossWidth/2;
   let d = dist(mouseX, mouseY, crossCenterX, crossCenterY);
-  if(d <= crossWidth || mouseX < cardX - cardWidth/2 || mouseX > cardX + cardWidth/2 || mouseY < cardY - cardHeight/2 || mouseY > cardY + cardHeight/2){
+  if(d <= crossWidth){
     closeCard = true;
     cursor(HAND);
   }else{
@@ -944,7 +968,7 @@ function drawCard(dot){
   stroke(red);
   strokeWeight(0.5);
   line(leftX + photoWidth + padding, topY + 80, leftX + cardWidth - 2*padding, topY + 80); //nome
-  line(leftX + photoWidth + padding, topY + 80 + 50, rightX, topY + 80 + 50); //data
+  line(leftX + photoWidth + padding, topY + 80 + 50, rightX - 40 - 20, topY + 80 + 50); //data
   line(leftX + photoWidth + padding, topY + 80 + 97, leftX + cardWidth - 2*padding, topY + 80 + 97); //luogo
   rectMode(CORNER);
   fill(grey);
@@ -965,6 +989,34 @@ function drawCard(dot){
   stroke(red);
   strokeWeight(2);
   rect(width/2 + verticalOffset + padding, bottomY - padding - 14, rightX, bottomY, 100); //sfondo del bottone
+
+  // icona e tooltip per la data
+  noStroke();
+  circle(rightX - 20, topY + 80 + 40, 40);
+  if(dateIcon == "tick"){
+    imageMode(CENTER);
+    image(tickIcon, rightX - 20, topY + 80 + 40, 40, 40);
+  }else{
+    noStroke();
+    fill(red);
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    text("?", rightX - 20, topY + 80 + 43);
+  }
+
+  // tooltip
+  let dDate = dist(mouseX, mouseY, rightX - 20, topY + 80 + 40);
+  if(dDate <= 20){
+    fill(bg);
+    rectMode(CORNER);
+    let rectHeight = 120;
+    let rectWidth = 160;
+    rect(rightX + 2*padding, topY + 80 + 40 - rectHeight/2, rectWidth, rectHeight, 10);
+    fill(white);
+    textAlign(LEFT, CENTER);
+    textSize(14);
+    text(ambiguous, rightX + 2*padding + padding/2, topY + 80 + 40, rectWidth - padding/2);
+  }
 
   // etichette
   fill(red);
@@ -1027,15 +1079,8 @@ function drawCard(dot){
   text(tortured, leftX + padding + 200, topY + photoHeight + 6.5*padding + 54 + 14);
   text(heldCaptive, leftX + padding + 200, topY + photoHeight + 7.5*padding + 54 + 28);
 
-  //photo credit
-  textSize(9);
-  textLeading(9);
-  textAlign(LEFT, TOP);
-  text(photoCredit, leftX, topY + photoHeight + 5, photoWidth);
-
   // bottone discover more
-  textAlign(CENTER, BOTTOM);
-  textSize(14);
+  textAlign(CENTER);
   text("DISCOVER MORE", (width/2 + verticalOffset + padding + rightX)/2 + 20, bottomY - padding/2);
 
   imageMode(CENTER);
@@ -1050,7 +1095,6 @@ function drawCard(dot){
     cpjButtonHover = null;
   }
 
-  textLeading(12);
 }
 
 
