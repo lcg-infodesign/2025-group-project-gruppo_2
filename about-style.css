@@ -4,7 +4,9 @@ html, body {
   width: 100%;
   height: 100%; 
   overflow-x: hidden; 
-  overflow-y: auto; 
+  background: #191919;
+  color: rgb(255, 245, 233);
+  font-family: "JetBrains Mono", monospace;
 }
 
 canvas {
@@ -15,17 +17,7 @@ canvas {
   z-index: -1; 
 }
 
-body {
-  background: #191919;
-  color: rgb(255, 245, 233);
-  font-family: "JetBrains Mono", monospace;
-}
-
 /* HEADER */
-:root {
-  --header-height: 80px; 
-}
-
 #main-header {
   position: fixed;
   top: 0;
@@ -42,97 +34,96 @@ body {
 }
 
 .logo {
-  color: rgb(255, 245, 233);
   font-size: 1.2rem;
   font-weight: bold;
   letter-spacing: -1px;
 }
 
-.nav-menu {
-  display: flex;
-  align-items: center;
-}
-
-.nav-link {
+.nav-menu .nav-link {
   color: rgb(255, 245, 233);
   text-decoration: none;
   font-size: 0.9rem;
-  cursor: pointer;
-  transition: color 0.2s ease-in-out;
-}
-
-.nav-menu > .nav-link {
   margin-left: 40px;
+  transition: color 0.2s;
 }
 
-.nav-link:hover {
-  text-decoration: underline;
+.nav-link:hover { text-decoration: underline; }
+
+/* LANGUAGE SWITCHER */
+#lang-control {
+  position: fixed;
+  top: 100px;
+  right: 5%;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
+
+.lang-btn {
+  background: none;
+  border: none;
+  color: rgba(255, 245, 233, 0.4);
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.lang-btn.active { color: #ff0000; font-weight: bold; }
 
 /* ACCORDION */
 #accordion-wrapper {
   width: 70%;
   max-width: 900px;
   margin: 0 auto; 
-  min-height: 100vh; 
-  display: flex;  
-  flex-direction: column; 
-  justify-content: center;
-  padding-top: 80px;
-  padding-bottom: 40px; 
-  box-sizing: border-box;
+  padding-top: 150px;
+  padding-bottom: 80px;
 }
 
-/* linee separatori */
 .accordion-section {
-  width: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .accordion-header {
   font-size: 2.2rem;
   font-weight: 700;
   color: red;
-  margin: 0;
   padding: 30px 0;
   cursor: pointer;
-  transition: opacity 0.3s;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  text-transform: uppercase;
+  margin: 0;
 }
 
-/* freccetta a lato */
 .accordion-header::after {
   content: '\2335';
-  color: rgb(255, 245, 233);
-  font-family: "JetBrains Mono", monospace; 
   font-size: 1.8rem; 
-  font-weight: bold; 
   transition: transform 0.3s ease;
-  display: inline-block;
-  margin-left: 15px;
-  vertical-align: middle; 
 }
 
-/* freccetta a lato ruotata */
 .accordion-section.active .accordion-header::after {
-  transform: rotate(180deg); 
+  transform: rotate(180deg);
 }
 
 .accordion-content {
   max-height: 0;
-  overflow: hidden;
+  overflow-y: auto; /* Attiva lo scroll interno */
   transition: max-height 0.5s ease-out;
 }
+
+/* Stile scrollbar interna */
+.accordion-content::-webkit-scrollbar { width: 4px; }
+.accordion-content::-webkit-scrollbar-thumb { background: red; }
 
 .about-text {
   font-size: 1.1rem;
   line-height: 1.6;
-  font-weight: 200;
-  color: rgb(255, 245, 233);
-  padding-bottom: 30px;
+  font-weight: 300;
+  text-transform: none; /* Mantiene il testo normale */
   white-space: pre-line;
-  margin: 0;
-  text-align: left;
+  padding-right: 20px;
+  padding-bottom: 30px;
 }
