@@ -68,6 +68,10 @@
   <li> Bubble Chart: utilizzata per raggruppare i dot e rendere immediato il confronto visivo tra i diversi stati di impunità. </li>
 </ul>
 
+<br>
+
 6. STRUMENTI AI
-   Abbiamo utilizzato strumenti come ChatGPT, Claude e Gemini per integrare le conoscenze acquisite durante il corso, al fine di completare operazioni più complesse o non alla nostra portata, come l’animazione della cascata e la scrittura di codice Python per estrarre immagini e crediti dal sito di CPJ."
+
+   Abbiamo utilizzato strumenti come ChatGPT, Claude e Gemini per integrare le conoscenze acquisite durante il corso, al fine di completare operazioni più complesse
+   o non alla nostra portata, come l’animazione della cascata e la scrittura di codice Python per estrarre immagini e crediti dal sito di CPJ.
  
