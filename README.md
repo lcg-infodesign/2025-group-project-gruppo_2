@@ -45,7 +45,7 @@
     <li> Sara Allegro ha lavorato alla realizzazione dei prototipi lo-fi e hi-fi su Figma, ha supportato il coordinamento delle attività e ha contribuito allo 
       sviluppo del codice della sezione About. <br>
     <li> Filippo Garbero ha collaborato allo sviluppo del primo grafico e alla realizzazione della sidebar contenente le informazioni e il filtro per paese,
-      di cui si è occupato per la sua interezza. È stato di supporto nello sviluppo generale del sito. </li> <br>
+      di cui si è occupato per la sua interezza. È stato di supporto nello sviluppo generale del sito. Si è inoltre occupato di apportare lo stesso trattamento visivo tramite Photoshop alle immagini dei giornalisti. </li> <br>
     <li> Letizia Neri ha lavorato allo sviluppo di tutte le pagine del sito, contribuendo in particolare al secondo grafico e coordinando il lavoro su HTML,
       CSS e JavaScript. Si è inoltre occupata dell’estrazione delle immagini e dei crediti tramite Python. Una menzione speciale va a Letizia per il ruolo
       centrale nel lavoro sul codice e per l’attività di integrazione, revisione e unificazione dei diversi contributi fino alle fasi finali del progetto. </li> <br>
@@ -67,4 +67,7 @@
   <li> Beeswarm Chart: scelta per visualizzare la densità temporale senza sovrapposizioni, permettendo di percepire ogni singolo punto come un'unità distinta. </li> <br>
   <li> Bubble Chart: utilizzata per raggruppare i dot e rendere immediato il confronto visivo tra i diversi stati di impunità. </li>
 </ul>
+
+6. STRUMENTI AI
+   Abbiamo utilizzato strumenti come ChatGPT, Claude e Gemini per integrare le conoscenze acquisite durante il corso, al fine di completare operazioni più complesse o non alla nostra portata, come l’animazione della cascata e la scrittura di codice Python per estrarre immagini e crediti dal sito di CPJ."
  
