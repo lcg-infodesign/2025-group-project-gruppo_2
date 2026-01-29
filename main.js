@@ -51,10 +51,10 @@ let categories = [
 ];
 
 // variabili per le card
-let activeCard = null; //variabile che stabilisce se/quale card mostrare
+let activeCard = null;
 let closeCard = null;
-let cpjLogo; //conterrà l'immagine del logo di cpj per il bottone della card
-let cpjButtonHover = null; //memorizza se l'utente sta facendo hover sul bottone che rimanda alla pagina cpj
+let cpjLogo;
+let cpjButtonHover = null; 
 let cpjUrl;
 let photo;
 let hasLoadedPhoto = null;
@@ -63,7 +63,7 @@ let tickIcon;
 
 //variabili per la navigazione
 let currentStep = 0;
-let totalSteps = 12;
+let totalSteps = 13;
 let showYAxis = false;
 let showXAxis = false;
 let showGridLines = false;
@@ -220,21 +220,21 @@ let globalSteps = [...explanationSections, ...conflictSections, ...countrySectio
 let currentGlobalStep = 0;
 
 
-// funzione globale di attivazione sezioni + evento correlato (passaggi 1 e 2)
+// funzione globale di attivazione sezioni + evento correlato
 function activateGlobalStep(step) {
     if (step < 0 || step >= globalSteps.length) return;
     currentGlobalStep = step;
 
-    // mappa i primi 4 step (graph-explained) sugli step del grafico
+    // x i primi 4 step (graph-explained)
     if (step < explanationSections.length) {
       graphExplainedMode = true;
       graphExplainedStep = step;
-      currentStep = step; // fondamentale per updateVisualization()
-    } else if (step === 13) {
-      currentStep = 11;
+      currentStep = step;
+    } else if (step === 14) {
+      currentStep = 13;
       graphExplainedMode = false;
     } else {
-        graphExplainedMode = false; // esci dalla modalità grafico
+        graphExplainedMode = false; // esca dalla modalita grafico
         currentStep = step;
     }
 
@@ -246,18 +246,25 @@ function activateGlobalStep(step) {
 
     // mostra la sezione corretta
     let active = document.getElementById(globalSteps[step]);
-    if (active) 
-        active.style.display = "flex";
 
-    if (active.id === "explanation-closure") {
-    let bodyEl = active.querySelector(".section-body");
-    if (bodyEl) typeWriter(bodyEl, 20);
+    // MODIFICA: se siamo allo step 13, mostra filtro + wrapper
+    if (step === 13) {
+        document.getElementById("filter-container").style.display = "flex";
+        document.getElementById("impunity-status-wrapper").style.display = "flex";
+    } else if (active) {
+        active.style.display = "flex";
+    }
+
+    if (active && active.id === "explanation-closure") {
+        let bodyEl = active.querySelector(".section-body");
+        if (bodyEl) typeWriter(bodyEl, 20);
     }
 
     handleConflictsFlags(step);
     
     updateVisualization();
 }
+
 
 // navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
@@ -383,20 +390,6 @@ window.addEventListener("load", () => {
   let urlParams = new URLSearchParams(window.location.search);
   let stepParam = urlParams.get("step");
 
-  if (stepParam !== null) {
-    let stepNumber = parseInt(stepParam);
-    if (!isNaN(stepNumber)) {
-      
-      // costruisce subito grafico completo
-      buildFullVisualization();
-
-      // attiva step desiderato
-      activateGlobalStep(stepNumber);
-    }
-  } else {
-    // comportamento normale
-    activateGlobalStep(0);
-  }
 });
 
 
@@ -571,6 +564,8 @@ function categoryToY(category) {
 
 //crea gradualmente i pallini
 function spawnUpToCurrentYear() {
+  if(animationCompleted) return; 
+
   if (!years.length || currentYearIndex >= years.length) return;
 
   let yearLimit = years[currentYearIndex];
@@ -763,8 +758,15 @@ function buildFullVisualization() {
   for (let j of journalists) {
     if (!spawnedIds.has(j.id)) {
       let dot = new Dot(j.id, j.year, j.category);
+
+      //forza lo stato finale
+      dot.pos.x = dot.finalX;
+      dot.pos.y = dot.finalY;
+      dot.arrived = true;
+
       dot.visible = true;
       dot.dimmed = false;
+
       dots.push(dot);
       spawnedIds.add(j.id);
     }
@@ -1148,6 +1150,31 @@ function setup() {
   });
 
   inVisualizationArea = true;
+
+  // gestione step da url
+  let urlParams = new URLSearchParams(window.location.search);
+  let stepParam = urlParams.get("step");
+
+  if (stepParam !== null) {
+    let stepNumber = parseInt(stepParam);
+    if (!isNaN(stepNumber)) {
+
+      selectedCountry = null;
+
+      buildFullVisualization();
+
+      animationInitialized = true;
+      animationStarted = true;
+      animationCompleted = true;
+
+      currentYearIndex = years.length - 1;
+
+      activateGlobalStep(stepNumber);
+      return;
+    }
+  }
+
+  activateGlobalStep(0);
 }
 
 function draw() {
@@ -1157,7 +1184,7 @@ function draw() {
   updateVisualization();
   drawGridWithSteps();
 
-  if (inVisualizationArea) {
+  if (inVisualizationArea && !animationCompleted) {
     spawnUpToCurrentYear();
   }
 

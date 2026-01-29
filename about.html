@@ -3,67 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>About</title>
-
+    <title>About - Stolen Voices</title>
     <link rel="stylesheet" type="text/css" href="about-style.css">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script> 
   </head>
-
   <body>
     
-       <!-- HEADER -->
     <header id="main-header">
         <div class="logo">STOLEN VOICES</div>
         <nav class="nav-menu">
             <a href="index.html" class="nav-link">HOME</a>
-            <a href="main.html?step=12" class="nav-link" data-step="12">SOURCE OF FIRE</a>
-            <a href="second.html?step=closure" class="nav-link">IMPUNITY</a>
+            <a href="main.html?step=13" class="nav-link">SOURCE OF FIRE</a>
+            <a href="second.html?step=final" class="nav-link">IMPUNITY</a>
             <a href="about.html" class="nav-link">ABOUT</a>
             <a href="team.html" class="nav-link">TEAM</a>
         </nav>
     </header> 
 
-    <!-- ACCORDION -->
-    <div id="accordion-wrapper">
-        
-        <div id="why-this-project" class="accordion-section">
-          <h2 id="why-this-project-title" class="accordion-header"></h2>
-          <div class="accordion-content">
-            <p class="about-text" id="why-this-project-text"></p>
-          </div>
-        </div>
-
-        <div id="why-this-metodology" class="accordion-section">
-          <h2 id="why-this-metodology-title" class="accordion-header"></h2>
-          <div class="accordion-content">
-            <p class="about-text" id="why-this-metodology-text"></p>
-          </div>
-        </div>
-
-        <div id="what-is-cpj" class="accordion-section">
-          <h2 id="what-is-cpj-title" class="accordion-header"></h2>
-          <div class="accordion-content">
-            <p class="about-text" id="what-is-cpj-text"></p>
-          </div>
-        </div>
-
-        <div id="how-cpj-collected-this-dataset" class="accordion-section">
-          <h2 id="how-cpj-collected-this-dataset-title" class="accordion-header"></h2>
-          <div class="accordion-content">
-            <p class="about-text" id="how-cpj-collected-this-dataset-text"></p>
-          </div>
-        </div>
-
-    </div>
+    <!-- allineo centralmente -->
+    <main id="about-container">
+        <div id="accordion-wrapper"></div>
+    </main>
 
     <script src="about.js"></script>
-
   </body>
 </html>

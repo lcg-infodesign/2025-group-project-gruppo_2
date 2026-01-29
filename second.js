@@ -411,6 +411,7 @@ function draw() {
   background(25);
 
   for (let b of bubbles) {
+    if (activeCardDot === null) {
       b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
 
       for (let p of b.points) {
@@ -420,7 +421,13 @@ function draw() {
 
           p.hover = dist(mouseX, mouseY, px, py) < 6;
       }
+  } else {
+    b.isHovered = false;
+    for (let p of b.points) {
+      p.hover = false;
+    }
   }
+}
 
 
   for (let b of bubbles) {
@@ -727,6 +734,26 @@ function populateCountryPanel() {
 
 
 function mousePressed() {
+      // SE C'È UNA CARD APERTA, GESTISCI SOLO LA CHIUSURA E IL BOTTONE CPJ
+    if (activeCardDot !== null) {
+        // chiude la card al click sulla x
+        if (closeCard) {
+            activeCardDot = null;
+            closeCard = null;
+            cursor(ARROW);
+            hasLoadedPhoto = false; 
+            return;
+        }
+        
+        // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+        if(cpjButtonHover){
+            window.open(cpjUrl);
+            cpjButtonHover = null;
+        }
+        
+        return; // Esce dalla funzione senza controllare pallini o label
+    }
+
     for (let b of bubbles) {
 
         for (let p of b.points) {
