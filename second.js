@@ -24,6 +24,7 @@ let closeCard = null;
 
 let activeLabel = null;
 let openedFromLabel = false;
+let isFinalActive = false;
 let activeCardDot = null;
 
 let sectionSequence = [
@@ -237,11 +238,17 @@ function goToStepFromURL() {
     const params = new URLSearchParams(window.location.search);
     const step = params.get("step");
 
-    if (step === "closure") {
-        let headlineWrapper = document.getElementById("headline-wrapper");
-        if (headlineWrapper) headlineWrapper.style.display = "none";
+    if (!step) return;
 
+    let headlineWrapper = document.getElementById("headline-wrapper");
+    if (headlineWrapper) headlineWrapper.style.display = "none";
+
+    if (step === "closure") {
         activateSection("closure-wrapper", "ALL");
+    }
+
+    if (step === "final") {
+        activateFinal();
     }
 }
 
@@ -277,87 +284,90 @@ function goToPrevSection(currentWrapperId) {
 
 function activateSection(wrapperId, categoryFilter) {
 
-    activeLabel = categoryFilter;
+  isFinalActive = false;
+  activeLabel = categoryFilter;
 
-    // nasconde tutte le sezioni
-    document.querySelectorAll(".section-wrapper")
-        .forEach(w => w.style.display = "none");
+  // nasconde tutte le sezioni
+  document.querySelectorAll(".section-wrapper")
+      .forEach(w => w.style.display = "none");
 
-    let wrapper = document.getElementById(wrapperId);
-    wrapper.style.display = "flex";
+  let wrapper = document.getElementById(wrapperId);
+  wrapper.style.display = "flex";
 
-    // dim delle bubbles delle altre categorie
-    for (let b of bubbles) {
-        b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
-    }
+  // dim delle bubbles delle altre categorie
+  for (let b of bubbles) {
+      b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
+  }
 
-    let titleEl = wrapper.querySelector(".section-title");
-    let bodyEl  = wrapper.querySelector(".section-body");
-    let arrows  = wrapper.querySelectorAll(".arrow");
+  let titleEl = wrapper.querySelector(".section-title");
+  let bodyEl  = wrapper.querySelector(".section-body");
+  let arrows  = wrapper.querySelectorAll(".arrow");
 
-    if (titleEl) titleEl.style.visibility = "hidden";
-    if (bodyEl)  bodyEl.style.visibility  = "hidden";
+  if (titleEl) titleEl.style.visibility = "hidden";
+  if (bodyEl)  bodyEl.style.visibility  = "hidden";
 
-    arrows.forEach(a => {
-        a.style.visibility = "hidden";
-        a.style.opacity = "0";
-    });
+  arrows.forEach(a => {
+      a.style.visibility = "hidden";
+      a.style.opacity = "0";
+  });
 
-    let closeLabel = wrapper.querySelector(".close-label");
+  let closeLabel = wrapper.querySelector(".close-label");
 
-    if (closeLabel) {
-        // inizialmente nascosto
-        closeLabel.classList.remove("visible");
+  if (closeLabel) {
+      // inizialmente nascosto
+      closeLabel.classList.remove("visible");
 
-        // il click porta direttamente a closure
-        closeLabel.onclick = () => {
-            activateSection("closure-wrapper", "ALL");
-        };
-    }
+      // il click porta direttamente a closure
+      closeLabel.onclick = () => {
+          activateSection("closure-wrapper", "ALL");
+      };
+  }
 
-    let showNavigation = () => {
-        if (openedFromLabel && closeLabel) {
-            // mostra close-label con classe .visible
-            closeLabel.classList.add("visible");
-        } else {
-            arrows.forEach(a => {
-                a.style.visibility = "visible";
-                a.style.opacity = "1";
-            });
-        }
-    };
+  let showNavigation = () => {
+      if (openedFromLabel && closeLabel) {
+          // mostra close-label con classe .visible
+          closeLabel.classList.add("visible");
+      } else {
+          arrows.forEach(a => {
+              a.style.visibility = "visible";
+              a.style.opacity = "1";
+          });
+      }
+  };
 
-    if (wrapperId === "closure-wrapper") {
+  if (wrapperId === "closure-wrapper") {
 
-        if (bodyEl) {
-            typeWriter(bodyEl, 20, showNavigation);
-        }
+      if (bodyEl) {
+          typeWriter(bodyEl, 20, showNavigation);
+      }
 
-    } else {
-        // tutte le altre sezioni: mostra subito il testo
-        if (titleEl) titleEl.style.visibility = "visible";
-        if (bodyEl) bodyEl.style.visibility = "visible";
-        showNavigation();
-    }
+  } else {
+      // tutte le altre sezioni: mostra subito il testo
+      if (titleEl) titleEl.style.visibility = "visible";
+      if (bodyEl) bodyEl.style.visibility = "visible";
+      showNavigation();
+  }
 }
 
 
 function activateFinal() {
-    document.querySelectorAll(".section-wrapper")
-        .forEach(w => w.style.display = "none");
+  document.querySelectorAll(".section-wrapper")
+    .forEach(w => w.style.display = "none");
 
-    let wrapper = document.getElementById("final-wrapper");
-    wrapper.style.display = "flex";
+  let wrapper = document.getElementById("final-wrapper");
+  wrapper.style.display = "flex";
 
-    document.getElementById("other-visualization-wrapper").style.display = "flex";
+  document.getElementById("other-visualization-wrapper").style.display = "flex";
 
-    activeLabel = "ALL";
+  activeLabel = "ALL";
+  isFinalActive = true;
 
-    document.getElementById("filter-container").style.display = "block";
-    selectedCountry = null;
-    updateDotsVisibility();
-    updateDeathCounter(null);
+  document.getElementById("filter-container").style.display = "block";
+  selectedCountry = null;
+  updateDotsVisibility();
+  updateDeathCounter(null);
 }
+
 
 // primo click apre unknown
 document.getElementById("next-arrow-headline").addEventListener("click", () => {
@@ -386,20 +396,21 @@ function draw() {
   let hoveringPoint = false;
 
   for (let b of bubbles) {
-      if (activeLabel && b.labelClicked(mouseX, mouseY)) {
-          hoveringLabel = true;
-      }
+    if (!isFinalActive && activeLabel && b.labelClicked(mouseX, mouseY)) {
+    hoveringLabel = true;
+    }
 
-      // controllo hover sui punti
-      for (let p of b.points) {
-          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-          let px = b.x + cos(p.angle) * rr;
-          let py = b.y + sin(p.angle) * rr;
 
-          p.hover = dist(mouseX, mouseY, px, py) < 6;
+    // controllo hover sui punti
+    for (let p of b.points) {
+      let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+      let px = b.x + cos(p.angle) * rr;
+      let py = b.y + sin(p.angle) * rr;
 
-          if (p.hover) hoveringPoint = true;
-      }
+      p.hover = dist(mouseX, mouseY, px, py) < 6;
+
+      if (p.hover) hoveringPoint = true;
+    }
   }
 
   if (hoveringLabel || hoveringPoint) {
@@ -572,86 +583,89 @@ function buildJournalistsFromTable() {
 }
 
 class Bubble {
-    constructor(x, y, r, indices, category) {
-        this.x = x;
-        this.y = y;
-        this.r = r;
-        this.category = category;
-        this.indices = indices;
-        this.count = indices.length;
+constructor(x, y, r, indices, category) {
+    this.x = x;
+    this.y = y;
+    this.r = r;
+    this.category = category;
+    this.indices = indices;
+    this.count = indices.length;
 
-        this.isHovered = false;
-        this.dimmed = false;
+    this.isHovered = false;
+    this.dimmed = false;
 
-        this.points = [];
+    this.points = [];
 
-        for (let i = 0; i < this.indices.length; i++) {
-            let p = {
-                id: this.indices[i],
-                angle: random(TWO_PI),
-                rad: this.r * sqrt(random()),
-                offset: random(1000),
-                speed: random(-0.003, 0.003),
-                hover: false,
-                visible: true
-            };
-            this.points.push(p);
-        }
+    for (let i = 0; i < this.indices.length; i++) {
+        let p = {
+            id: this.indices[i],
+            angle: random(TWO_PI),
+            rad: this.r * sqrt(random()),
+            offset: random(1000),
+            speed: random(-0.003, 0.003),
+            hover: false,
+            visible: true
+        };
+        this.points.push(p);
+    }
+  }
+
+update() {
+    let speedFactor = this.isHovered ? 0 : 1;
+
+    for (let p of this.points) {
+        p.angle += p.speed * speedFactor;
+        p.rad = constrain(
+            p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
+            0,
+            this.r
+        );
+    }
+  }
+
+show() {
+    noStroke();
+
+    for (let p of this.points) {
+        if (p.visible === false) continue;
+
+        // calcola posizione
+        let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+        let px = this.x + cos(p.angle) * rr;
+        let py = this.y + sin(p.angle) * rr;
+
+        // dimensione punti ingrandita se hover
+        let dSize = p.hover ? 6 : 3;
+
+        fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+        circle(px, py, dSize);
     }
 
-    update() {
-        let speedFactor = this.isHovered ? 0 : 1;
-
-        for (let p of this.points) {
-            p.angle += p.speed * speedFactor;
-            p.rad = constrain(
-                p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
-                0,
-                this.r
-            );
-        }
-    }
-
-    show() {
-        noStroke();
-
-        for (let p of this.points) {
-            if (p.visible === false) continue;
-
-            // calcola posizione
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-            let px = this.x + cos(p.angle) * rr;
-            let py = this.y + sin(p.angle) * rr;
-
-            // dimensione punti ingrandita se hover
-            let dSize = p.hover ? 6 : 3;
-
-            fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
-            circle(px, py, dSize);
-        }
-
-        if (activeLabel === "ALL" || this.category === activeLabel) {
-            fill(255);
-            textAlign(CENTER, BOTTOM);
-            textFont("JetBrains Mono");
-            let labelSize = min(width, height) * 0.018;
-            textSize(labelSize);
-            text(this.category, this.x, this.y - this.r - labelSize * 0.8);
-        }
-    }
-
-    labelClicked(mx, my) {
+    if (activeLabel === "ALL" || this.category === activeLabel) {
+        fill(255);
+        textAlign(CENTER, BOTTOM);
+        textFont("JetBrains Mono");
         let labelSize = min(width, height) * 0.018;
         textSize(labelSize);
-        textFont("JetBrains Mono");
-        let tw = textWidth(this.category);
-        let th = labelSize;
-
-        let lx = this.x - tw / 2;
-        let ly = this.y - this.r - 8;
-
-        return mx > lx && mx < lx + tw && my > ly - th && my < ly;
+        text(this.category, this.x, this.y - this.r - labelSize * 0.8);
     }
+  }
+
+  labelClicked(mx, my) {
+    if (isFinalActive) return false;
+
+    let labelSize = min(width, height) * 0.018;
+    textSize(labelSize);
+    textFont("JetBrains Mono");
+    let tw = textWidth(this.category);
+    let th = labelSize;
+
+    let lx = this.x - tw / 2;
+    let ly = this.y - this.r - 8;
+
+    return mx > lx && mx < lx + tw && my > ly - th && my < ly;
+  }
+
 }
 
 /* funzioni per il funzionamento del filtro */
@@ -788,12 +802,15 @@ function mousePressed() {
     }
 
 
+    if (!isFinalActive) {
     for (let b of bubbles) {
         if ((activeLabel === "ALL" || activeLabel === b.category) &&
             b.labelClicked(mouseX, mouseY)) {
             triggerSectionFromLabel(b.category);
         }
     }
+}
+
 }
 
 function triggerSectionFromLabel(cat) {

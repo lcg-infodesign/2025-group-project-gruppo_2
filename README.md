@@ -23,15 +23,16 @@
   <p> Fonte: Committee to Protect Journalists (CPJ) - cpj.org </p>
   <p> Dati utilizzati: CPJ Journalists Killed (1992-2025) </p>
   <p> Rielaborazione:
-  <ul>
-    <li> Integrazione: abbiamo aggiunto una colonna “id” per identificare ogni giornalista tramite un numero univoco, così da rendere immediato 
-      il collegamento alla relativa immagine nel codice e facilitarne la visualizzazione nella visione di dettaglio; abbiamo aggiunto una colonna 
-      "photoCredit" per affiancare alle immagini prese dal sito di CPJ i relativi crediti di provenienza; abbiamo nominato le caselle vuote nelle 
-      colonne "source_of_fire" e "impunity" come "Unknown"
-    <li> Ricerca geopolitica: abbiamo condotto un'analisi approfondita dei contesti storici e geopolitici per interpretare correttamente le dinamiche 
-      dietro i picchi di mortalità presenti nel dataset, in modo da fornire all'utente una spiegazione testuale associata ai punti di maggiore interesse
-      nella prima visualizzazione d'insieme
-  </ul>
+    <ul>
+      <li> Integrazione: abbiamo aggiunto una colonna “id” per identificare ogni giornalista tramite un numero univoco, così da rendere immediato 
+        il collegamento alla relativa immagine nel codice e facilitarne la visualizzazione nella visione di dettaglio; abbiamo aggiunto una colonna 
+        "photoCredit" per affiancare alle immagini prese dal sito di CPJ i relativi crediti di provenienza; abbiamo nominato le caselle vuote nelle 
+        colonne "source_of_fire" e "impunity" come "Unknown"
+      <li> Ricerca geopolitica: abbiamo condotto un'analisi approfondita dei contesti storici e geopolitici per interpretare correttamente le dinamiche 
+        dietro i picchi di mortalità presenti nel dataset, in modo da fornire all'utente una spiegazione testuale associata ai punti di maggiore interesse
+        nella prima visualizzazione d'insieme
+    </ul>
+  </p>
 
 <br>
       
