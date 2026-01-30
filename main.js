@@ -852,13 +852,13 @@ class Dot {
 
     let dotColor = color(255);
 
-    if (highlightMaguindanao && this.year === 2009 && this.category === "Government Officials")
+    if (highlightMaguindanao && this.year === 2009 && this.country === "philippines")
       dotColor = color(255, 0, 0);
 
-    if (highlightPalestina && this.year === 2023 && this.category === "Military Officials")
+    if (highlightPalestina && this.country === "israel and the occupied palestinian territory")
       dotColor = color(255, 0, 0);
 
-    if (highlightIraq && this.year === 2006 && this.category === "Political Group")
+    if (highlightIraq && this.year >= 2003 && this.year <= 2011 && this.country === "iraq")
       dotColor = color(255, 0, 0);
 
     if (highlightUncertain && highlightUnknown) {
