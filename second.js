@@ -235,21 +235,21 @@ window.onload = () => {
 
 // apre la pagina dall header direttamente a closure
 function goToStepFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const step = params.get("step");
+  let params = new URLSearchParams(window.location.search);
+  let step = params.get("step");
 
-    if (!step) return;
+  if (!step) return;
 
-    let headlineWrapper = document.getElementById("headline-wrapper");
-    if (headlineWrapper) headlineWrapper.style.display = "none";
+  let headlineWrapper = document.getElementById("headline-wrapper");
+  if (headlineWrapper) headlineWrapper.style.display = "none";
 
-    if (step === "closure") {
-        activateSection("closure-wrapper", "ALL");
-    }
+  if (step === "closure") {
+      activateSection("closure-wrapper", "ALL");
+  }
 
-    if (step === "final") {
-        activateFinal();
-    }
+  if (step === "final") {
+      activateFinal();
+  }
 }
 
 function goToNextSection(currentWrapperId) {
@@ -257,13 +257,13 @@ function goToNextSection(currentWrapperId) {
 
   let index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
   if (index !== -1 && index < sectionSequence.length - 1) {
-      const next = sectionSequence[index + 1];
+    let next = sectionSequence[index + 1];
 
-      if (next.wrapperId === "final-wrapper") {
-          activateFinal();
-      } else {
-          activateSection(next.wrapperId, next.category);
-      }
+    if (next.wrapperId === "final-wrapper") {
+        activateFinal();
+    } else {
+        activateSection(next.wrapperId, next.category);
+    }
   }
 }
 
@@ -272,13 +272,13 @@ function goToPrevSection(currentWrapperId) {
 
   let index = sectionSequence.findIndex(s => s.wrapperId === currentWrapperId);
   if (index > 0) {
-      const prev = sectionSequence[index - 1];
+    let prev = sectionSequence[index - 1];
 
-      if (currentWrapperId === "final-wrapper") {
-          activateSection("closure-wrapper", "ALL");
-      } else {
-          activateSection(prev.wrapperId, prev.category);
-      }
+    if (currentWrapperId === "final-wrapper") {
+      activateSection("closure-wrapper", "ALL");
+    } else {
+      activateSection(prev.wrapperId, prev.category);
+    }
   }
 }
 
@@ -289,14 +289,14 @@ function activateSection(wrapperId, categoryFilter) {
 
   // nasconde tutte le sezioni
   document.querySelectorAll(".section-wrapper")
-      .forEach(w => w.style.display = "none");
+    .forEach(w => w.style.display = "none");
 
   let wrapper = document.getElementById(wrapperId);
   wrapper.style.display = "flex";
 
   // dim delle bubbles delle altre categorie
   for (let b of bubbles) {
-      b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
+    b.dimmed = categoryFilter !== "ALL" && b.category !== categoryFilter;
   }
 
   let titleEl = wrapper.querySelector(".section-title");
@@ -307,45 +307,45 @@ function activateSection(wrapperId, categoryFilter) {
   if (bodyEl)  bodyEl.style.visibility  = "hidden";
 
   arrows.forEach(a => {
-      a.style.visibility = "hidden";
-      a.style.opacity = "0";
+    a.style.visibility = "hidden";
+    a.style.opacity = "0";
   });
 
   let closeLabel = wrapper.querySelector(".close-label");
 
   if (closeLabel) {
-      // inizialmente nascosto
-      closeLabel.classList.remove("visible");
+    // inizialmente nascosto
+    closeLabel.classList.remove("visible");
 
-      // il click porta direttamente a closure
-      closeLabel.onclick = () => {
-          activateSection("closure-wrapper", "ALL");
-      };
+    // il click porta direttamente a closure
+    closeLabel.onclick = () => {
+        activateSection("closure-wrapper", "ALL");
+    };
   }
 
   let showNavigation = () => {
-      if (openedFromLabel && closeLabel) {
-          // mostra close-label con classe .visible
-          closeLabel.classList.add("visible");
-      } else {
-          arrows.forEach(a => {
-              a.style.visibility = "visible";
-              a.style.opacity = "1";
-          });
-      }
+    if (openedFromLabel && closeLabel) {
+      // mostra close-label con classe .visible
+      closeLabel.classList.add("visible");
+    } else {
+      arrows.forEach(a => {
+        a.style.visibility = "visible";
+        a.style.opacity = "1";
+      });
+    }
   };
 
   if (wrapperId === "closure-wrapper") {
 
-      if (bodyEl) {
-          typeWriter(bodyEl, 20, showNavigation);
-      }
+    if (bodyEl) {
+      typeWriter(bodyEl, 20, showNavigation);
+    }
 
   } else {
-      // tutte le altre sezioni: mostra subito il testo
-      if (titleEl) titleEl.style.visibility = "visible";
-      if (bodyEl) bodyEl.style.visibility = "visible";
-      showNavigation();
+    // tutte le altre sezioni: mostra subito il testo
+    if (titleEl) titleEl.style.visibility = "visible";
+    if (bodyEl) bodyEl.style.visibility = "visible";
+    showNavigation();
   }
 }
 
@@ -371,15 +371,15 @@ function activateFinal() {
 
 // primo click apre unknown
 document.getElementById("next-arrow-headline").addEventListener("click", () => {
-    openedFromLabel = false;
-    document.getElementById("headline-wrapper").style.display = "none";
-    activateSection("unknown-wrapper", "Unknown");
+  openedFromLabel = false;
+  document.getElementById("headline-wrapper").style.display = "none";
+  activateSection("unknown-wrapper", "Unknown");
 });
 
 // listener frecce
 document.querySelectorAll(".navigation-arrows .arrow").forEach(btn => {
     btn.addEventListener("click", (e) => {
-        const parentWrapper = e.target.closest(".section-wrapper");
+        let parentWrapper = e.target.closest(".section-wrapper");
         if(!parentWrapper) return;
 
         if(e.target.id.startsWith("next-arrow")){
@@ -403,20 +403,27 @@ function draw() {
 
     // controllo hover sui punti
     for (let p of b.points) {
-      let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-      let px = b.x + cos(p.angle) * rr;
-      let py = b.y + sin(p.angle) * rr;
+    if (!p.visible) {
+      p.hover = false;
+      continue;
+    }
 
-      p.hover = dist(mouseX, mouseY, px, py) < 6;
+    let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+    let px = b.x + cos(p.angle) * rr;
+    let py = b.y + sin(p.angle) * rr;
 
-      if (p.hover) hoveringPoint = true;
+    p.hover = dist(mouseX, mouseY, px, py) < 6;
+
+    if (p.hover) {
+      hoveringPoint = true;
+    }
     }
   }
 
   if (hoveringLabel || hoveringPoint) {
-      cursor(HAND);
+    cursor(HAND);
   } else {
-      cursor(ARROW);
+    cursor(ARROW);
   }
 
   background(25);
@@ -426,24 +433,24 @@ function draw() {
       b.isHovered = dist(mouseX, mouseY, b.x, b.y) < b.r;
 
       for (let p of b.points) {
-          let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-          let px = b.x + cos(p.angle) * rr;
-          let py = b.y + sin(p.angle) * rr;
+        let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+        let px = b.x + cos(p.angle) * rr;
+        let py = b.y + sin(p.angle) * rr;
 
-          p.hover = dist(mouseX, mouseY, px, py) < 6;
+        p.hover = dist(mouseX, mouseY, px, py) < 6;
       }
-  } else {
-    b.isHovered = false;
-    for (let p of b.points) {
-      p.hover = false;
+    } else {
+      b.isHovered = false;
+      for (let p of b.points) {
+        p.hover = false;
+      }
     }
   }
-}
 
 
   for (let b of bubbles) {
-      b.update();
-      b.show();
+    b.update();
+    b.show();
   }
 
   if (activeCardDot !== null) {
@@ -583,7 +590,7 @@ function buildJournalistsFromTable() {
 }
 
 class Bubble {
-constructor(x, y, r, indices, category) {
+  constructor(x, y, r, indices, category) {
     this.x = x;
     this.y = y;
     this.r = r;
@@ -597,57 +604,57 @@ constructor(x, y, r, indices, category) {
     this.points = [];
 
     for (let i = 0; i < this.indices.length; i++) {
-        let p = {
-            id: this.indices[i],
-            angle: random(TWO_PI),
-            rad: this.r * sqrt(random()),
-            offset: random(1000),
-            speed: random(-0.003, 0.003),
-            hover: false,
-            visible: true
-        };
-        this.points.push(p);
+      let p = {
+        id: this.indices[i],
+        angle: random(TWO_PI),
+        rad: this.r * sqrt(random()),
+        offset: random(1000),
+        speed: random(-0.003, 0.003),
+        hover: false,
+        visible: true
+      };
+      this.points.push(p);
     }
   }
 
-update() {
+  update() {
     let speedFactor = this.isHovered ? 0 : 1;
 
     for (let p of this.points) {
-        p.angle += p.speed * speedFactor;
-        p.rad = constrain(
-            p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
-            0,
-            this.r
-        );
+      p.angle += p.speed * speedFactor;
+      p.rad = constrain(
+        p.rad + sin((frameCount + p.offset) * 0.01) * 0.2 * speedFactor,
+        0,
+        this.r
+      );
     }
   }
 
-show() {
+  show() {
     noStroke();
 
     for (let p of this.points) {
-        if (p.visible === false) continue;
+      if (p.visible === false) continue;
 
-        // calcola posizione
-        let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-        let px = this.x + cos(p.angle) * rr;
-        let py = this.y + sin(p.angle) * rr;
+      // calcola posizione
+      let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+      let px = this.x + cos(p.angle) * rr;
+      let py = this.y + sin(p.angle) * rr;
 
-        // dimensione punti ingrandita se hover
-        let dSize = p.hover ? 6 : 3;
+      // dimensione punti ingrandita se hover
+      let dSize = p.hover ? 6 : 3;
 
-        fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
-        circle(px, py, dSize);
+      fill(this.dimmed ? "rgba(255,255,255,0.15)" : "white");
+      circle(px, py, dSize);
     }
 
     if (activeLabel === "ALL" || this.category === activeLabel) {
-        fill(255);
-        textAlign(CENTER, BOTTOM);
-        textFont("JetBrains Mono");
-        let labelSize = min(width, height) * 0.018;
-        textSize(labelSize);
-        text(this.category, this.x, this.y - this.r - labelSize * 0.8);
+      fill(255);
+      textAlign(CENTER, BOTTOM);
+      textFont("JetBrains Mono");
+      let labelSize = min(width, height) * 0.018;
+      textSize(labelSize);
+      text(this.category, this.x, this.y - this.r - labelSize * 0.8);
     }
   }
 
@@ -748,44 +755,8 @@ function populateCountryPanel() {
 
 
 function mousePressed() {
-      // SE C'È UNA CARD APERTA, GESTISCI SOLO LA CHIUSURA E IL BOTTONE CPJ
-    if (activeCardDot !== null) {
-        // chiude la card al click sulla x
-        if (closeCard) {
-            activeCardDot = null;
-            closeCard = null;
-            cursor(ARROW);
-            hasLoadedPhoto = false; 
-            return;
-        }
-        
-        // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
-        if(cpjButtonHover){
-            window.open(cpjUrl);
-            cpjButtonHover = null;
-        }
-        
-        return; // Esce dalla funzione senza controllare pallini o label
-    }
-
-    for (let b of bubbles) {
-
-        for (let p of b.points) {
-
-            // coordinate dot
-            let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
-
-            let px = b.x + cos(p.angle) * rr;
-            let py = b.y + sin(p.angle) * rr;
-
-            if (dist(mouseX, mouseY, px, py) < 6) {
-                activeCardDot = p;
-                hasLoadedPhoto = false;
-                return;
-            }
-        }
-    }
-
+  // SE C'È UNA CARD APERTA, GESTISCI SOLO LA CHIUSURA E IL BOTTONE CPJ
+  if (activeCardDot !== null) {
     // chiude la card al click sulla x
     if (closeCard) {
         activeCardDot = null;
@@ -793,40 +764,76 @@ function mousePressed() {
         cursor(ARROW);
         hasLoadedPhoto = false; 
         return;
-    }
-
+      }
+    
     // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
     if(cpjButtonHover){
-        window.open(cpjUrl);
-        cpjButtonHover = null;
+      window.open(cpjUrl);
+      cpjButtonHover = null;
     }
+    
+    return; // Esce dalla funzione senza controllare pallini o label
+  }
+
+  for (let b of bubbles) {
+
+    for (let p of b.points) {
+      if (!p.visible) continue;
+      
+      // coordinate dot
+      let rr = p.rad + sin((frameCount + p.offset) * 0.01) * 0.8;
+
+      let px = b.x + cos(p.angle) * rr;
+      let py = b.y + sin(p.angle) * rr;
+
+      if (dist(mouseX, mouseY, px, py) < 6) {
+        activeCardDot = p;
+        hasLoadedPhoto = false;
+        return;
+      }
+    }
+  }
+
+  // chiude la card al click sulla x
+  if (closeCard) {
+    activeCardDot = null;
+    closeCard = null;
+    cursor(ARROW);
+    hasLoadedPhoto = false; 
+    return;
+  }
+
+  // aprire la pagina di cpj quando si preme su DISCOVER MORE nella card
+  if(cpjButtonHover){
+    window.open(cpjUrl);
+    cpjButtonHover = null;
+  }
 
 
-    if (!isFinalActive) {
+  if (!isFinalActive) {
     for (let b of bubbles) {
-        if ((activeLabel === "ALL" || activeLabel === b.category) &&
-            b.labelClicked(mouseX, mouseY)) {
-            triggerSectionFromLabel(b.category);
-        }
+      if ((activeLabel === "ALL" || activeLabel === b.category) && b.labelClicked(mouseX, mouseY)) {
+        triggerSectionFromLabel(b.category);
+      }
     }
-}
+  }
 
 }
 
 function triggerSectionFromLabel(cat) {
-    let map = {
-        "Unknown":      ["unknown-wrapper", "Unknown"],
-        "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
-        "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
-        "Full Justice":      ["full-wrapper", "Full Justice"]
-    };
+  let map = {
+    "Unknown":      ["unknown-wrapper", "Unknown"],
+    "Complete Impunity": ["complete-wrapper", "Complete Impunity"],
+    "Partial Impunity":  ["partial-wrapper", "Partial Impunity"],
+    "Full Justice":      ["full-wrapper", "Full Justice"]
+  };
 
-    if (!map[cat]) return;
+  if (!map[cat]) return;
 
-    let [wrapperId, filter] = map[cat];
+  let [wrapperId, filter] = map[cat];
 
-    openedFromLabel = true;
-    activateSection(wrapperId, filter);
+  openedFromLabel = true;
+  activateSection(wrapperId, filter);
 }
 
 
@@ -1096,5 +1103,5 @@ function drawCard(dot){
 
 
 function windowResized() {
-    resizeCanvas(windowWidth - sidebarWidth, windowHeight);
+  resizeCanvas(windowWidth - sidebarWidth, windowHeight);
 }

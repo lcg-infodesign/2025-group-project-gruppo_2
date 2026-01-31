@@ -1506,3 +1506,7 @@ function drawCard(dot){
 
   textLeading(12);
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth - sidebarWidth, windowHeight);
+}
