@@ -97,101 +97,101 @@ function preload() {
 
 function handleConflictsFlags(step) {
 
-    // reset di tutti gli highlight
-    highlightMaguindanao = false;
-    highlightPalestina = false;
-    highlightIraq = false;
-    highlightUncertain = false;
-    highlightUnknown = false;
+  // reset di tutti gli highlight
+  highlightMaguindanao = false;
+  highlightPalestina = false;
+  highlightIraq = false;
+  highlightUncertain = false;
+  highlightUnknown = false;
 
-    // mappa degli step globali → highlight
-    switch(step) {
+  // mappa degli step globali → highlight
+  switch(step) {
 
-        case 6: // conflicts-philippines
-          highlightMaguindanao = true;
-          break;
+    case 6: // conflicts-philippines
+      highlightMaguindanao = true;
+    break;
 
-        case 7: // conflicts-palestine
-          highlightPalestina = true;
-          break;
+    case 7: // conflicts-palestine
+      highlightPalestina = true;
+    break;
 
-        case 8: // conflicts-iraq
-          highlightIraq = true;
-          break;
+    case 8: // conflicts-iraq
+      highlightIraq = true;
+    break;
 
-        case 9: // without-perpetrators-intro
-          highlightUncertain = true;
-          highlightUnknown = true;
-          break;
+    case 9: // without-perpetrators-intro
+      highlightUncertain = true;
+      highlightUnknown = true;
+    break;
 
-        case 10: // section-uncertain
-          highlightUncertain = true;
-          break;
+    case 10: // section-uncertain
+      highlightUncertain = true;
+    break;
 
-        case 11: // section-unknown
-          highlightUnknown = true;
-          break;
+    case 11: // section-unknown
+      highlightUnknown = true;
+    break;
 
-        case 12:
-          highlightNone = true;
-          break;
-        
-        default:
-          // tutti gli highlight si resettano
-          break;
-    }
+    case 12:
+      highlightNone = true;
+    break;
+    
+    default:
+      // tutti gli highlight si resettano
+    break;
+  }
 }
 
 // animazione typewriter
 function typeWriter(element, speed = 20, callback = null) {
-    let html = element.innerHTML.trim();
-    let output = "", buffer = "";
-    let i = 0, insideTag = false;
+  let html = element.innerHTML.trim();
+  let output = "", buffer = "";
+  let i = 0, insideTag = false;
 
-    element.innerHTML = "";
-    element.style.visibility = "visible";
+  element.innerHTML = "";
+  element.style.visibility = "visible";
 
-    function type() {
-        if (i >= html.length) {
-            if (callback) callback();
-            return;
-        }
-
-        let char = html[i];
-
-        if (char === "<") {
-            insideTag = true;
-            buffer = "<";
-        } else if (char === ">") {
-            insideTag = false;
-            buffer += ">";
-            output += buffer;
-            element.innerHTML = output;
-            buffer = "";
-        } else if (insideTag) {
-            buffer += char;
-        } else {
-            output += char;
-            element.innerHTML = output;
-        }
-
-        i++;
-        
-        if(!insideTag) {
-          setTimeout(type, speed);
-        } else {
-          type();
-        }
+  function type() {
+    if (i >= html.length) {
+      if (callback) callback();
+      return;
     }
-    type();
+
+    let char = html[i];
+
+    if (char === "<") {
+      insideTag = true;
+      buffer = "<";
+    } else if (char === ">") {
+      insideTag = false;
+      buffer += ">";
+      output += buffer;
+      element.innerHTML = output;
+      buffer = "";
+    } else if (insideTag) {
+      buffer += char;
+    } else {
+      output += char;
+      element.innerHTML = output;
+    }
+
+    i++;
+    
+    if(!insideTag) {
+      setTimeout(type, speed);
+    } else {
+      type();
+    }
+  }
+  type();
 }
 
 // lista sezioni di graph-explained in ordine
 let explanationSections = [
-    "explanation-categories",
-    "explanation-timeline",
-    "explanation-dot",
-    "explanation-closure"
+  "explanation-categories",
+  "explanation-timeline",
+  "explanation-dot",
+  "explanation-closure"
 ];
 
 // lista sezioni di conflicts in ordine
@@ -222,164 +222,165 @@ let currentGlobalStep = 0;
 
 // funzione globale di attivazione sezioni + evento correlato
 function activateGlobalStep(step) {
-    if (step < 0 || step >= globalSteps.length) return;
-    currentGlobalStep = step;
+  if (step < 0 || step >= globalSteps.length) return;
+  currentGlobalStep = step;
 
-    // x i primi 4 step (graph-explained)
-    if (step < explanationSections.length) {
-      graphExplainedMode = true;
-      graphExplainedStep = step;
-      currentStep = step;
-    } else if (step === 14) {
-      currentStep = 13;
-      graphExplainedMode = false;
-    } else {
-        graphExplainedMode = false; // esca dalla modalita grafico
-        currentStep = step;
-    }
+  // x i primi 4 step (graph-explained)
+  if (step < explanationSections.length) {
+    graphExplainedMode = true;
+    graphExplainedStep = step;
+    currentStep = step;
+  } else if (step === 14) {
+    currentStep = 13;
+    graphExplainedMode = false;
+  } else {
+    graphExplainedMode = false; // esca dalla modalita grafico
+    currentStep = step;
+  }
 
-    // nasconde tutte le sezioni
-    globalSteps.forEach(id => {
-        let el = document.getElementById(id);
-        if (el) el.style.display = "none";
-    });
+  // nasconde tutte le sezioni
+  globalSteps.forEach(id => {
+    let el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 
-    // mostra la sezione corretta
-    let active = document.getElementById(globalSteps[step]);
+  // mostra la sezione corretta
+  let active = document.getElementById(globalSteps[step]);
 
-    // MODIFICA: se siamo allo step 13, mostra filtro + wrapper
-    if (step === 13) {
-        document.getElementById("filter-container").style.display = "flex";
-        document.getElementById("impunity-status-wrapper").style.display = "flex";
-    } else if (active) {
-        active.style.display = "flex";
-    }
+  // MODIFICA: se siamo allo step 13, mostra filtro + wrapper
+  if (step === 13) {
+    document.getElementById("filter-container").style.display = "flex";
+    document.getElementById("impunity-status-wrapper").style.display = "flex";
+  } else if (active) {
+    active.style.display = "flex";
+  }
 
-    if (active && active.id === "explanation-closure") {
-        let bodyEl = active.querySelector(".section-body");
-        if (bodyEl) typeWriter(bodyEl, 20);
-    }
+  if (active && active.id === "explanation-closure") {
+    let bodyEl = active.querySelector(".section-body");
+    if (bodyEl) typeWriter(bodyEl, 20);
+  }
 
-    handleConflictsFlags(step);
-    
-    updateVisualization();
+  handleConflictsFlags(step);
+  
+  updateVisualization();
 }
 
 
 // navigazione con le frecce di graph
 function setupGraphExplainedNavigation() {
 
-    function localActivate(i) {
-        activateGlobalStep(i);
-    }
+  function localActivate(i) {
+    activateGlobalStep(i);
+  }
 
-    document.getElementById("next-arrow-categories").addEventListener("click", () => {
-        localActivate(1);
-    });
+  document.getElementById("next-arrow-categories").addEventListener("click", () => {
+    localActivate(1);
+  });
 
-    document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
-        localActivate(0);
-    });
-    document.getElementById("next-arrow-timeline").addEventListener("click", () => {
-        localActivate(2);
-    });
+  document.getElementById("prev-arrow-timeline").addEventListener("click", () => {
+    localActivate(0);
+  });
+  document.getElementById("next-arrow-timeline").addEventListener("click", () => {
+    localActivate(2);
+  });
 
-    document.getElementById("prev-arrow-dot").addEventListener("click", () => {
-        localActivate(1);
-    });
-    document.getElementById("next-arrow-dot").addEventListener("click", () => {
-        localActivate(3);
-    });
+  document.getElementById("prev-arrow-dot").addEventListener("click", () => {
+    localActivate(1);
+  });
+  document.getElementById("next-arrow-dot").addEventListener("click", () => {
+    localActivate(3);
+  });
 
-    document.getElementById("prev-arrow-closure").addEventListener("click", () => {
-        localActivate(2);
-    });
+  document.getElementById("prev-arrow-closure").addEventListener("click", () => {
+    localActivate(2);
+  });
 
-    // qui avviene il passaggio a conflicts
-    document.getElementById("next-arrow-closure").addEventListener("click", () => {
-        // step 3 → step 4
-        activateGlobalStep(4);
-    });
+  // qui avviene il passaggio a conflicts
+  document.getElementById("next-arrow-closure").addEventListener("click", () => {
+    // step 3 → step 4
+    activateGlobalStep(4);
+  });
 }
 
 // navigazione con le frecce di conflicts
 function setupConflictsNavigation() {
 
-    function localActivateConflicts(relativeIndex) {
-        // num. sezioni graph-explained = 4 → offset = 4
-        activateGlobalStep(4 + relativeIndex);
-    }
+  function localActivateConflicts(relativeIndex) {
+    // num. sezioni graph-explained = 4 → offset = 4
+    activateGlobalStep(4 + relativeIndex);
+  }
 
-    document.getElementById("next-arrow-intro-first-paragraph").addEventListener("click", () => {
-        localActivateConflicts(1);
-    });
+  document.getElementById("next-arrow-intro-first-paragraph").addEventListener("click", () => {
+    localActivateConflicts(1);
+  });
 
-    document.getElementById("prev-arrow-intro-second-paragraph").addEventListener("click", () => {
-        localActivateConflicts(0);
-    });
-    document.getElementById("next-arrow-intro-second-paragraph").addEventListener("click", () => {
-        localActivateConflicts(2);
-    });
+  document.getElementById("prev-arrow-intro-second-paragraph").addEventListener("click", () => {
+    localActivateConflicts(0);
+  });
+  document.getElementById("next-arrow-intro-second-paragraph").addEventListener("click", () => {
+    localActivateConflicts(2);
+  });
 
-    document.getElementById("prev-arrow-philippines").addEventListener("click", () => {
-        localActivateConflicts(1);
-    });
-    document.getElementById("next-arrow-philippines").addEventListener("click", () => {
-        localActivateConflicts(3);
-    });
+  document.getElementById("prev-arrow-philippines").addEventListener("click", () => {
+    localActivateConflicts(1);
+  });
+  document.getElementById("next-arrow-philippines").addEventListener("click", () => {
+    localActivateConflicts(3);
+  });
 
-    document.getElementById("prev-arrow-palestine").addEventListener("click", () => {
-        localActivateConflicts(2);
-    });
-    document.getElementById("next-arrow-palestine").addEventListener("click", () => {
-        localActivateConflicts(4);
-    });
+  document.getElementById("prev-arrow-palestine").addEventListener("click", () => {
+    localActivateConflicts(2);
+  });
+  document.getElementById("next-arrow-palestine").addEventListener("click", () => {
+    localActivateConflicts(4);
+  });
 
-    document.getElementById("prev-arrow-iraq").addEventListener("click", () => {
-        localActivateConflicts(3);
-    });
-    document.getElementById("next-arrow-iraq").addEventListener("click", () => {
-        localActivateConflicts(5);
-    });
+  document.getElementById("prev-arrow-iraq").addEventListener("click", () => {
+    localActivateConflicts(3);
+  });
 
-    document.getElementById("prev-arrow-without-perpetrators").addEventListener("click", () => {
-        localActivateConflicts(4);
-    });
-    document.getElementById("next-arrow-without-perpetrators").addEventListener("click", () => {
-        localActivateConflicts(6);
-    });
+  document.getElementById("next-arrow-iraq").addEventListener("click", () => {
+    localActivateConflicts(5);
+  });
 
-    document.getElementById("prev-arrow-uncertain").addEventListener("click", () => {
-        localActivateConflicts(5);
-    });
-    document.getElementById("next-arrow-uncertain").addEventListener("click", () => {
-        localActivateConflicts(7);
-    });
+  document.getElementById("prev-arrow-without-perpetrators").addEventListener("click", () => {
+    localActivateConflicts(4);
+  });
+  document.getElementById("next-arrow-without-perpetrators").addEventListener("click", () => {
+    localActivateConflicts(6);
+  });
 
-    document.getElementById("prev-arrow-unknown").addEventListener("click", () => {
-        localActivateConflicts(6);
-    });
-    document.getElementById("next-arrow-unknown").addEventListener("click", () => {
-        let index = globalSteps.indexOf("country-intro");
-        activateGlobalStep(index);
-    });
+  document.getElementById("prev-arrow-uncertain").addEventListener("click", () => {
+    localActivateConflicts(5);
+  });
+  document.getElementById("next-arrow-uncertain").addEventListener("click", () => {
+    localActivateConflicts(7);
+  });
 
-    document.getElementById("next-arrow-country-intro").addEventListener("click", () => {
+  document.getElementById("prev-arrow-unknown").addEventListener("click", () => {
+    localActivateConflicts(6);
+  });
+  document.getElementById("next-arrow-unknown").addEventListener("click", () => {
+    let index = globalSteps.indexOf("country-intro");
+    activateGlobalStep(index);
+  });
 
-        // nasconde country-intro
-        let countryIntro = document.getElementById("country-intro");
-        countryIntro.style.display = "none";
+  document.getElementById("next-arrow-country-intro").addEventListener("click", () => {
 
-        // mostra filter-container
-        let filterContainer = document.getElementById("filter-container");
-        filterContainer.style.display = "flex";
-        filterContainer.style.opacity = "1";
+    // nasconde country-intro
+    let countryIntro = document.getElementById("country-intro");
+    countryIntro.style.display = "none";
 
-        // mostra impunity-status-wrapper
-        let impunityWrapper = document.getElementById("impunity-status-wrapper");
-        impunityWrapper.style.display = "flex";
-        impunityWrapper.style.opacity = "1";
-    });
+    // mostra filter-container
+    let filterContainer = document.getElementById("filter-container");
+    filterContainer.style.display = "flex";
+    filterContainer.style.opacity = "1";
+
+    // mostra impunity-status-wrapper
+    let impunityWrapper = document.getElementById("impunity-status-wrapper");
+    impunityWrapper.style.display = "flex";
+    impunityWrapper.style.opacity = "1";
+  });
 }
 
 
@@ -389,7 +390,6 @@ window.addEventListener("load", () => {
 
   let urlParams = new URLSearchParams(window.location.search);
   let stepParam = urlParams.get("step");
-
 });
 
 
@@ -573,24 +573,24 @@ function spawnUpToCurrentYear() {
   let maxSpawnPerFrame = 10;
 
   for (let j of journalists) {
-  if (spawnedCount >= maxSpawnPerFrame) break;
-  if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
+    if (spawnedCount >= maxSpawnPerFrame) break;
+    if (j.year <= yearLimit && !spawnedIds.has(j.id)) {
 
-    // FILTRO PAESE
-    let dot = new Dot(j.id, j.year, j.category); 
-    // imposta la visibilità al momento della creazione
-    if (!selectedCountry) {
-      dot.visible = true;
-      dot.dimmed = false;
-    } else {
-      let dotCountry = (dot.country || "").trim().toLowerCase();
-      dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
-      dot.dimmed = !dot.visible;
+      // FILTRO PAESE
+      let dot = new Dot(j.id, j.year, j.category); 
+      // imposta la visibilità al momento della creazione
+      if (!selectedCountry) {
+        dot.visible = true;
+        dot.dimmed = false;
+      } else {
+        let dotCountry = (dot.country || "").trim().toLowerCase();
+        dot.visible = dotCountry === selectedCountry.trim().toLowerCase();
+        dot.dimmed = !dot.visible;
+      }
+      dots.push(dot);
+      spawnedIds.add(j.id);
+      spawnedCount++;
     }
-    dots.push(dot);
-    spawnedIds.add(j.id);
-    spawnedCount++;
-  }
   }
 
   // passa all'anno successivo solo quando tutti i pallini di questo anno sono spawnati
@@ -936,6 +936,7 @@ function populateCountryPanel() {
       allOptions.forEach(opt => {
         opt.style.display = 'flex';
       });
+      
     });
 
     panel.appendChild(div);

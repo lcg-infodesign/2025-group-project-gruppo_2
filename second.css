@@ -174,11 +174,11 @@ a {
 }
 
 #closure-wrapper {
-    display: none;
-    text-align: center;
-    color: rgb(255,245,233);
-    font-family: 'JetBrains Mono', monospace;
-    padding: 30px;
+  display: none;
+  text-align: center;
+  color: rgb(255,245,233);
+  font-family: 'JetBrains Mono', monospace;
+  padding: 30px;
 }
 
 .section-wrapper {
@@ -343,7 +343,7 @@ a {
 /* BOTTONE */
 
 #other-visualization-wrapper {
-    display: none;
+  display: none;
 }
 
 .other-visualization-button {
