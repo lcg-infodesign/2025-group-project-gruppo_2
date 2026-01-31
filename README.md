@@ -62,12 +62,13 @@
 5. SCELTE PROGETTUALI
 
 <ul>
-  <li> Interfaccia: abbiamo adottato uno sfondo scuro per sottolineare la serietà del tema. I dot bianchi diventano rossi quando evidenziati, per focalizzare
-    l'attenzione sul singolo caso. </li> <br>
-  <li> Beeswarm Chart: scelta per visualizzare la densità temporale senza sovrapposizioni, permettendo di percepire ogni singolo punto come un'unità distinta. </li> <br>
-  <li> Bubble Chart: utilizzata per raggruppare i dot e rendere immediato il confronto visivo tra i diversi stati di impunità. </li>
+  <li> Interfaccia: Abbiamo adottato uno sfondo scuro per creare un ambiente visivo sobrio e rispettoso della gravità del tema trattato: l’uccisione di giornalisti. Il contrasto elevato permette ai dot di emergere con forza visiva, rendendo immediatamente percepibile la presenza di ogni singola vittima.
+I dot sono bianchi e mantengono questo colore per rappresentare in modo neutro e uniforme ogni giornalista. Il colore rosso compare solo in corrispondenza dei picchi di mortalità, quando il sistema mette in evidenza periodi con un numero particolarmente alto di vittime: in questo modo il rosso non segnala una selezione, ma una criticità statistica, attirando l’attenzione sui momenti storicamente più drammatici. </li> <br>
+  <li> Dots: Ogni dot è cliccabile in qualsiasi momento e rappresenta un singolo giornalista. Cliccando su un pallino, l’utente può accedere a tutte le informazioni relative al caso (nome, data, paese, stato dell’indagine, ecc.) e, tramite un link diretto, raggiungere il sito del Committee to Protect Journalists (CPJ) per approfondire la vicenda attraverso la fonte ufficiale. In questo modo la visualizzazione non resta astratta, ma rimanda costantemente a storie reali e documentate. </li><br>
+  <li> Beeswarm Chart: La visualizzazione in forma di beeswarm è stata scelta per rappresentare la dimensione temporale delle uccisioni senza creare sovrapposizioni tra i dati. Ogni punto mantiene una posizione autonoma, evitando aggregazioni.
+Questa soluzione consente di percepire simultaneamente sia l’andamento nel tempo sia la numerosità degli eventi. </li> <br>
+  <li> Bubble Chart: Il bubble chart è utilizzato per riorganizzare gli stessi dot in gruppi, sulla base dello stato di impunità (casi risolti, non risolti, parzialmente risolti, Unknown). Questo consente un confronto visivo immediato tra le diverse categorie, mettendo in evidenza squilibri e criticità del sistema giudiziario. Il passaggio dalla disposizione temporale del beeswarm alla struttura raggruppata delle bolle permette all’utente di osservare lo stesso insieme di dati da due prospettive complementari: una narrativa (nel tempo) e una analitica (per stato di giustizia), rafforzando la comprensione del fenomeno. </li>
 </ul>
-
 <br>
 
 6. STRUMENTI AI
